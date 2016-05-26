@@ -26,6 +26,9 @@ OPTIONS:
 
 die "$usage\n" unless@ARGV;
 
+my $start = localtime();
+my $tstart = time;
+
 ## Defining options
 my $mapper = 'bwa';
 my $algo = 'bwasw';
@@ -108,3 +111,10 @@ elsif ($mapper eq 'hisat2'){
 	system "mkdir HISAT2_indexes; mv *.ht2 *.fai HISAT2_indexes/";
 	system "mkdir HISAT2_VCFs; mv *.vcf HISAT2_VCFs/";
 }
+
+my $end = localtime();
+my $time_taken = time -$tstart;
+
+print "\nMapping started on: $start\n";
+print "Mapping ended on: $end\n";
+print "Time elapsed: $time_taken seconds\n";

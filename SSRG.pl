@@ -31,6 +31,9 @@ END_OPTIONS
 my $usage = "\nUSAGE = perl SSRG.pl [options] *.fasta\n\n$options";
 die $usage unless(scalar@ARGV>=1);
 
+my $start = localtime();
+my $tstart = time;
+
 ## Declare options
 my $winsize = 100;
 my $cov100 = '';      ## Default is false so that 50X coverage is used 
@@ -150,6 +153,13 @@ while (my $fasta = shift @ARGV) {
 		}
 	}
 }
+
+my $end = localtime();
+my $time_taken = time -$tstart;
+
+print "\nSSRG started on: $start\n";
+print "SSRG ended on: $end\n";
+print "Time elapsed: $time_taken seconds\n";
 
 close IN;
 close OUT;
