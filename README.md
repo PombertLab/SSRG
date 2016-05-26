@@ -8,10 +8,17 @@ This simple tool calculates pairwise SNPs for every possible combination in the 
 -	SNPs reported in the VCF files can be summarized with count_SNPs.pl.
 
 Requirements:
+
 Unix/Linux or MacOS X
+
 Perl 5
+
 BWA - http://bio-bwa.sourceforge.net/
+
 Bowtie2 - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
+
 HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
+
 Samtools - http://www.htslib.org/
+
 VarScan2 - http://dkoboldt.github.io/varscan/
