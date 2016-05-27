@@ -72,7 +72,7 @@ if ($mapper eq 'bwa'){
 ## Running Bowtie2 mapping
 elsif ($mapper eq 'bowtie2'){
 	## Creating Burrows-Wheeler HISAT2 indexes
-	foreach my $fasta (@fasta){system "$bowtie2"."bowtie2-build $fasta $fasta.bt2";}
+	foreach my $fasta (@fasta){system "$bowtie2"."bowtie2-build --threads $threads $fasta $fasta.bt2";}
 	## Running the read mapping
 	foreach my $fastq (@fastq){
 		foreach my $fasta (@fasta){
