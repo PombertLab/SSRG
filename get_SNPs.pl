@@ -50,7 +50,7 @@ GetOptions(
 my $start = localtime();
 my $tstart = time;
 my $todo = scalar(@fastq)*scalar(@fasta);
-open LOG, ">time.log"; ## Keep track of running time
+open LOG, ">time.$mapper.log"; ## Keep track of running time
 print LOG "Mapping/SNP calling started on: $start\n";
 print LOG "A total of $todo pairwise comparisons will be performed\n";
 my $comparison = 0;
