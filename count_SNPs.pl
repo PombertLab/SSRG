@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+## Pombert JF, Illinois tech - 2016
 # v1.1
 
 use strict;
