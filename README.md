@@ -1,4 +1,4 @@
-# SNPs
+# SNPs -SSRG
 A Simple Pipeline to Assess Genetic Diversity Between Bacterial Genomes
 
 This simple tool calculates pairwise SNPs for every possible combination in the genomes provided as input.
