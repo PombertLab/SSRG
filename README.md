@@ -11,11 +11,11 @@ This simple tool calculates pairwise SNPs for every possible combination in the 
 Requirements:
 - Unix/Linux or MacOS X
 - Perl 5
-- BWA 0.7.12 - http://bio-bwa.sourceforge.net/
-- Bowtie2 2.2.9+ - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
-- HISAT2 2.0+ - https://ccb.jhu.edu/software/hisat2/index.shtml
-- Samtools 0.1.19 - http://www.htslib.org/
-- VarScan2 2.4.2+ - http://dkoboldt.github.io/varscan/
+- BWA version 0.7.12 - http://bio-bwa.sourceforge.net/
+- Bowtie2 version 2.2.9 or above - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
+- HISAT2 version 2.0 or above - https://ccb.jhu.edu/software/hisat2/index.shtml
+- Samtools version 0.1.19 - http://www.htslib.org/
+- VarScan2 version 2.4.2 or above - http://dkoboldt.github.io/varscan/
 
 ## On Fedora
 dnf install bwa; dnf install samtools
