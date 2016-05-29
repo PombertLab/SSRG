@@ -9,7 +9,7 @@ use Getopt::Long qw(GetOptions);
 ## User-defined environment variables. Change these to reflect your settings.
 my $bwa = '/usr/bin/'; ## Path to BWA - http://bio-bwa.sourceforge.net/
 my $bowtie2 = '/opt/bowtie2-2.2.9/'; ## Path to Bowtie2 - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
-my $hisat2 = '/opt/hisat2-2.0.1-beta/'; ## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
+my $hisat2 = '/opt/hisat2-2.0.4/'; ## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
 my $varscan = '/opt/VarScan/VarScan.v2.4.2.jar'; ## Define which VarScan2 jar file to use -  https://github.com/dkoboldt/varscan
 
 ## Defining options
@@ -21,7 +21,7 @@ EXAMPLE: get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --threads 
 OPTIONS:
 --fasta		Reference genome(s) in fasta file
 --fastq		Fastq reads to be mapped against reference(s)
---mapper	Read mapping tool: bwa, bowtie2 or hisat2 (not recommended) [default: bowtie2]
+--mapper	Read mapping tool: bwa, bowtie2 or hisat2 [default: bowtie2]
 --algo		BWA mapping algorithm:  bwasw, mem, samse [default: bwasw]
 --threads	Number of processing threads: 2,4,8 ... [default: 16]
 --indel		Calculates indels
@@ -73,15 +73,15 @@ if ($mapper eq 'bwa'){
 			my $mstart = localtime();
 			print MAP "\n".'###'." Mapping started on $mstart\n";
 			print MAP "\n$fastq vs. $fasta\n";
-			system "$bwa"."bwa $algo -t $threads $fasta $fastq -f $fastq.$fasta.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
-			system "samtools view -bS $fastq.$fasta.sam -o $fastq.$fasta.bam";
-			system "samtools sort $fastq.$fasta.bam $fastq.$fasta.sorted";
-			system "samtools mpileup -f $fasta $fastq.$fasta.sorted.bam | java -jar $varscan mpileup2snp --output-vcf --strand-filter 0 > $fastq.$fasta.BWA.SNP.vcf";
-			if ($indel){system "samtools mpileup -f $fasta $fastq.$fasta.sorted.bam | java -jar $varscan mpileup2indel --output-vcf --strand-filter 0 > $fastq.$fasta.BWA.indel.vcf";}
+			system "$bwa"."bwa $algo -t $threads $fasta $fastq -f $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
+			system "samtools view -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
+			system "samtools sort $fastq.$fasta.bam $fastq.$fasta.$mapper.";
+			system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2snp --output-vcf --strand-filter 0 > $fastq.$fasta.$mapper.SNP.vcf";
+			if ($indel){system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2indel --output-vcf --strand-filter 0 > $fastq.$fasta.$mapper.indel.vcf";}
 			## Cleaning temp files
-			system "rm $fastq.$fasta.bam";
-			unless ($bam) {system "rm $fastq.$fasta.sorted.bam";}
-			unless ($sam) {system "rm $fastq.$fasta.sam";}
+			system "rm $fastq.$fasta.bam"; ## Discarding unsorted BAM file
+			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
+			unless ($sam) {system "rm $fastq.$fasta.$mapper.sam";}
 			## Logs
 			my $run_time = time - $tstart; my $mend = localtime();
 			$comparison++;
@@ -105,15 +105,15 @@ elsif ($mapper eq 'bowtie2'){
 			my $mstart = localtime();
 			print MAP "\n".'###'." Mapping started on $mstart\n";
 			print MAP "\n$fastq vs. $fasta\n";
-			system "$bowtie2"."bowtie2 -p $threads -x $fasta.bt2 -U $fastq -S $fastq.$fasta.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
-			system "samtools view -bS $fastq.$fasta.sam -o $fastq.$fasta.bam";
-			system "samtools sort $fastq.$fasta.bam $fastq.$fasta.sorted";
-			system "samtools mpileup -f $fasta $fastq.$fasta.sorted.bam | java -jar $varscan mpileup2snp --output-vcf --strand-filter 0 > $fastq.$fasta.Bowtie2.SNP.vcf";
-			if ($indel){system "samtools mpileup -f $fasta $fastq.$fasta.sorted.bam | java -jar $varscan mpileup2indel --output-vcf --strand-filter 0 > $fastq.$fasta.Bowtie2.indel.vcf";}
+			system "$bowtie2"."bowtie2 -p $threads -x $fasta.bt2 -U $fastq -S $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
+			system "samtools view -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
+			system "samtools sort $fastq.$fasta.bam $fastq.$fasta.$mapper";
+			system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2snp --output-vcf --strand-filter 0 > $fastq.$fasta.$mapper.SNP.vcf";
+			if ($indel){system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2indel --output-vcf --strand-filter 0 > $fastq.$fasta.$mapper.indel.vcf";}
 			## Cleaning temp files
-			system "rm $fastq.$fasta.bam";
-			unless ($bam) {system "rm $fastq.$fasta.sorted.bam";}
-			unless ($sam) {system "rm $fastq.$fasta.sam";}
+			system "rm $fastq.$fasta.bam"; ## Discarding unsorted BAM file
+			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
+			unless ($sam) {system "rm $fastq.$fasta.$mapper.sam";}
 			## Logs
 			my $run_time = time - $tstart; my $mend = localtime();
 			$comparison++;
@@ -137,15 +137,15 @@ elsif ($mapper eq 'hisat2'){
 			my $mstart = localtime();
 			print MAP "\n".'###'." Mapping started on $mstart\n";
 			print MAP "\n$fastq vs. $fasta\n";
-			system "$hisat2"."hisat2 -p $threads --phred33 -x $fasta.ht -U $fastq --no-spliced-alignment -S $fastq.$fasta.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
-			system "samtools view -bS $fastq.$fasta.sam -o $fastq.$fasta.bam";
-			system "samtools sort $fastq.$fasta.bam $fastq.$fasta.sorted";
-			system "samtools mpileup -f $fasta $fastq.$fasta.sorted.bam | java -jar $varscan mpileup2snp --output-vcf --strand-filter 0 > $fastq.$fasta.HISAT2.SNP.vcf";
-			if ($indel){system "samtools mpileup -f $fasta $fastq.$fasta.sorted.bam | java -jar $varscan mpileup2indel --output-vcf --strand-filter 0 > $fastq.$fasta.HISAT2.indel.vcf";}
+			system "$hisat2"."hisat2 -p $threads --phred33 -x $fasta.ht -U $fastq --no-spliced-alignment -S $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
+			system "samtools view -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
+			system "samtools sort $fastq.$fasta.bam $fastq.$fasta.$mapper";
+			system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2snp --output-vcf --strand-filter 0 > $fastq.$fasta.$mapper.SNP.vcf";
+			if ($indel){system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2indel --output-vcf --strand-filter 0 > $fastq.$fasta.$mapper.indel.vcf";}
 			## Cleaning temp files
-			system "rm $fastq.$fasta.bam";
-			unless ($bam) {system "rm $fastq.$fasta.sorted.bam";}
-			unless ($sam) {system "rm $fastq.$fasta.sam";}
+			system "rm $fastq.$fasta.bam"; ## Discarding unsorted BAM file
+			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
+			unless ($sam) {system "rm $fastq.$fasta.$mapper.sam";}
 			## Logs
 			my $run_time = time - $tstart; my $mend = localtime();
 			$comparison++;
