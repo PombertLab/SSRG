@@ -1,14 +1,14 @@
 #!/usr/bin/perl
 ## Pombert JF,  Illinois Tech 2016
 ## Retrieve multifasta files from NCBI's FTP
-## Tab-delimited lists can be generated from NCBI's Genome Assembly and Annotation reports
+## TAB/CSV-delimited lists can be generated from NCBI's Genome Assembly and Annotation reports
 
 use strict;
 use warnings;
 
 my $usage = 'USAGE = queryNCBI.pl genome_list';
 die "\n$usage\n
-list =	TAB-delimited list generated from NCBI's Genome Assembly and Annotation reports, e.g.:
+list =	TAB/CSV-delimited list generated from NCBI's Genome Assembly and Annotation reports, e.g.:
 	1) goto http://www.ncbi.nlm.nih.gov/genome/genomes/159?
 	2) click on the Download Table link in the upper right corner 
 " unless@ARGV;
@@ -25,9 +25,10 @@ my $suffix = '_genomic.fna.gz';
 
 while (my $line = <IN>){
 	chomp $line;
-	if ($line =~ /^#/){next;}
+	$line =~ s/\"//g; ## Removing quotes
+	if ($line =~ /^#/){next;} ## Discarding comments
 	else {
-		my @genome = split(/\t/, $line);
+		my @genome = split(/\t|,/, $line);
 		## Organism info
 		my $organism = $genome[0];
 		my $genus = undef;
