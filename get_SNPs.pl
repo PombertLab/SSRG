@@ -51,7 +51,7 @@ GetOptions(
 	'fastq=s@{1,}' => \@fastq,
 );
 
-## Timestamps
+## Timestamps and logs
 my $start = localtime();
 my $tstart = time;
 my $todo = scalar(@fastq)*scalar(@fasta);
