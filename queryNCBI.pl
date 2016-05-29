@@ -11,7 +11,7 @@ die "\n$usage\n
 list =	TAB/CSV-delimited list generated from NCBI's Genome Assembly and Annotation reports, e.g.:
 	1) goto http://www.ncbi.nlm.nih.gov/genome/genomes/159?
 	2) click on the Download Table link in the upper right corner 
-" unless@ARGV;
+\n" unless@ARGV;
 
 my $start = localtime();
 my $tstart = time;
