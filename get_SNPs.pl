@@ -102,7 +102,7 @@ if ($mapper eq 'bwa'){
 			print MAP "\n$fastq vs. $fasta\n";
 			system "$bwa"."bwa $algo -t $threads $fasta $fastq -f $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
 			system "samtools view -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
-			system "samtools sort $fastq.$fasta.bam $fastq.$fasta.$mapper.";
+			system "samtools sort $fastq.$fasta.bam $fastq.$fasta.$mapper";
 			system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
 			if ($indel){system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.indel.vcf";}
 			## Cleaning temp files
