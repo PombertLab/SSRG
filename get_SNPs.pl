@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois tech - 2016
-## Version 1.2a
+## Version 1.2b
 
 use strict;
 use warnings;
@@ -16,29 +16,49 @@ my $varscan = '/opt/VarScan/VarScan.v2.4.2.jar'; ## Define which VarScan2 jar fi
 my $usage = "
 USAGE = perl get_SNPs.pl [options]
 
-EXAMPLE: get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --threads 16 --indel --bam
+EXAMPLE: get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --threads 16 --indel --sf 1 --mc 20
 
 OPTIONS:
+
+## Mapping options
 --fasta		Reference genome(s) in fasta file
 --fastq		Fastq reads to be mapped against reference(s)
 --mapper	Read mapping tool: bwa, bowtie2 or hisat2 [default: bowtie2]
 --algo		BWA mapping algorithm:  bwasw, mem, samse [default: bwasw]
---threads	Number of processing threads: 2,4,8 ... [default: 16]
---indel		Calculates indels
+--threads	Number of processing threads [default: 16]
 --bam		Keeps BAM files generated
 --sam		Keeps SAM files generated; SAM files can be quite large
+
+## VarScan2 parameters (see http://dkoboldt.github.io/varscan/using-varscan.html)
+--indel				Calculates indels 	## Runs mpileup2indel
+--mc (--min-coverage)		[default: 8]		## Minimum read depth at a position to make a call
+--mr (--min-reads2)		[default: 2]		## Minimum supporting reads at a position to call variants
+--maq (--min-avg-qual)		[default: 15]		## Minimum base quality at a position to count a read
+--mvf (--min-var-freq)		[default: 0.01]		## Minimum variant allele frequency threshold
+--mhom (--min-freq-for-hom)	[default: 0.75]		## Minimum frequency to call homozygote
+--pv (--p-value)		[default: 99e-02]	## P-value threshold for calling variants 
+--sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
 ";
 
 die "$usage\n" unless@ARGV;
 
+## Mapping
 my $mapper = 'bowtie2';
 my $algo = 'bwasw';
 my $threads = 16;
 my $bam = '';
 my $sam = '';
-my $indel = '';
 my @fasta;
 my @fastq;
+## VarScan
+my $indel = '';
+my $mc = 8;
+my $mr = 2;
+my $maq = 15;
+my $mvf = '0.01';
+my $mhom = '0.75';
+my $pv = '99e-02';
+my $sf = 0;
 
 GetOptions(
 	'mapper=s' => \$mapper,
@@ -46,9 +66,16 @@ GetOptions(
 	'threads=i' => \$threads,
 	'bam' => \$bam,
 	'sam' => \$sam,
-	'indel' => \$indel,
 	'fasta=s@{1,}' => \@fasta,
 	'fastq=s@{1,}' => \@fastq,
+	'indel' => \$indel,
+	'mc|min-coverage=i' => \$mc,
+	'mr|min-reads2=i' => \$mr,
+	'maq|min-avg-qual=i' => \$maq,
+	'mvf|min-var-freq=s' => \$mvf,
+	'mhom|min-freq-for-hom=s' => \$mhom,
+	'pv|p-value=s' => \$pv,
+	'sf|strand-filter=i' => \$sf,
 );
 
 ## Timestamps and logs
@@ -76,8 +103,8 @@ if ($mapper eq 'bwa'){
 			system "$bwa"."bwa $algo -t $threads $fasta $fastq -f $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
 			system "samtools view -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
 			system "samtools sort $fastq.$fasta.bam $fastq.$fasta.$mapper.";
-			system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2snp --output-vcf --strand-filter 0 > $fastq.$fasta.$mapper.SNP.vcf";
-			if ($indel){system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2indel --output-vcf --strand-filter 0 > $fastq.$fasta.$mapper.indel.vcf";}
+			system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
+			if ($indel){system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.indel.vcf";}
 			## Cleaning temp files
 			system "rm $fastq.$fasta.bam"; ## Discarding unsorted BAM file
 			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
@@ -108,8 +135,8 @@ elsif ($mapper eq 'bowtie2'){
 			system "$bowtie2"."bowtie2 -p $threads -x $fasta.bt2 -U $fastq -S $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
 			system "samtools view -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
 			system "samtools sort $fastq.$fasta.bam $fastq.$fasta.$mapper";
-			system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2snp --output-vcf --strand-filter 0 > $fastq.$fasta.$mapper.SNP.vcf";
-			if ($indel){system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2indel --output-vcf --strand-filter 0 > $fastq.$fasta.$mapper.indel.vcf";}
+			system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
+			if ($indel){system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.indel.vcf";}
 			## Cleaning temp files
 			system "rm $fastq.$fasta.bam"; ## Discarding unsorted BAM file
 			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
@@ -140,8 +167,8 @@ elsif ($mapper eq 'hisat2'){
 			system "$hisat2"."hisat2 -p $threads --phred33 -x $fasta.ht -U $fastq --no-spliced-alignment -S $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
 			system "samtools view -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
 			system "samtools sort $fastq.$fasta.bam $fastq.$fasta.$mapper";
-			system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2snp --output-vcf --strand-filter 0 > $fastq.$fasta.$mapper.SNP.vcf";
-			if ($indel){system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2indel --output-vcf --strand-filter 0 > $fastq.$fasta.$mapper.indel.vcf";}
+			system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
+			if ($indel){system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.indel.vcf";}
 			## Cleaning temp files
 			system "rm $fastq.$fasta.bam"; ## Discarding unsorted BAM file
 			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
