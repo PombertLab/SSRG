@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 ## Pombert JF,  Illinois Tech 2016
 ## Retrieve genomes/proteins from the NCBI Nucleotide database using a list of accession numbers (one per line)
+## Based on NCBI's efetch tool - http://www.ncbi.nlm.nih.gov/books/NBK25499/
 
 use strict;
 use warnings;
