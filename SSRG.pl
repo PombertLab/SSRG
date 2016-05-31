@@ -14,18 +14,15 @@ use Getopt::Long qw(GetOptions);
 ## Define command line options:
 my $options = <<'END_OPTIONS';
 OPTIONS: 
- --readsize=100     The size of the synthetic reads, which
- --r                has a default value of 100 base pairs.
-                    It should be at least 25 for 50X coverage
-                    and 50 for 100X coverage.
+ -r (--readsize)	The size of the synthetic reads [default: 100].
+                	Minimum size required for 50X coverage: 25 nt.
+                	Minimum size required for 50X coverage: 50 nt.
 
- --cov100           Do 100X coverage. 50X coverage is the default.
- --c100
+ -c100 (--cov100)	Set sequencing depth to 100X [default: 50].
 
- --qscore=30        The artificial quality score associated with each base,
- --q                which has a default value of 30.
-
- --q64              Use Old Illumina FastQ format. The default is Q33 format.
+ -q (--qscore)		Quality score associated with each base [default: 30].
+ 
+ --q64          	Old Illumina Q64 FastQ format [default: Q33 (Sanger)].
 END_OPTIONS
 
 my $usage = "\nUSAGE = perl SSRG.pl [options] *.fasta\n\n$options";
