@@ -14,7 +14,7 @@ use Getopt::Long qw(GetOptions);
 ## Define command line options:
 my $options = <<'END_OPTIONS';
 OPTIONS: 
- -r (--readsize)	The size of the synthetic reads [default: 100].
+ -r (--readsize)	Synthetic reads size [default: 100].
                 	Minimum size required for 50X coverage: 25 nt.
                 	Minimum size required for 50X coverage: 50 nt.
 
