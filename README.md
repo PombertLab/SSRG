@@ -14,10 +14,12 @@ Requirements:
 - Unix/Linux or MacOS X
 - Perl 5
 - Samtools version 0.1.19 - http://www.htslib.org/
+
 Compatible read aligners
 - BWA version 0.7.12 - http://bio-bwa.sourceforge.net/
 - Bowtie2 version 2.2.9 or above - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
 - HISAT2 version 2.0 or above - https://ccb.jhu.edu/software/hisat2/index.shtml
+
 Compatible variant callers
 - VarScan2 version 2.4.2 or above - http://dkoboldt.github.io/varscan/
 - FreeBayes - https://github.com/ekg/freebayes
