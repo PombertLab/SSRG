@@ -20,9 +20,9 @@ OPTIONS:
 
  -c100 (--cov100)	Set sequencing depth to 100X [default: 50].
 
- -q (--qscore)		Quality score associated with each base [default: 30].
+ -qs (--qscore)		Quality score associated with each base [default: 30].
  
- --q64          	Old Illumina Q64 FastQ format [default: Q33 (Sanger)].
+ -q64          	Old Illumina Q64 FastQ format [default: Q33 (Sanger)].
 END_OPTIONS
 
 my $usage = "\nUSAGE = perl SSRG.pl [options] *.fasta\n\n$options";
@@ -40,7 +40,7 @@ my $q64 = '';         ## Default is false so that Q33 format is used
 
 GetOptions(
 'readsize|r=i' => \$winsize,
-'qscore|q=i' => \$qscore,
+'qscore|qs=i' => \$qscore,
 'q64' => \$q64,
 'cov100|c100' => \$cov100);
 
