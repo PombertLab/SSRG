@@ -22,7 +22,7 @@ OPTIONS:
 
  -qs (--qscore)		Quality score associated with each base [default: 30].
  
- -q64          	Old Illumina Q64 FastQ format [default: Q33 (Sanger)].
+ -q64          		Old Illumina Q64 FastQ format [default: Q33 (Sanger)].
 END_OPTIONS
 
 my $usage = "\nUSAGE = perl SSRG.pl [options] *.fasta\n\n$options";
