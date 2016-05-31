@@ -16,7 +16,7 @@ my $options = <<'END_OPTIONS';
 OPTIONS: 
  -r (--readsize)	Synthetic reads size [default: 100].
                 	Minimum size required for 50X coverage: 25 nt.
-                	Minimum size required for 50X coverage: 50 nt.
+                	Minimum size required for 100X coverage: 50 nt.
 
  -c100 (--cov100)	Set sequencing depth to 100X [default: 50].
 
