@@ -13,7 +13,7 @@ With the exception of the SSRG.pl script, the pipeline should work fine with euk
 Requirements:
 - Unix/Linux or MacOS X
 - Perl 5
-- Samtools version 0.1.19 - http://www.htslib.org/
+- Samtools version 1.3.1+ - http://www.htslib.org/
 
 Compatible read aligners
 - BWA version 0.7.12 - http://bio-bwa.sourceforge.net/
