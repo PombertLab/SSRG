@@ -1,17 +1,19 @@
 #!/usr/bin/perl
-## Pombert JF, Illinois tech - 2016
-## Version 1.2c
+## Pombert JF, Illinois Tech - 2016
+## Version 1.2d
 
 use strict;
 use warnings;
 use Getopt::Long qw(GetOptions);
 
-## User-defined environment variables. Change these to reflect your settings or leave blank (e.g. $bwa = '';) if set in $PATH
-my $bwa = '/usr/bin/'; ## Path to BWA - http://bio-bwa.sourceforge.net/
-my $bowtie2 = '/opt/bowtie2-2.2.9/'; ## Path to Bowtie2 - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
-my $hisat2 = '/opt/hisat2-2.0.4/'; ## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
-my $freebayes = '/opt/freebayes/bin/'; ## Path to FreeBayes -  https://github.com/ekg/freebayes
-my $varscan = '/opt/VarScan/'; ## Define which VarScan2 jar file to use -  https://github.com/dkoboldt/varscan
+## User-defined environment variables.
+## Change these to reflect your settings or leave blank (e.g. $bwa = '';) if set in $PATH
+my $samtools = '/opt/samtools-1.3.1/bin/';	## Path to samtools 1.3.1+ - http://www.htslib.org/
+my $bwa = '/usr/bin/';						## Path to BWA - http://bio-bwa.sourceforge.net/
+my $bowtie2 = '/opt/bowtie2-2.2.9/';			## Path to Bowtie2 - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
+my $hisat2 = '/opt/hisat2-2.0.4/';			## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
+my $freebayes = '/opt/freebayes/bin/';		## Path to FreeBayes -  https://github.com/ekg/freebayes
+my $varscan = '/opt/VarScan/';				## Define which VarScan2 jar file to use -  https://github.com/dkoboldt/varscan
 
 ## Define which VarScan2 jar file to use
 my $varjar = 'VarScan.v2.4.2.jar';
@@ -31,18 +33,18 @@ OPTIONS:
 --mapper	Read mapping tool: bwa, bowtie2 or hisat2 [default: bowtie2]
 --caller	Variant caller: varscan2 or freebayes [default: varscan2]
 --algo		BWA mapping algorithm:  bwasw, mem, samse [default: bwasw]
---threads	Number of processing threads [default: 2]
+--threads	Number of processing threads [default: 16]
 --bam		Keeps BAM files generated
 --sam		Keeps SAM files generated; SAM files can be quite large
 
 ## VarScan2 parameters (see http://dkoboldt.github.io/varscan/using-varscan.html)
 --indel				Calculates indels 	## Runs mpileup2indel
---mc (--min-coverage)		[default: 8]		## Minimum read depth at a position to make a call
---mr (--min-reads2)		[default: 2]		## Minimum supporting reads at a position to call variants
---maq (--min-avg-qual)		[default: 15]		## Minimum base quality at a position to count a read
---mvf (--min-var-freq)		[default: 0.01]		## Minimum variant allele frequency threshold
+--mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
+--mr (--min-reads2)		[default: 5]		## Minimum supporting reads at a position to call variants
+--maq (--min-avg-qual)		[default: 28]		## Minimum base quality at a position to count a read
+--mvf (--min-var-freq)		[default: 0.2]		## Minimum variant allele frequency threshold
 --mhom (--min-freq-for-hom)	[default: 0.75]		## Minimum frequency to call homozygote
---pv (--p-value)		[default: 99e-02]	## P-value threshold for calling variants 
+--pv (--p-value)		[default: 1e-02]	## P-value threshold for calling variants 
 --sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
 
 ## FreeBayes (see https://github.com/ekg/freebayes/)
@@ -62,13 +64,14 @@ my @fasta;
 my @fastq;
 ## VarScan
 my $indel = '';
-my $mc = 8;
-my $mr = 2;
-my $maq = 15;
-my $mvf = '0.01';
+my $mc = 15;
+my $mr = 5;
+my $maq = 28;
+my $mvf = '0.2';
 my $mhom = '0.75';
-my $pv = '99e-02';
+my $pv = '1e-02';
 my $sf = 0;
+## FreeBayes
 my $ploidy = 1;
 
 GetOptions(
@@ -114,15 +117,15 @@ if ($mapper eq 'bwa'){
 			print MAP "\n".'###'." Mapping started on $mstart\n";
 			print MAP "\n$fastq vs. $fasta\n";
 			system "$bwa"."bwa $algo -t $threads $fasta $fastq -f $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
-			system "samtools view -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
-			system "samtools sort $fastq.$fasta.bam $fastq.$fasta.$mapper";
+			system "$samtools"."samtools view -@ $threads -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
+			system "$samtools"."samtools sort -@ $threads -o $fastq.$fasta.$mapper.bam $fastq.$fasta.bam";
 			system "rm $fastq.$fasta.bam"; ## Discarding unsorted BAM file
 			if ($caller eq 'varscan2'){
-				system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
-				if ($indel){system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.indel.vcf";}
+				system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
+				if ($indel){system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.indel.vcf";}
 			}
 			elsif ($caller eq 'freebayes'){ ## single thread only, parallel version behaving wonky
-				system "samtools index $fastq.$fasta.$mapper.bam";
+				system "$samtools"."samtools index $fastq.$fasta.$mapper.bam";
 				system "$freebayes"."freebayes -f $fasta -p $ploidy $fastq.$fasta.$mapper.bam > $fastq.$fasta.$mapper.$caller.SNP.vcf";
 				system "rm $fastq.$fasta.$mapper.bam.bai";
 			}
@@ -153,15 +156,15 @@ elsif ($mapper eq 'bowtie2'){
 			print MAP "\n".'###'." Mapping started on $mstart\n";
 			print MAP "\n$fastq vs. $fasta\n";
 			system "$bowtie2"."bowtie2 -p $threads -x $fasta.bt2 -U $fastq -S $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
-			system "samtools view -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
-			system "samtools sort $fastq.$fasta.bam $fastq.$fasta.$mapper";
+			system "$samtools"."samtools view -@ $threads -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
+			system "$samtools"."samtools sort -@ $threads -o $fastq.$fasta.$mapper.bam $fastq.$fasta.bam";
 			system "rm $fastq.$fasta.bam"; ## Discarding unsorted BAM file
 			if ($caller eq 'varscan2'){
-				system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
-				if ($indel){system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.indel.vcf";}
+				system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
+				if ($indel){system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.indel.vcf";}
 			}
 			elsif ($caller eq 'freebayes'){ ## single thread only, parallel version behaving wonky
-				system "samtools index $fastq.$fasta.$mapper.bam";
+				system "$samtools"."samtools index $fastq.$fasta.$mapper.bam";
 				system "$freebayes"."freebayes -f $fasta -p $ploidy $fastq.$fasta.$mapper.bam > $fastq.$fasta.$mapper.$caller.SNP.vcf";
 				system "rm $fastq.$fasta.$mapper.bam.bai";
 			}
@@ -192,15 +195,15 @@ elsif ($mapper eq 'hisat2'){
 			print MAP "\n".'###'." Mapping started on $mstart\n";
 			print MAP "\n$fastq vs. $fasta\n";
 			system "$hisat2"."hisat2 -p $threads --phred33 -x $fasta.ht -U $fastq --no-spliced-alignment -S $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
-			system "samtools view -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
-			system "samtools sort $fastq.$fasta.bam $fastq.$fasta.$mapper";
+			system "$samtools"."samtools view -@ $threads -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
+			system "$samtools"."samtools sort -@ $threads -o $fastq.$fasta.$mapper.bam $fastq.$fasta.bam";
 			system "rm $fastq.$fasta.bam"; ## Discarding unsorted BAM file
 			if ($caller eq 'varscan2'){
-				system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
-				if ($indel){system "samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.indel.vcf";}
+				system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
+				if ($indel){system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.indel.vcf";}
 			}
 			elsif ($caller eq 'freebayes'){ ## single thread only, parallel version behaving wonky
-				system "samtools index $fastq.$fasta.$mapper.bam";
+				system "$samtools"."samtools index $fastq.$fasta.$mapper.bam";
 				system "$freebayes"."freebayes -f $fasta -p $ploidy $fastq.$fasta.$mapper.bam > $fastq.$fasta.$mapper.$caller.SNP.vcf";
 				system "rm $fastq.$fasta.$mapper.bam.bai";
 			}
