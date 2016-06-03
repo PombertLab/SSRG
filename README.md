@@ -25,4 +25,4 @@ Compatible variant callers
 - FreeBayes - https://github.com/ekg/freebayes
 
 ## On Fedora
-dnf install bwa; dnf install samtools
+dnf install bwa; dnf install ncurses-devel
