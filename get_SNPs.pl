@@ -48,7 +48,7 @@ OPTIONS:
 --sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
 
 ## FreeBayes (see https://github.com/ekg/freebayes/)
---ploidy		[default: 1]		## Change ploidy (if needed)
+--ploidy			[default: 1]		## Change ploidy (if needed)
 ";
 
 die "$usage\n" unless@ARGV;
