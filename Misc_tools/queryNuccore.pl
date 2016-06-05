@@ -17,6 +17,7 @@ OPTIONS:
 -fa (--fasta)	Reference genome(s) in fasta format
 -gb (--genbank)	Reference genome(s) in GenBank format
 -sqn (--sequin)	Reference genome(s) in Sequin ASN format
+-db (--database)	NCBI database to be queried [default: nuccore]
 -p (--proteins)	Protein sequences (amino acids)
 -c (--cds)	Protein sequences (nucleotides)
 -l (--list)	Accession numbers list, one accession per line
@@ -29,6 +30,7 @@ my $genbank;
 my $proteins;
 my $sequin;
 my $cds;
+my $db = 'nuccore';
 my $list = '';
 
 GetOptions(
@@ -38,6 +40,7 @@ GetOptions(
 	'sequin|sqn' => \$sequin,
 	'cds|c' => \$cds,
 	'list|l=s' => \$list,
+	'db|database=s' => \$db,
 );
 
 my $start = localtime();
