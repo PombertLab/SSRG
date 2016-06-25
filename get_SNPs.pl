@@ -9,7 +9,7 @@ use Getopt::Long qw(GetOptions);
 ## User-defined environment variables.
 ## Change these to reflect your settings or leave blank (e.g. $bwa = '';) if set in $PATH
 my $samtools = '/opt/samtools-1.3.1/bin/';	## Path to samtools 1.3.1+ - http://www.htslib.org/
-my $bcftools = '/opt/bcftools-1.3.1/';	## Path to bcftools 1.3.1+ - http://www.htslib.org/
+my $bcftools = '/opt/bcftools-1.3.1/';		## Path to bcftools 1.3.1+ - http://www.htslib.org/
 my $bwa = '/usr/bin/';				## Path to BWA - http://bio-bwa.sourceforge.net/
 my $bowtie2 = '/opt/bowtie2-2.2.9/';		## Path to Bowtie2 - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
 my $hisat2 = '/opt/hisat2-2.0.4/';		## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
