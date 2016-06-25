@@ -22,7 +22,7 @@ Compatible read aligners
 
 Compatible variant callers
 - VarScan2 version 2.4.2 or above - http://dkoboldt.github.io/varscan/
-- BCFtools versions 1.3.1 or above - http://samtools.github.io/bcftools/
+- BCFtools version 1.3.1 or above - http://samtools.github.io/bcftools/
 - FreeBayes - https://github.com/ekg/freebayes
 
 ## On Fedora
