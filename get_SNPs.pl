@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2016
-## Version 1.2d
+## Version 1.2e
 
 use strict;
 use warnings;
@@ -9,6 +9,7 @@ use Getopt::Long qw(GetOptions);
 ## User-defined environment variables.
 ## Change these to reflect your settings or leave blank (e.g. $bwa = '';) if set in $PATH
 my $samtools = '/opt/samtools-1.3.1/bin/';	## Path to samtools 1.3.1+ - http://www.htslib.org/
+my $bcftools = '/opt/bcftools-1.3.1/';	## Path to bcftools 1.3.1+ - http://www.htslib.org/
 my $bwa = '/usr/bin/';				## Path to BWA - http://bio-bwa.sourceforge.net/
 my $bowtie2 = '/opt/bowtie2-2.2.9/';		## Path to Bowtie2 - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
 my $hisat2 = '/opt/hisat2-2.0.4/';		## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
@@ -31,7 +32,7 @@ OPTIONS:
 --fasta		Reference genome(s) in fasta file
 --fastq		Fastq reads to be mapped against reference(s)
 --mapper	Read mapping tool: bwa, bowtie2 or hisat2 [default: bowtie2]
---caller	Variant caller: varscan2 or freebayes [default: varscan2]
+--caller	Variant caller: varscan2, bcftools or freebayes [default: varscan2]
 --algo		BWA mapping algorithm:  bwasw, mem, samse [default: bwasw]
 --threads	Number of processing threads [default: 16]
 --bam		Keeps BAM files generated
@@ -47,7 +48,7 @@ OPTIONS:
 --pv (--p-value)		[default: 1e-02]	## P-value threshold for calling variants 
 --sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
 
-## FreeBayes (see https://github.com/ekg/freebayes/)
+## FreeBayes/BCFtools (see https://github.com/ekg/freebayes/; https://samtools.github.io/bcftools/bcftools.html)
 --ploidy			[default: 1]		## Change ploidy (if needed)
 ";
 
@@ -71,7 +72,7 @@ my $mvf = '0.2';
 my $mhom = '0.75';
 my $pv = '1e-02';
 my $sf = 0;
-## FreeBayes
+## FreeBayes/BCFtools
 my $ploidy = 1;
 
 GetOptions(
@@ -124,6 +125,10 @@ if ($mapper eq 'bwa'){
 				system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
 				if ($indel){system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.indel.vcf";}
 			}
+			elsif ($caller eq 'bcftools'){
+				system "$samtools"."samtools mpileup -ugf $fasta $fastq.$fasta.$mapper.bam | $bcftools"."bcftools call -vmO v -V indels --ploidy $ploidy --output $fastq.$fasta.$mapper.SNP.vcf";
+				if ($indel){system "$samtools"."samtools mpileup -ugf $fasta $fastq.$fasta.$mapper.bam | $bcftools"."bcftools call -vmO v -V snps --ploidy $ploidy --output $fastq.$fasta.$mapper.indel.vcf";}
+			}
 			elsif ($caller eq 'freebayes'){ ## single thread only, parallel version behaving wonky
 				system "$samtools"."samtools index $fastq.$fasta.$mapper.bam";
 				system "$freebayes"."freebayes -f $fasta -p $ploidy $fastq.$fasta.$mapper.bam > $fastq.$fasta.$mapper.$caller.SNP.vcf";
@@ -163,6 +168,10 @@ elsif ($mapper eq 'bowtie2'){
 				system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
 				if ($indel){system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.indel.vcf";}
 			}
+			elsif ($caller eq 'bcftools'){
+				system "$samtools"."samtools mpileup -ugf $fasta $fastq.$fasta.$mapper.bam | $bcftools"."bcftools call -vmO v -V indels --ploidy $ploidy --output $fastq.$fasta.$mapper.SNP.vcf";
+				if ($indel){system "$samtools"."samtools mpileup -ugf $fasta $fastq.$fasta.$mapper.bam | $bcftools"."bcftools call -vmO v -V snps --ploidy $ploidy --output $fastq.$fasta.$mapper.indel.vcf";}
+			}
 			elsif ($caller eq 'freebayes'){ ## single thread only, parallel version behaving wonky
 				system "$samtools"."samtools index $fastq.$fasta.$mapper.bam";
 				system "$freebayes"."freebayes -f $fasta -p $ploidy $fastq.$fasta.$mapper.bam > $fastq.$fasta.$mapper.$caller.SNP.vcf";
@@ -201,6 +210,10 @@ elsif ($mapper eq 'hisat2'){
 			if ($caller eq 'varscan2'){
 				system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
 				if ($indel){system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.indel.vcf";}
+			}
+			elsif ($caller eq 'bcftools'){
+				system "$samtools"."samtools mpileup -ugf $fasta $fastq.$fasta.$mapper.bam | $bcftools"."bcftools call -vmO v -V indels --ploidy $ploidy --output $fastq.$fasta.$mapper.SNP.vcf";
+				if ($indel){system "$samtools"."samtools mpileup -ugf $fasta $fastq.$fasta.$mapper.bam | $bcftools"."bcftools call -vmO v -V snps --ploidy $ploidy --output $fastq.$fasta.$mapper.indel.vcf";}
 			}
 			elsif ($caller eq 'freebayes'){ ## single thread only, parallel version behaving wonky
 				system "$samtools"."samtools index $fastq.$fasta.$mapper.bam";
