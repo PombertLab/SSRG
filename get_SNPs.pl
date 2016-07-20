@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2016
-## Version 1.2e
+## Version 1.2f
 
 use strict;
 use warnings;
@@ -120,6 +120,7 @@ if ($mapper eq 'bwa'){
 			system "$bwa"."bwa $algo -t $threads $fasta $fastq -f $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
 			system "$samtools"."samtools view -@ $threads -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
 			system "$samtools"."samtools sort -@ $threads -o $fastq.$fasta.$mapper.bam $fastq.$fasta.bam";
+			system "$samtools"."samtools depth -a $fastq.$fasta.$mapper.bam > $fastq.$fasta.$mapper.coverage"; ## Printing per base coverage information
 			system "rm $fastq.$fasta.bam"; ## Discarding unsorted BAM file
 			if ($caller eq 'varscan2'){
 				system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
@@ -134,6 +135,21 @@ if ($mapper eq 'bwa'){
 				system "$freebayes"."freebayes -f $fasta -p $ploidy $fastq.$fasta.$mapper.bam > $fastq.$fasta.$mapper.$caller.SNP.vcf";
 				system "rm $fastq.$fasta.$mapper.bam.bai";
 			}
+			## Printing mapping stats
+			open COV, "<$fastq.$fasta.$mapper.coverage";
+			open STATS, ">$fastq.$fasta.$mapper.stats";
+			my $total = 0; my $covered = 0; my $nocov = 0;
+			while (my $line = <COV>){
+				chomp $line;
+				if ($line =~ /^\S+\s+\d+\s+(\d+)/){
+					my $coverage = $1;
+					if ($coverage >= 1) {$total++; $covered++;}
+					else {$total++; $nocov++;}
+				}
+			}
+			print STATS "Total number of bases in the reference genome: $total bp\n"."Number of bases covered by at least one read: $covered\n". "Number of bases without coverage: $nocov\n";
+			if ($total == $covered){print STATS "Percentage of bases covered by at least one read: 100%\n";}
+			if ($total != $covered){my $av_cov = sprintf("%d%%", ($covered/$total)*100); print STATS "Percentage of bases covered by at least one read: $av_cov\n";}
 			## Cleaning SAM/BAM files
 			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
 			unless ($sam) {system "rm $fastq.$fasta.$mapper.sam";}
@@ -150,7 +166,7 @@ if ($mapper eq 'bwa'){
 }
 ## Running Bowtie2 mapping
 elsif ($mapper eq 'bowtie2'){
-	## Creating Burrows-Wheeler HISAT2 indexes
+	## Creating Burrows-Wheeler BOWTIE2 indexes
 	foreach my $fasta (@fasta){system "$bowtie2"."bowtie2-build --threads $threads $fasta $fasta.bt2";}
 	my $index_time = time - $tstart;
 	print LOG "Time required to create all indexes: $index_time seconds\n";
@@ -163,6 +179,7 @@ elsif ($mapper eq 'bowtie2'){
 			system "$bowtie2"."bowtie2 -p $threads -x $fasta.bt2 -U $fastq -S $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
 			system "$samtools"."samtools view -@ $threads -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
 			system "$samtools"."samtools sort -@ $threads -o $fastq.$fasta.$mapper.bam $fastq.$fasta.bam";
+			system "$samtools"."samtools depth -a $fastq.$fasta.$mapper.bam > $fastq.$fasta.$mapper.coverage"; ## Printing per base coverage information
 			system "rm $fastq.$fasta.bam"; ## Discarding unsorted BAM file
 			if ($caller eq 'varscan2'){
 				system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
@@ -177,6 +194,21 @@ elsif ($mapper eq 'bowtie2'){
 				system "$freebayes"."freebayes -f $fasta -p $ploidy $fastq.$fasta.$mapper.bam > $fastq.$fasta.$mapper.$caller.SNP.vcf";
 				system "rm $fastq.$fasta.$mapper.bam.bai";
 			}
+			## Printing mapping stats
+			open COV, "<$fastq.$fasta.$mapper.coverage";
+			open STATS, ">$fastq.$fasta.$mapper.stats";
+			my $total = 0; my $covered = 0; my $nocov = 0;
+			while (my $line = <COV>){
+				chomp $line;
+				if ($line =~ /^\S+\s+\d+\s+(\d+)/){
+					my $coverage = $1;
+					if ($coverage >= 1) {$total++; $covered++;}
+					else {$total++; $nocov++;}
+				}
+			}
+			print STATS "Total number of bases in the reference genome: $total bp\n"."Number of bases covered by at least one read: $covered\n". "Number of bases without coverage: $nocov\n";
+			if ($total == $covered){print STATS "Percentage of bases covered by at least one read: 100%\n";}
+			if ($total != $covered){my $av_cov = sprintf("%d%%", ($covered/$total)*100); print STATS "Percentage of bases covered by at least one read: $av_cov\n";}
 			## Cleaning SAM/BAM files
 			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
 			unless ($sam) {system "rm $fastq.$fasta.$mapper.sam";}
@@ -206,6 +238,7 @@ elsif ($mapper eq 'hisat2'){
 			system "$hisat2"."hisat2 -p $threads --phred33 -x $fasta.ht -U $fastq --no-spliced-alignment -S $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
 			system "$samtools"."samtools view -@ $threads -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
 			system "$samtools"."samtools sort -@ $threads -o $fastq.$fasta.$mapper.bam $fastq.$fasta.bam";
+			system "$samtools"."samtools depth -a $fastq.$fasta.$mapper.bam > $fastq.$fasta.$mapper.coverage"; ## Printing per base coverage information
 			system "rm $fastq.$fasta.bam"; ## Discarding unsorted BAM file
 			if ($caller eq 'varscan2'){
 				system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
@@ -220,6 +253,21 @@ elsif ($mapper eq 'hisat2'){
 				system "$freebayes"."freebayes -f $fasta -p $ploidy $fastq.$fasta.$mapper.bam > $fastq.$fasta.$mapper.$caller.SNP.vcf";
 				system "rm $fastq.$fasta.$mapper.bam.bai";
 			}
+			## Printing mapping stats
+			open COV, "<$fastq.$fasta.$mapper.coverage";
+			open STATS, ">$fastq.$fasta.$mapper.stats";
+			my $total = 0; my $covered = 0; my $nocov = 0;
+			while (my $line = <COV>){
+				chomp $line;
+				if ($line =~ /^\S+\s+\d+\s+(\d+)/){
+					my $coverage = $1;
+					if ($coverage >= 1) {$total++; $covered++;}
+					else {$total++; $nocov++;}
+				}
+			}
+			print STATS "Total number of bases in the reference genome: $total bp\n"."Number of bases covered by at least one read: $covered\n". "Number of bases without coverage: $nocov\n";
+			if ($total == $covered){print STATS "Percentage of bases covered by at least one read: 100%\n";}
+			if ($total != $covered){my $av_cov = sprintf("%d%%", ($covered/$total)*100); print STATS "Percentage of bases covered by at least one read: $av_cov\n";}
 			## Cleaning SAM/BAM files
 			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
 			unless ($sam) {system "rm $fastq.$fasta.$mapper.sam";}
