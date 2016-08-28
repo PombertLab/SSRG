@@ -25,5 +25,8 @@ Compatible variant callers
 - BCFtools version 1.3.1 or above - http://samtools.github.io/bcftools/
 - FreeBayes - https://github.com/ekg/freebayes
 
+2016-08-28 - Added support for Mash - https://github.com/marbl/Mash (Ondov et al. DOI: 10.1186/s13059-016-0997-x)
+- Mash genetic distances can be computed using get_SNPs.pl or with the standalone run_Mash script 
+
 ## On Fedora
 dnf install bwa; dnf install ncurses-devel
