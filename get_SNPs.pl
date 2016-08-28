@@ -119,7 +119,6 @@ open MAP, ">>mapping.$mapper.log"; ## Keep track of read mapper STDERR messages
 my $comparison = 0;
 
 ## Genetic distances with MASH
-
 if ($mh){
 	system "echo Running Mash genetic distance analysis...";
 	system "$mash"."mash sketch -o reference @fasta";
