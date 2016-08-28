@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2016
-## Version 1.2f
+## Version 1.3
 
 use strict;
 use warnings;
@@ -14,7 +14,8 @@ my $bwa = '/usr/bin/';				## Path to BWA - http://bio-bwa.sourceforge.net/
 my $bowtie2 = '/opt/bowtie2-2.2.9/';		## Path to Bowtie2 - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
 my $hisat2 = '/opt/hisat2-2.0.4/';		## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
 my $freebayes = '/opt/freebayes/bin/';		## Path to FreeBayes -  https://github.com/ekg/freebayes
-my $varscan = '/opt/VarScan/';			## Define which VarScan2 jar file to use -  https://github.com/dkoboldt/varscan
+my $varscan = '/opt/VarScan/';			## Path to VarScan2 jar file to use -  https://github.com/dkoboldt/varscan
+my $mash = '/opt/Mash/bin/';			## Path to Mash - https://github.com/marbl/Mash
 
 ## Define which VarScan2 jar file to use
 my $varjar = 'VarScan.v2.4.2.jar';
@@ -27,6 +28,11 @@ EXAMPLE (simple): get_SNPs.pl --fasta *.fasta --fastq *.fastq
 EXAMPLE (advanced): get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller freebayes --threads 16
 
 OPTIONS:
+
+## Genetic distances
+--mh	Evaluate genetic distances using Mash (Ondov et al. DOI: 10.1186/s13059-016-0997-x)
+--out	Output file name [default: Mash.txt]
+--sort	Sort Mash output by decreasing order of similarity
 
 ## Mapping options
 --fasta		Reference genome(s) in fasta file
@@ -54,6 +60,10 @@ OPTIONS:
 
 die "$usage\n" unless@ARGV;
 
+## Genetic distances
+my $mh = '';
+my $out = 'Mash.txt';
+my $sort = '';
 ## Mapping
 my $mapper = 'bowtie2';
 my $caller = 'varscan2';
@@ -76,6 +86,9 @@ my $sf = 0;
 my $ploidy = 1;
 
 GetOptions(
+	'mh' => \$mh,
+	'out=s' => \$out,
+	'sort' => \$sort,
 	'mapper=s' => \$mapper,
 	'caller=s' => \$caller,
 	'algo=s' => \$algo,
@@ -104,6 +117,18 @@ print LOG "Mapping/SNP calling started on: $start\n";
 print LOG "A total of $todo pairwise comparisons will be performed\n";
 open MAP, ">>mapping.$mapper.log"; ## Keep track of read mapper STDERR messages
 my $comparison = 0;
+
+## Genetic distances with MASH
+
+if ($mh){
+	system "echo Running Mash genetic distance analysis...";
+	system "$mash"."mash sketch -o reference @fasta";
+	system "$mash"."mash dist reference.msh @fasta > $out";
+	if ($sort){
+		system "echo Sorting out Mash results - See $out.sorted";
+		system "sort -gk3 $out > $out.sorted";
+	}
+ }
 
 ## Running BWA mapping
 if ($mapper eq 'bwa'){
