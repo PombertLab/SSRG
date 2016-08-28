@@ -10,14 +10,11 @@ my $mash = '/opt/Mash/bin/';
 
 ## Defining options
 my $usage = "
-Mash - https://github.com/marbl/Mash
-Ondov et al. DOI: 10.1186/s13059-016-0997-x
+Mash - https://github.com/marbl/Mash (Ondov et al. DOI: 10.1186/s13059-016-0997-x)
 
 USAGE = perl run_Mash.pl [options]
 EXAMPLE = run_Mash.pl --fasta *.fasta --out Mash.txt --sort 
-
 OPTIONS:
-
 --fasta		Reference genome(s) in fasta file
 --out		Output file name
 --sort		Sort Mash output by decreasing order of similarity
