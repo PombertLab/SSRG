@@ -13,19 +13,19 @@ With the exception of the SSRG.pl script, the pipeline should work fine with euk
 Requirements:
 - Unix/Linux or MacOS X
 - Perl 5
-- Samtools version 1.3.1+ - http://www.htslib.org/
+- Samtools version 1.3.1+ - http://www.htslib.org/ (Li et al. 2009. DOI: 10.1093/bioinformatics/btp352)
 
 Compatible read aligners
-- BWA version 0.7.12 - http://bio-bwa.sourceforge.net/
-- Bowtie2 version 2.2.9 or above - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
-- HISAT2 version 2.0 or above - https://ccb.jhu.edu/software/hisat2/index.shtml
+- BWA version 0.7.12 - http://bio-bwa.sourceforge.net/ (Li et al. 2010. DOI: 10.1093/bioinformatics/btp698)
+- Bowtie2 version 2.2.9 or above - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml (Langmead et al. 2012. DOI: 10.1038/nmeth.1923)
+- HISAT2 version 2.0 or above - https://ccb.jhu.edu/software/hisat2/index.shtml (Kim et al. 2015. DOI: 10.1038/nmeth.3317)
 
 Compatible variant callers
-- VarScan2 version 2.4.2 or above - http://dkoboldt.github.io/varscan/
+- VarScan2 version 2.4.2 or above - http://dkoboldt.github.io/varscan/ (Koboldt et al. 2012. DOI: 10.1101/gr.129684.111)
 - BCFtools version 1.3.1 or above - http://samtools.github.io/bcftools/
-- FreeBayes - https://github.com/ekg/freebayes
+- FreeBayes - https://github.com/ekg/freebayes (Garrison et al. 2012. arXiv preprint arXiv:1207.3907 [q-bio.GN])
 
-2016-08-28 - Added support for Mash - https://github.com/marbl/Mash (Ondov et al. DOI: 10.1186/s13059-016-0997-x)
+2016-08-28 - Added support for Mash - https://github.com/marbl/Mash (Ondov et al. 2016. DOI: 10.1186/s13059-016-0997-x)
 - Mash genetic distances can be computed using get_SNPs.pl or with the standalone run_Mash script 
 
 ## On Fedora
