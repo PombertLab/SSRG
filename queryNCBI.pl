@@ -38,7 +38,7 @@ while (my $line = <IN>){
 		my $strain = $genome[1]; $strain =~ s/ /_/g; $strain =~ s/\//_/g; $strain =~ s/\|/_/g; ## Substituting problematic characters with underscores
 		# Accession info
 		my $genbankFTP = $genome[$#genome];
-		if ($genbankFTP =~ /\/all\/(\S+)$/){$accession = $1;}
+		if ($genbankFTP =~ /.*\/(\S+)$/){$accession = $1;}
 		my $filename = $accession."_genomic.fna.gz";
 		## Downloading files
 		$url = $genbankFTP.'/'.$accession.$suffix;
