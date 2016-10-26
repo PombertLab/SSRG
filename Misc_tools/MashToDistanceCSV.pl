@@ -2,6 +2,7 @@
 
 ## Pombert lab, 2016
 ## Convert MASH output to CSV format
+## Version 1.1
 
 use strict;
 use warnings;
@@ -12,9 +13,11 @@ die $usage unless @ARGV;
 while (my $file = shift@ARGV){
 	open IN, "<$file";
 	$file =~ s/.txt//;
-	open OUT, ">$file.csv";
+	open MASH, ">$file.mashdist.csv";
+	open CORR, ">$file.alternatedist.csv";
 	
 	my %hash = ();
+	my %dist = ();
 	my @OTU = ();
 	
 	while (my $line = <IN>){
@@ -25,19 +28,23 @@ while (my $file = shift@ARGV){
 			my $mashdist= $3;
 			my $pval = $4;
 			my $similarity = "$5".'/'."$6";
-			my $distance = 1-($5/$6);
+			my $distance = 1-($5/$6); ## Applying an alternate method to calculate genetic distances, i.e. 1 - proportion of kmers shared; e.g. 1 - 857/1000 = 0.143.
 			if (exists $hash{$reference}){
-				$hash{$reference} .= "\,$distance";
+				$hash{$reference} .= "\,$mashdist";
+				$dist{$reference} .= "\,$distance";
 			}
 			else{
-				$hash{$reference} .= "\,$distance";
+				$hash{$reference} .= "\,$mashdist";
+				$dist{$reference} .= "\,$distance";
 				push (@OTU, $reference);
 			}
 		}
 	}
-	foreach (@OTU) {print OUT "\,$_";}
-	print OUT "\n";
+	foreach (@OTU) {print MASH "\,$_"; print CORR "\,$_";}
+	print MASH "\n";
+	print CORR "\n";
 	while (my $taxa = shift@OTU){
-		print OUT "$taxa"."$hash{$taxa}\n";
+		print MASH "$taxa"."$hash{$taxa}\n";
+		print CORR "$taxa"."$dist{$taxa}\n";
 	}
 }
