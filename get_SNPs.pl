@@ -145,7 +145,7 @@ if ($mapper eq 'bwa'){ ## Creating Burrows-Wheeler BWA indexes
 			print MAP "\n$fastq vs. $fasta\n";
 			system "$bwa"."bwa $algo -t $threads $fasta $fastq -f $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
 			samtools();
-			mapper();
+			variant();
 			stats(); logs(); ## Printing stats
 			## Cleaning SAM/BAM files
 			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
@@ -170,7 +170,7 @@ elsif ($mapper eq 'bowtie2'){ ## Creating Burrows-Wheeler BOWTIE2 indexes
 			print MAP "\n$fastq vs. $fasta\n";
 			system "$bowtie2"."bowtie2 -p $threads -x $fasta.bt2 -U $fastq -S $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
 			samtools();
-			mapper();
+			variant();
 			stats(); logs(); ## Printing stats
 			## Cleaning SAM/BAM files
 			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
@@ -195,7 +195,7 @@ elsif ($mapper eq 'hisat2'){ ## Creating Burrows-Wheeler HISAT2 indexes
 			print MAP "\n$fastq vs. $fasta\n";
 			system "$hisat2"."hisat2 -p $threads --phred33 -x $fasta.ht -U $fastq --no-spliced-alignment -S $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
 			samtools();
-			mapper();
+			variant();
 			stats(); logs(); ## Printing stats
 			## Cleaning SAM/BAM files
 			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
@@ -226,7 +226,7 @@ sub samtools{
 	system "rm $fastq.$fasta.bam"; ## Discarding unsorted BAM file
 }
 
-sub mapper{
+sub variant{
 	if ($caller eq 'varscan2'){
 		system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.SNP.vcf";
 		if ($indel){system "$samtools"."samtools mpileup -f $fasta $fastq.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $fastq.$fasta.$mapper.indel.vcf";}
