@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2016
-## Version 1.3
+## Version 1.3a
 
 use strict;
 use warnings;
@@ -162,18 +162,26 @@ if ($mapper eq 'bwa'){
 			## Printing mapping stats
 			open COV, "<$fastq.$fasta.$mapper.coverage";
 			open STATS, ">$fastq.$fasta.$mapper.stats";
-			my $total = 0; my $covered = 0; my $nocov = 0;
+			my $total = 0; my $covered = 0; my $nocov = 0; my $max = 0; my $sumcov;
 			while (my $line = <COV>){
 				chomp $line;
 				if ($line =~ /^\S+\s+\d+\s+(\d+)/){
 					my $coverage = $1;
-					if ($coverage >= 1) {$total++; $covered++;}
-					else {$total++; $nocov++;}
+					$total++; 
+					$sumcov += $coverage;
+					if ($coverage >= 1) {
+						$covered++;
+						if ($coverage > $max){$max = $coverage;}
+					}
+					else {$nocov++;}
 				}
 			}
-			print STATS "Total number of bases in the reference genome: $total bp\n"."Number of bases covered by at least one read: $covered\n". "Number of bases without coverage: $nocov\n";
-			if ($total == $covered){print STATS "Percentage of bases covered by at least one read: 100%\n";}
-			if ($total != $covered){my $av_cov = sprintf("%d%%", ($covered/$total)*100); print STATS "Percentage of bases covered by at least one read: $av_cov\n";}
+			print STATS "Total number of bases in the reference genome\t$total bp\n"."Number of bases covered by at least one read\t$covered\n". "Number of bases without coverage\t$nocov\n";
+			print STATS "Maximum sequencing depth\t$max"."X\n";
+			my $avc = sprintf("%.2f", ($sumcov/$total));
+			print STATS "Average sequencing depth\t$avc"."X\n";
+			if ($total == $covered){print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t100%\n";}
+			if ($total != $covered){my $av_cov = sprintf("%d%%", ($covered/$total)*100); print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t$av_cov\n";}
 			## Cleaning SAM/BAM files
 			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
 			unless ($sam) {system "rm $fastq.$fasta.$mapper.sam";}
@@ -221,18 +229,26 @@ elsif ($mapper eq 'bowtie2'){
 			## Printing mapping stats
 			open COV, "<$fastq.$fasta.$mapper.coverage";
 			open STATS, ">$fastq.$fasta.$mapper.stats";
-			my $total = 0; my $covered = 0; my $nocov = 0;
+			my $total = 0; my $covered = 0; my $nocov = 0; my $max = 0; my $sumcov;
 			while (my $line = <COV>){
 				chomp $line;
 				if ($line =~ /^\S+\s+\d+\s+(\d+)/){
 					my $coverage = $1;
-					if ($coverage >= 1) {$total++; $covered++;}
-					else {$total++; $nocov++;}
+					$total++; 
+					$sumcov += $coverage;
+					if ($coverage >= 1) {
+						$covered++;
+						if ($coverage > $max){$max = $coverage;}
+					}
+					else {$nocov++;}
 				}
 			}
-			print STATS "Total number of bases in the reference genome: $total bp\n"."Number of bases covered by at least one read: $covered\n". "Number of bases without coverage: $nocov\n";
-			if ($total == $covered){print STATS "Percentage of bases covered by at least one read: 100%\n";}
-			if ($total != $covered){my $av_cov = sprintf("%d%%", ($covered/$total)*100); print STATS "Percentage of bases covered by at least one read: $av_cov\n";}
+			print STATS "Total number of bases in the reference genome\t$total bp\n"."Number of bases covered by at least one read\t$covered\n". "Number of bases without coverage\t$nocov\n";
+			print STATS "Maximum sequencing depth\t$max"."X\n";
+			my $avc = sprintf("%.2f", ($sumcov/$total));
+			print STATS "Average sequencing depth\t$avc"."X\n";
+			if ($total == $covered){print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t100%\n";}
+			if ($total != $covered){my $av_cov = sprintf("%d%%", ($covered/$total)*100); print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t$av_cov\n";}
 			## Cleaning SAM/BAM files
 			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
 			unless ($sam) {system "rm $fastq.$fasta.$mapper.sam";}
@@ -280,18 +296,26 @@ elsif ($mapper eq 'hisat2'){
 			## Printing mapping stats
 			open COV, "<$fastq.$fasta.$mapper.coverage";
 			open STATS, ">$fastq.$fasta.$mapper.stats";
-			my $total = 0; my $covered = 0; my $nocov = 0;
+			my $total = 0; my $covered = 0; my $nocov = 0; my $max = 0; my $sumcov;
 			while (my $line = <COV>){
 				chomp $line;
 				if ($line =~ /^\S+\s+\d+\s+(\d+)/){
 					my $coverage = $1;
-					if ($coverage >= 1) {$total++; $covered++;}
-					else {$total++; $nocov++;}
+					$total++; 
+					$sumcov += $coverage;
+					if ($coverage >= 1) {
+						$covered++;
+						if ($coverage > $max){$max = $coverage;}
+					}
+					else {$nocov++;}
 				}
 			}
-			print STATS "Total number of bases in the reference genome: $total bp\n"."Number of bases covered by at least one read: $covered\n". "Number of bases without coverage: $nocov\n";
-			if ($total == $covered){print STATS "Percentage of bases covered by at least one read: 100%\n";}
-			if ($total != $covered){my $av_cov = sprintf("%d%%", ($covered/$total)*100); print STATS "Percentage of bases covered by at least one read: $av_cov\n";}
+			print STATS "Total number of bases in the reference genome\t$total bp\n"."Number of bases covered by at least one read\t$covered\n". "Number of bases without coverage\t$nocov\n";
+			print STATS "Maximum sequencing depth\t$max"."X\n";
+			my $avc = sprintf("%.2f", ($sumcov/$total));
+			print STATS "Average sequencing depth\t$avc"."X\n";
+			if ($total == $covered){print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t100%\n";}
+			if ($total != $covered){my $av_cov = sprintf("%d%%", ($covered/$total)*100); print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t$av_cov\n";}
 			## Cleaning SAM/BAM files
 			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
 			unless ($sam) {system "rm $fastq.$fasta.$mapper.sam";}
