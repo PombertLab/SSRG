@@ -18,14 +18,18 @@ my $varscan = '/opt/VarScan/';			## Path to VarScan2 jar file to use -  https://
 my $mash = '/opt/Mash/bin/';			## Path to Mash - https://github.com/marbl/Mash
 my $varjar = 'VarScan.v2.4.2.jar';		## Define which VarScan2 jar file to use
 
-## Defining options
-my $usage = "
-USAGE = perl get_SNPs.pl [options]
-
+## Usage definition
+my $usage = "\nUSAGE = perl get_SNPs.pl [options]\n
 EXAMPLE (simple): get_SNPs.pl -fa *.fasta -fq *.fastq
-EXAMPLE (advanced): get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller freebayes --threads 16
+EXAMPLE (advanced): get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller freebayes --threads 16\n";
+my $hint = "Type get_SNPs.pl -h (--help) for list of options\n";
+die "$usage\n$hint\n" unless@ARGV;
 
+## Defining options
+my $options = <<'END_OPTIONS';
 OPTIONS:
+
+-h (--help)	Display this list of options
 
 ## Genetic distances
 -mh	Evaluate genetic distances using Mash (Ondov et al. DOI: 10.1186/s13059-016-0997-x)
@@ -54,10 +58,10 @@ OPTIONS:
 
 ## FreeBayes/BCFtools (see https://github.com/ekg/freebayes/; https://samtools.github.io/bcftools/bcftools.html)
 -ploidy			[default: 1]		## Change ploidy (if needed)
-";
 
-die "$usage\n" unless@ARGV;
+END_OPTIONS
 
+my $help ='';
 ## Genetic distances
 my $mh = '';
 my $out = 'Mash.txt';
@@ -84,6 +88,7 @@ my $sf = 0;
 my $ploidy = 1;
 
 GetOptions(
+	'h|help' => \$help,
 	'mh' => \$mh,
 	'out=s' => \$out,
 	'sort' => \$sort,
@@ -105,6 +110,8 @@ GetOptions(
 	'sf|strand-filter=i' => \$sf,
 	'ploidy=i' => \$ploidy,
 );
+
+if ($help){die "$usage\n$options";}
 
 ## Timestamps and logs
 my $start = localtime();
