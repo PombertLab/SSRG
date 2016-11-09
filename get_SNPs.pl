@@ -16,7 +16,7 @@ my $hisat2 = '/opt/hisat2-2.0.4/';		## Path to HISAT2 - https://ccb.jhu.edu/soft
 my $freebayes = '/opt/freebayes/bin/';		## Path to FreeBayes -  https://github.com/ekg/freebayes
 my $varscan = '/opt/VarScan/';			## Path to VarScan2 jar file to use -  https://github.com/dkoboldt/varscan
 my $mash = '/opt/Mash/bin/';			## Path to Mash - https://github.com/marbl/Mash
-my $varjar = 'VarScan.v2.4.2.jar';	## Define which VarScan2 jar file to use
+my $varjar = 'VarScan.v2.4.2.jar';		## Define which VarScan2 jar file to use
 
 ## Defining options
 my $usage = "
