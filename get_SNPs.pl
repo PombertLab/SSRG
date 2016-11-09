@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2016
-## Version 1.3b
+## Version 1.3c
 
 use strict;
 use warnings;
@@ -16,46 +16,44 @@ my $hisat2 = '/opt/hisat2-2.0.4/';		## Path to HISAT2 - https://ccb.jhu.edu/soft
 my $freebayes = '/opt/freebayes/bin/';		## Path to FreeBayes -  https://github.com/ekg/freebayes
 my $varscan = '/opt/VarScan/';			## Path to VarScan2 jar file to use -  https://github.com/dkoboldt/varscan
 my $mash = '/opt/Mash/bin/';			## Path to Mash - https://github.com/marbl/Mash
-
-## Define which VarScan2 jar file to use
-my $varjar = 'VarScan.v2.4.2.jar';
+my $varjar = 'VarScan.v2.4.2.jar';	## Define which VarScan2 jar file to use
 
 ## Defining options
 my $usage = "
 USAGE = perl get_SNPs.pl [options]
 
-EXAMPLE (simple): get_SNPs.pl --fasta *.fasta --fastq *.fastq
+EXAMPLE (simple): get_SNPs.pl -fa *.fasta -fq *.fastq
 EXAMPLE (advanced): get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller freebayes --threads 16
 
 OPTIONS:
 
 ## Genetic distances
---mh	Evaluate genetic distances using Mash (Ondov et al. DOI: 10.1186/s13059-016-0997-x)
---out	Output file name [default: Mash.txt]
---sort	Sort Mash output by decreasing order of similarity
+-mh	Evaluate genetic distances using Mash (Ondov et al. DOI: 10.1186/s13059-016-0997-x)
+-out	Output file name [default: Mash.txt]
+-sort	Sort Mash output by decreasing order of similarity
 
 ## Mapping options
---fasta		Reference genome(s) in fasta file
---fastq		Fastq reads to be mapped against reference(s)
---mapper	Read mapping tool: bwa, bowtie2 or hisat2 [default: bowtie2]
---caller	Variant caller: varscan2, bcftools or freebayes [default: varscan2]
---algo		BWA mapping algorithm:  bwasw, mem, samse [default: bwasw]
---threads	Number of processing threads [default: 16]
---bam		Keeps BAM files generated
---sam		Keeps SAM files generated; SAM files can be quite large
+-fa (--fasta)	Reference genome(s) in fasta file
+-fq (--fastq)	Fastq reads to be mapped against reference(s)
+-mapper		Read mapping tool: bwa, bowtie2 or hisat2 [default: bowtie2]
+-caller		Variant caller: varscan2, bcftools or freebayes [default: varscan2]
+-algo		BWA mapping algorithm:  bwasw, mem, samse [default: bwasw]
+-threads	Number of processing threads [default: 16]
+-bam		Keeps BAM files generated
+-sam		Keeps SAM files generated; SAM files can be quite large
 
 ## VarScan2 parameters (see http://dkoboldt.github.io/varscan/using-varscan.html)
---indel				Calculates indels 	## Runs mpileup2indel
---mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
---mr (--min-reads2)		[default: 5]		## Minimum supporting reads at a position to call variants
---maq (--min-avg-qual)		[default: 28]		## Minimum base quality at a position to count a read
---mvf (--min-var-freq)		[default: 0.2]		## Minimum variant allele frequency threshold
---mhom (--min-freq-for-hom)	[default: 0.75]		## Minimum frequency to call homozygote
---pv (--p-value)		[default: 1e-02]	## P-value threshold for calling variants 
---sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
+-indel				Calculates indels 	## Runs mpileup2indel
+-mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
+-mr (--min-reads2)		[default: 5]		## Minimum supporting reads at a position to call variants
+-maq (--min-avg-qual)		[default: 28]		## Minimum base quality at a position to count a read
+-mvf (--min-var-freq)		[default: 0.2]		## Minimum variant allele frequency threshold
+-mhom (--min-freq-for-hom)	[default: 0.75]		## Minimum frequency to call homozygote
+-pv (--p-value)			[default: 1e-02]	## P-value threshold for calling variants 
+-sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
 
 ## FreeBayes/BCFtools (see https://github.com/ekg/freebayes/; https://samtools.github.io/bcftools/bcftools.html)
---ploidy			[default: 1]		## Change ploidy (if needed)
+-ploidy			[default: 1]		## Change ploidy (if needed)
 ";
 
 die "$usage\n" unless@ARGV;
@@ -95,8 +93,8 @@ GetOptions(
 	'threads=i' => \$threads,
 	'bam' => \$bam,
 	'sam' => \$sam,
-	'fasta=s@{1,}' => \@fasta,
-	'fastq=s@{1,}' => \@fastq,
+	'fa|fasta=s@{1,}' => \@fasta,
+	'fq|fastq=s@{1,}' => \@fastq,
 	'indel' => \$indel,
 	'mc|min-coverage=i' => \$mc,
 	'mr|min-reads2=i' => \$mr,
@@ -131,86 +129,42 @@ if ($mh){
 
 ## Running read mapping/SNP calling
 my $fasta = undef; my $fastq = undef;
-if ($mapper eq 'bwa'){ ## Creating Burrows-Wheeler BWA indexes
-	foreach (@fasta){system "$bwa"."bwa index -a is $_";}
-	my $index_time = time - $tstart;
-	print LOG "Time required to create all indexes: $index_time seconds\n";
-	## Running the read mapping
-	foreach (@fastq){
-		$fastq = $_;
-		foreach (@fasta){
-			$fasta = $_;
-			my $mstart = localtime();
-			print MAP "\n".'###'." Mapping started on $mstart\n";
-			print MAP "\n$fastq vs. $fasta\n";
-			system "$bwa"."bwa $algo -t $threads $fasta $fastq -f $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
-			samtools();
-			variant();
-			stats(); logs(); ## Printing stats
-			## Cleaning SAM/BAM files
-			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
-			unless ($sam) {system "rm $fastq.$fasta.$mapper.sam";}
-		}
-	}
-	## Cleaning up
-	system "mkdir $mapper.indexes; mv *.amb *.ann *.bwt *.fai *.pac *.sa $mapper.indexes/";
-	system "mkdir $mapper.$caller.VCFs; mv *.vcf $mapper.$caller.VCFs/";
+foreach (@fasta){ ## Creating indexes
+	if ($mapper eq 'bwa'){system "$bwa"."bwa index -a is $_";}
+	elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2-build --threads $threads $_ $_.bt2";}
+	elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2-build $_ $_.ht";}
 }
-elsif ($mapper eq 'bowtie2'){ ## Creating Burrows-Wheeler BOWTIE2 indexes
-	foreach (@fasta){system "$bowtie2"."bowtie2-build --threads $threads $_ $_.bt2";}
-	my $index_time = time - $tstart;
-	print LOG "Time required to create all indexes: $index_time seconds\n";
-	## Running the read mapping
-	foreach (@fastq){
-		$fastq = $_;
-		foreach (@fasta){
-			$fasta = $_;
-			my $mstart = localtime();
-			print MAP "\n".'###'." Mapping started on $mstart\n";
-			print MAP "\n$fastq vs. $fasta\n";
-			system "$bowtie2"."bowtie2 -p $threads -x $fasta.bt2 -U $fastq -S $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
-			samtools();
-			variant();
-			stats(); logs(); ## Printing stats
-			## Cleaning SAM/BAM files
-			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
-			unless ($sam) {system "rm $fastq.$fasta.$mapper.sam";}
-		}
+my $index_time = time - $tstart;
+print LOG "Time required to create all indexes: $index_time seconds\n";
+foreach (@fastq){
+	$fastq = $_;
+	foreach (@fasta){
+		$fasta = $_;
+		my $mstart = localtime();
+		print MAP "\n".'###'." Mapping started on $mstart\n";
+		print MAP "\n$fastq vs. $fasta\n";
+		if ($mapper eq 'bwa'){system "$bwa"."bwa $algo -t $threads $fasta $fastq -f $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log";} ## Appending STDERR to mapping.$mapper.log"
+		elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 -p $threads -x $fasta.bt2 -U $fastq -S $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log";} 
+		elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 -x $fasta.ht -U $fastq --no-spliced-alignment -S $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log";}
+		samtools();
+		variant();
+		stats(); logs(); ## Printing stats
+		## Cleaning SAM/BAM files
+		unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
+		unless ($sam) {system "rm $fastq.$fasta.$mapper.sam";}
 	}
-	## Cleaning up
-	system "mkdir $mapper.indexes; mv *.bt2 *.fai $mapper.indexes/";
-	system "mkdir $mapper.$caller.VCFs; mv *.vcf $mapper.$caller.VCFs/";
-}
-elsif ($mapper eq 'hisat2'){ ## Creating Burrows-Wheeler HISAT2 indexes
-	foreach (@fasta){system "$hisat2"."hisat2-build $_ $_.ht";}
-	my $index_time = time - $tstart;
-	print LOG "Time required to create all indexes: $index_time seconds\n";
-	## Running the read mapping
-	foreach $fastq (@fastq){
-		$fastq = $_;
-		foreach (@fasta){
-			$fastq = $_;
-			my $mstart = localtime();
-			print MAP "\n".'###'." Mapping started on $mstart\n";
-			print MAP "\n$fastq vs. $fasta\n";
-			system "$hisat2"."hisat2 -p $threads --phred33 -x $fasta.ht -U $fastq --no-spliced-alignment -S $fastq.$fasta.$mapper.sam 2>> mapping.$mapper.log"; ## Appending STDERR to mapping.$mapper.log"
-			samtools();
-			variant();
-			stats(); logs(); ## Printing stats
-			## Cleaning SAM/BAM files
-			unless ($bam) {system "rm $fastq.$fasta.$mapper.bam";}
-			unless ($sam) {system "rm $fastq.$fasta.$mapper.sam";}
-		}
-	}
-	## Cleaning up
-	system "mkdir $mapper.indexes; mv *.ht2 *.fai $mapper.indexes/";
-	system "mkdir $mapper.$caller.VCFs; mv *.vcf $mapper.$caller.VCFs/";
 }
 
+## Cleaning up
+if ($mapper eq 'bwa'){system "mkdir $mapper.indexes; mv *.amb *.ann *.bwt *.fai *.pac *.sa $mapper.indexes/";}
+elsif ($mapper eq 'bowtie2'){system "mkdir $mapper.indexes; mv *.bt2 *.fai $mapper.indexes/";}
+elsif ($mapper eq 'hisat2'){system "mkdir $mapper.indexes; mv *.ht2 *.fai $mapper.indexes/";}
+system "mkdir $mapper.$caller.VCFs; mv *.vcf $mapper.$caller.VCFs/";
+
+## Printing timestamps and logs
 my $end = localtime();
 my $time_taken = time - $tstart;
 my $average_time = sprintf("%.1f", $time_taken/$comparison);
-
 print "\nMapping/SNP calling started on: $start\n";
 print "Mapping/SNP calling ended on: $end\n";
 print "Time elapsed: $time_taken seconds\n";
@@ -222,7 +176,7 @@ print LOG "Average time per pairwise comparison: $average_time seconds\n";
 sub samtools{
 	system "$samtools"."samtools view -@ $threads -bS $fastq.$fasta.$mapper.sam -o $fastq.$fasta.bam";
 	system "$samtools"."samtools sort -@ $threads -o $fastq.$fasta.$mapper.bam $fastq.$fasta.bam";
-	system "$samtools"."samtools depth -a $fastq.$fasta.$mapper.bam > $fastq.$fasta.$mapper.coverage"; ## Printing per base coverage information
+	system "$samtools"."samtools depth -aa $fastq.$fasta.$mapper.bam > $fastq.$fasta.$mapper.coverage"; ## Printing per base coverage information
 	system "rm $fastq.$fasta.bam"; ## Discarding unsorted BAM file
 }
 
@@ -248,9 +202,9 @@ sub stats{
 	my $total = 0; my $covered = 0; my $nocov = 0; my $max = 0; my $sumcov;
 	while (my $line = <COV>){
 		chomp $line;
+		$total++; 
 		if ($line =~ /^\S+\s+\d+\s+(\d+)/){
 			my $coverage = $1;
-			$total++; 
 			$sumcov += $coverage;
 			if ($coverage >= 1) {
 				$covered++;
@@ -259,12 +213,12 @@ sub stats{
 			else {$nocov++;}
 		}
 	}
-	print STATS "Total number of bases in the reference genome\t$total bp\n"."Number of bases covered by at least one read\t$covered\n". "Number of bases without coverage\t$nocov\n";
+	print STATS "\nTotal number of bases in the reference genome\t$total bp\n"."Number of bases covered by at least one read\t$covered\n". "Number of bases without coverage\t$nocov\n";
 	print STATS "Maximum sequencing depth\t$max"."X\n";
 	my $avc = sprintf("%.2f", ($sumcov/$total));
 	print STATS "Average sequencing depth\t$avc"."X\n";
 	if ($total == $covered){print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t100%\n";}
-	if ($total != $covered){my $av_cov = sprintf("%d%%", ($covered/$total)*100); print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t$av_cov\n";}
+	if ($total != $covered){my $av_cov = sprintf("%.2f%%", ($covered/$total)*100); print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t$av_cov\n";}
 	print STATS "\n## SAMTOOLS flagstat metrics\n";
 	close STATS;
 	system "$samtools"."samtools flagstat $fastq.$fasta.$mapper.bam >> $fastq.$fasta.$mapper.stats";
