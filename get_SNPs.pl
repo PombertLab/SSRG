@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2016
-## Version 1.3c
+## Version 1.3d
 
 use strict;
 use warnings;
@@ -11,12 +11,12 @@ use Getopt::Long qw(GetOptions);
 my $samtools = '/opt/samtools-1.3.1/bin/';	## Path to samtools 1.3.1+ - http://www.htslib.org/
 my $bcftools = '/opt/bcftools-1.3.1/';		## Path to bcftools 1.3.1+ - http://www.htslib.org/
 my $bwa = '/usr/bin/';				## Path to BWA - http://bio-bwa.sourceforge.net/
-my $bowtie2 = '/opt/bowtie2-2.2.9/';		## Path to Bowtie2 - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
+my $bowtie2 = '/opt/bowtie2-2.3.1/';		## Path to Bowtie2 - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
 my $hisat2 = '/opt/hisat2-2.0.4/';		## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
 my $freebayes = '/opt/freebayes/bin/';		## Path to FreeBayes -  https://github.com/ekg/freebayes
-my $varscan = '/opt/VarScan/';			## Path to VarScan2 jar file to use -  https://github.com/dkoboldt/varscan
+my $varscan = '/opt/varscan/';			## Path to VarScan2 jar file to use -  https://github.com/dkoboldt/varscan
 my $mash = '/opt/Mash/bin/';			## Path to Mash - https://github.com/marbl/Mash
-my $varjar = 'VarScan.v2.4.2.jar';		## Define which VarScan2 jar file to use
+my $varjar = 'VarScan.v2.4.3.jar';		## Define which VarScan2 jar file to use
 
 ## Usage definition
 my $usage = "\nUSAGE = perl get_SNPs.pl [options]\n
@@ -205,8 +205,13 @@ sub variant{
 
 sub stats{
 	open COV, "<$fastq.$fasta.$mapper.coverage";
+	open SN, "<$fastq.$fasta.$mapper.SNP.vcf";
 	open STATS, ">$fastq.$fasta.$mapper.stats";
-	my $total = 0; my $covered = 0; my $nocov = 0; my $max = 0; my $sumcov;
+	my $total = 0; my $covered = 0; my $nocov = 0; my $max = 0; my $sumcov; my $sn =0;
+	while (my $line = <SN>){
+		if ($line =~ /^#/){next;}
+		else {$sn++;}
+	}
 	while (my $line = <COV>){
 		chomp $line;
 		$total++; 
@@ -226,6 +231,8 @@ sub stats{
 	print STATS "Average sequencing depth\t$avc"."X\n";
 	if ($total == $covered){print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t100%\n";}
 	if ($total != $covered){my $av_cov = sprintf("%.2f%%", ($covered/$total)*100); print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t$av_cov\n";}
+	my $snkb = sprintf("%.2f", ($sn/$covered)*1000); 
+	print STATS "Average number of SNPs per Kb: $snkb\n";
 	print STATS "\n## SAMTOOLS flagstat metrics\n";
 	close STATS;
 	system "$samtools"."samtools flagstat $fastq.$fasta.$mapper.bam >> $fastq.$fasta.$mapper.stats";
