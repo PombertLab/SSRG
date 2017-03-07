@@ -225,13 +225,16 @@ sub stats{
 			else {$nocov++;}
 		}
 	}
+	print STATS "FASTQ file used: $fastq\n";
+	print STATS "Reference fasta file used: $fasta\n";
 	print STATS "\nTotal number of bases in the reference genome\t$total bp\n"."Number of bases covered by at least one read\t$covered\n". "Number of bases without coverage\t$nocov\n";
 	print STATS "Maximum sequencing depth\t$max"."X\n";
 	my $avc = sprintf("%.2f", ($sumcov/$total));
 	print STATS "Average sequencing depth\t$avc"."X\n";
 	if ($total == $covered){print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t100%\n";}
 	if ($total != $covered){my $av_cov = sprintf("%.2f%%", ($covered/$total)*100); print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t$av_cov\n";}
-	my $snkb = sprintf("%.2f", ($sn/$covered)*1000); 
+	my $snkb = sprintf("%.2f", ($sn/$covered)*1000);
+	print STATS "Total number of SNPs found: $sn\n";
 	print STATS "Average number of SNPs per Kb: $snkb\n";
 	print STATS "\n## SAMTOOLS flagstat metrics\n";
 	close STATS;
