@@ -2,7 +2,7 @@
 
 ## Pombert lab, 2016
 ## Convert MASH output to CSV format
-## Version 1.1
+## Version 1.1a
 
 use strict;
 use warnings;
@@ -20,6 +20,8 @@ while (my $file = shift@ARGV){
 	my %dist = ();
 	my @OTU = ();
 	
+	print MASH "OTU";
+	print CORR "OTU";
 	while (my $line = <IN>){
 		chomp $line;
 		if ($line =~ /^(\S+)\t(\S+)\t(\S+)\t(\S+)\t(\d+)\/(\d+)$/){ ## https://github.com/marbl/Mash/blob/master/doc/sphinx/tutorials.rst
