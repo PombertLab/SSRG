@@ -22,7 +22,7 @@ my $options = <<'END_OPTIONS';
 
 OPTIONS:
 -h (--help)		Display this list of options
---method (-m)		Dimentionsality reduction method (mds, tsne) [Default: mds]
+--method (-m)		Dimensionality reduction method (mds, tsne) [Default: mds]
 --input (-i)		Input file [Default: Mash.mashdist.csv]
 --rscript (-R)		R script generated [Default: Mash.R]
 --type (-t)		Image type (pdf, jpeg, png) [Default: pdf] ## other types not supported yet
