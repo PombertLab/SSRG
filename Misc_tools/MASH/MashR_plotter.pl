@@ -22,7 +22,7 @@ my $options = <<'END_OPTIONS';
 
 OPTIONS:
 -h (--help)		Display this list of options
---method (-m)		Dimensionality reduction method (mds, tsne) [Default: mds]
+--method (-m)		Dimentionsality reduction method (mds, tsne) [Default: mds]
 --input (-i)		Input file [Default: Mash.mashdist.csv]
 --rscript (-R)		R script generated [Default: Mash.R]
 --type (-t)		Image type (pdf, jpeg, png) [Default: pdf] ## other types not supported yet
@@ -35,7 +35,8 @@ OPTIONS:
 
 ## R plotter options
 --plotter (-p)		R plotter (plot, igraph) [Default: plot]
---symbol (-pch)		R Plot PCH Symbols [Default: 1] 
+--symbol (-pch)		R Plot PCH Symbols [Default: 1]
+--edges (-ed)		Draw edges
 --fonts			Fonts [Default: Times]
 --xrange (-x)		Plot width [Default: 0.005]
 ';
@@ -52,6 +53,7 @@ my $dimensions = '2';
 my $output = "plot";
 my $plotter = 'plot';
 my $symbol = '1';
+my $edge = '';
 my $fonts = "Times";
 my $xrange = '0.005';
 
@@ -67,6 +69,7 @@ GetOptions(
 	'output|o=s' => \$output,
 	'plotter|p=s' => \$plotter,
 	'symbol|pch=i' => \$symbol,
+	'edges|ed' => \$edge,
 	'fonts=s' => \$fonts,
 	'xrange|x=s' => \$xrange,
 );
@@ -110,7 +113,8 @@ if ($method eq 'mds'){
 
 	## Choosing plotter
 	if ($plotter eq 'plot'){
-		print OUT 'plot(x, y, main="mds", pch = '."$symbol".', xlim = range(x) + c(0, '."$xrange".'))'."\n";
+		if ($edge){print OUT 'plot(x, y, main="mds", t="o", pch = '."$symbol".', xlim = range(x) + c(0, '."$xrange".'))'."\n";}
+		else{print OUT 'plot(x, y, main="mds", pch = '."$symbol".', xlim = range(x) + c(0, '."$xrange".'))'."\n";}
 		print OUT 'text(x, y, pos = 4, labels = strain.name)'."\n";
 	}
 	elsif ($plotter eq 'igraph'){
@@ -127,7 +131,8 @@ elsif ($method eq 'tsne'){
 	print OUT 'colors = rainbow(length(unique(distance_matrix$OTU)))'."\n";
 	print OUT 'names(colors) = unique(distance_matrix$OTU)'."\n";
 	print OUT 'tsne <- Rtsne(distance_matrix[,-1], dims = '."$dimensions".', perplexity='."$perplexity".', check_duplicates=FALSE, is_distance=TRUE, verbose=TRUE, max_iter = '."$iterations".')'."\n";
-	print OUT 'plot(tsne$Y, main="tsne", pch='."$symbol".')'."\n";
+	if ($edge){print OUT 'plot(tsne$Y, main="tsne", t="o", pch='."$symbol".')'."\n";}
+	else{print OUT 'plot(tsne$Y, main="tsne", pch='."$symbol".')'."\n";}
 	print OUT 'text(tsne$Y, cex=0.4, labels=distance_matrix$OTU, col=colors[distance_matrix$OTU])'."\n";
 }
 
