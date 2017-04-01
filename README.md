@@ -26,7 +26,8 @@ Compatible variant callers
 - FreeBayes - https://github.com/ekg/freebayes (Garrison et al. 2012. arXiv preprint arXiv:1207.3907 [q-bio.GN])
 
 2016-08-28 - Added support for Mash - https://github.com/marbl/Mash (Ondov et al. 2016. DOI: 10.1186/s13059-016-0997-x)
-- Mash genetic distances can be computed using get_SNPs.pl or with the standalone run_Mash script 
+- Mash genetic distances can be computed using get_SNPs.pl or with the standalone run_Mash script
+2017-04-01 - Added support for paired ends read mapping
 
 ## On Fedora
 dnf install bwa; dnf install ncurses-devel
