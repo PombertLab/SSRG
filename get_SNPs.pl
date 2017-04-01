@@ -126,9 +126,9 @@ if ($help){die "$usage\n$options";}
 ## Timestamps and logs
 my $start = localtime();
 my $tstart = time;
-my $todo = undef;
-if (@fastq){$todo = scalar(@fastq)*scalar(@fasta);}
-if (@pe1 && @pe2){$todo = scalar(@pe1)*scalar(@fasta);}
+my $todo = 0;
+if (@fastq){$todo += scalar(@fastq)*scalar(@fasta);}
+if (@pe1 && @pe2){$todo += scalar(@pe1)*scalar(@fasta);}
 open LOG, ">time.$mapper.$caller.log"; ## Keep track of running time
 print LOG "Mapping/SNP calling started on: $start\n";
 print LOG "A total of $todo pairwise comparisons will be performed\n";
