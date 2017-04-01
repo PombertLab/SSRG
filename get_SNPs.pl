@@ -40,8 +40,8 @@ OPTIONS:
 ## Mapping options
 -fa (--fasta)	Reference genome(s) in fasta file
 -fq (--fastq)	Fastq reads (single ends) to be mapped against reference(s)
--pe1		Fastq reads #1 (pair ends) to be mapped against reference(s)
--pe2		Fastq reads #2 (pair ends) to be mapped against reference(s)
+-pe1		Fastq reads #1 (paired ends) to be mapped against reference(s)
+-pe2		Fastq reads #2 (paired ends) to be mapped against reference(s)
 -X			Maximum paired ends insert size (for bowtie2) [default: 750]
 -mapper		Read mapping tool: bwa, bowtie2 or hisat2 [default: bowtie2]
 -caller		Variant caller: varscan2, bcftools or freebayes [default: varscan2]
