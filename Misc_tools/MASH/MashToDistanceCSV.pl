@@ -2,7 +2,7 @@
 
 ## Pombert lab, 2016
 ## Convert MASH output to CSV format
-## Version 1.1a
+## Version 1.1b
 
 use strict;
 use warnings;
@@ -42,11 +42,12 @@ while (my $file = shift@ARGV){
 			}
 		}
 	}
-	foreach (@OTU) {print MASH "\,$_"; print CORR "\,$_";}
+	foreach (@OTU) {my $sp = $_;  $sp =~ s/.fasta$//; print MASH "\,$sp"; print CORR "\,$sp";}
 	print MASH "\n";
 	print CORR "\n";
 	while (my $taxa = shift@OTU){
-		print MASH "$taxa"."$hash{$taxa}\n";
-		print CORR "$taxa"."$dist{$taxa}\n";
+		my $spp = $taxa; $spp =~ s/.fasta$//;
+		print MASH "$spp"."$hash{$taxa}\n";
+		print CORR "$spp"."$dist{$taxa}\n";
 	}
 }
