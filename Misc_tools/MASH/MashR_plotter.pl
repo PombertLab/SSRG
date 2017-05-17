@@ -4,7 +4,7 @@
 # Requires R, R-devel
 # Requires the Rtsne, igraph, ape and phangorn R packages
 # E.g. to install the Rtsne package in R: type install.packages("Rtsne")
-# Version 0.2a
+# Version 0.2b
 
 use strict;
 use warnings;
@@ -37,6 +37,7 @@ OPTIONS:
 ## Phylogenetic tree options
 --treetype (-tt)	Tree type: phylogram, cladogram, fan, unrooted or radial [Default: phylogram]
 --distmeth (-dm)	Distance method: nj (neighbor-joining) or upgma [Default: nj]
+--outgroup (-og)	Desired outgroup from the distance matrix (e.g. -og Streptococcus_agalactiae_09mas018883)
 
 ## R plotter options
 --plotter (-p)		R plotter (plot, igraph) [Default: plot]
@@ -55,6 +56,7 @@ my $type = 'cluster';
 my $tt = 'phylogram'; my $dm = 'nj';
 my $wd = '16'; my $he = '10'; my $fs = '16'; ## Width, height and font size
 my $method = 'mds';
+my $og;
 my $input = 'Mash.mashdist.csv';
 my $rscript = 'Mash.R';
 my $format = 'pdf';
@@ -73,6 +75,7 @@ GetOptions(
 	't|type=s' => \$type,
 	'tt|treetype=s' => \$tt,
 	'dm|distmeth=s' => \$dm,
+	'og|outgroup=s' => \$og,
 	'wd=i' => \$wd,
 	'he=i' => \$he,
 	'fs|fontsize=i' => \$fs,
@@ -154,9 +157,16 @@ elsif ($type eq 'tree'){
 	print OUT 'distance_matrix <- distance_matrix[, -1]'."\n";
 	print OUT 'library(ape)'."\n";
 	print OUT 'library(phangorn)'."\n";
-	if ($dm eq 'nj') {print OUT 'tree <- nj(as.dist(distance_matrix))'."\n";}
-	elsif ($dm eq 'upgma') {print OUT 'tree <- upgma(as.dist(distance_matrix))'."\n";}
-	print OUT 'plot(tree, "'."$tt".'")'."\n";
+	if ($og){
+		dist();
+		print OUT 'rooted <- root(tree, "'."$og".'", node = NULL, resolve.root = TRUE)'."\n";
+		print OUT 'is.rooted(rooted)'."\n"; ## testing for successful rooting
+		print OUT 'plot(rooted, "'."$tt".'")'."\n";
+	}
+	else {
+		dist();
+		print OUT 'plot(tree, "'."$tt".'")'."\n";
+	}
 	close IN;
 	close OUT;
 }
@@ -171,4 +181,9 @@ sub Rhm { ## Generating R script, headers and matrix
 	open OUT, ">$rscript";
 	print OUT '#!/usr/bin/Rscript'."\n";
 	print OUT 'distance_matrix <- read.csv("'."$input".'")'."\n";
+}
+
+sub dist{
+	if ($dm eq 'nj') {print OUT 'tree <- nj(as.dist(distance_matrix))'."\n";}
+	elsif ($dm eq 'upgma') {print OUT 'tree <- upgma(as.dist(distance_matrix))'."\n";}
 }
