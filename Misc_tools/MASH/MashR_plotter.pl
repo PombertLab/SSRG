@@ -4,7 +4,7 @@
 # Requires R, R-devel
 # Requires the Rtsne, igraph, ape and phangorn R packages
 # E.g. to install the Rtsne package in R: type install.packages("Rtsne")
-# Version 0.2b
+# Version 0.2c
 
 use strict;
 use warnings;
@@ -37,7 +37,8 @@ OPTIONS:
 ## Phylogenetic tree options
 --treetype (-tt)	Tree type: phylogram, cladogram, fan, unrooted or radial [Default: phylogram]
 --distmeth (-dm)	Distance method: nj (neighbor-joining) or upgma [Default: nj]
---outgroup (-og)	Desired outgroup from the distance matrix (e.g. -og Streptococcus_agalactiae_09mas018883)
+--outgroup (-og)	Desired outgroup from the distance matrix (e.g. -og outgroup_name)
+--newick (-nw)		Phylogenetic tree ouput in Newick format [Default: tree.tre]
 
 ## R plotter options
 --plotter (-p)		R plotter (plot, igraph) [Default: plot]
@@ -53,7 +54,7 @@ END_OPTIONS
 
 my $help ='';
 my $type = 'cluster';
-my $tt = 'phylogram'; my $dm = 'nj';
+my $tt = 'phylogram'; my $dm = 'nj'; my $nw = 'tree.tre';
 my $wd = '16'; my $he = '10'; my $fs = '16'; ## Width, height and font size
 my $method = 'mds';
 my $og;
@@ -76,6 +77,7 @@ GetOptions(
 	'tt|treetype=s' => \$tt,
 	'dm|distmeth=s' => \$dm,
 	'og|outgroup=s' => \$og,
+	'nw|newick=s' => \$nw,
 	'wd=i' => \$wd,
 	'he=i' => \$he,
 	'fs|fontsize=i' => \$fs,
@@ -162,10 +164,12 @@ elsif ($type eq 'tree'){
 		print OUT 'rooted <- root(tree, "'."$og".'", node = NULL, resolve.root = TRUE)'."\n";
 		print OUT 'is.rooted(rooted)'."\n"; ## testing for successful rooting
 		print OUT 'plot(rooted, "'."$tt".'")'."\n";
+		print OUT 'write.tree(rooted, file="'."$nw".'")'."\n";
 	}
 	else {
 		dist();
 		print OUT 'plot(tree, "'."$tt".'")'."\n";
+		print OUT 'write.tree(tree, file="'."$nw".'")'."\n";
 	}
 	close IN;
 	close OUT;
