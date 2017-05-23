@@ -1,6 +1,6 @@
 #!/usr/bin/perl
-## Pombert JF, Illinois Tech - 2016
-## Version 1.4
+## Pombert JF, Illinois Tech - 2017
+## Version 1.4a
 
 use strict;
 use warnings;
@@ -205,6 +205,8 @@ if ($mapper eq 'bwa'){system "mkdir $mapper.indexes; mv *.amb *.ann *.bwt *.fai 
 elsif ($mapper eq 'bowtie2'){system "mkdir $mapper.indexes; mv *.bt2 *.fai $mapper.indexes/";}
 elsif ($mapper eq 'hisat2'){system "mkdir $mapper.indexes; mv *.ht2 *.fai $mapper.indexes/";}
 system "mkdir $mapper.$caller.VCFs; mv *.vcf $mapper.$caller.VCFs/";
+system "mkdir $mapper.$caller.coverage; mv *.$caller.coverage $mapper.$caller.coverage/";
+system "mkdir $mapper.$caller.stats; mv *.$caller.stats $mapper.$caller.stats/";
 
 ## Printing timestamps and logs
 my $end = localtime();
