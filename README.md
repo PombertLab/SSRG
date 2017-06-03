@@ -15,7 +15,7 @@ SSRG (read mapping):
 -	SNPs reported in the VCF files can be summarized with sort_stats.pl and/or count_SNPs.pl.
 -	Synonymous and non-synonymous mutations can be summarized with syn.pl ## alpha version, valid only for prokaryotes 
 
-MASH
+MASH:
 -	run_Mash.pl runs the genetic distance estimation tool from Ondov et al. 2016. DOI: 10.1186/s13059-016-0997-x.
 -	MashToDistanceCSV.pl converts the output of Mash to distance matrices.
 -	MashR_plotter.pl plots Mash-derived distance matrices as heatmaps, phylogenetic trees, or clusters.
@@ -35,4 +35,3 @@ Compatible variant callers
 - VarScan2 version 2.4.2 or above - http://dkoboldt.github.io/varscan/ (Koboldt et al. 2012. DOI: 10.1101/gr.129684.111)
 - BCFtools version 1.3.1 or above - http://samtools.github.io/bcftools/
 - FreeBayes - https://github.com/ekg/freebayes (Garrison et al. 2012. arXiv preprint arXiv:1207.3907 [q-bio.GN])
-
