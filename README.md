@@ -2,7 +2,7 @@
 A Simple Pipeline to Assess Genetic Diversity Between Bacterial Genomes
 
 This simple pipeline can:
-1)	Calculate pairwise SNPs between every provided genomes and references using standard read mapping approaches.
+1)	Calculate pairwise SNPs between every provided sequences and reference genomes using standard read mapping approaches.
 2)	Run Mash (https://github.com/marbl/Mash; Ondov et al. 2016. DOI: 10.1186/s13059-016-0997-x) and plot the estimated genetic distances
 	as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
@@ -35,4 +35,3 @@ Compatible variant callers
 - VarScan2 version 2.4.2 or above - http://dkoboldt.github.io/varscan/ (Koboldt et al. 2012. DOI: 10.1101/gr.129684.111)
 - BCFtools version 1.3.1 or above - http://samtools.github.io/bcftools/
 - FreeBayes - https://github.com/ekg/freebayes (Garrison et al. 2012. arXiv preprint arXiv:1207.3907 [q-bio.GN])
-
