@@ -1,9 +1,9 @@
 # SSRG - A Simple Pipeline to Assess Genetic Diversity Between Bacterial Genomes
 
 This simple pipeline can:
-1)	Calculate pairwise SNPs between FASTQ sequences and reference genomes using standard read mapping approaches.
-2)	Run Mash (https://github.com/marbl/Mash; Ondov et al. 2016. DOI: 10.1186/s13059-016-0997-x) and plot the estimated genetic distances
-	as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
+1)	Download genomes automatically from NCBI
+2)	Calculate pairwise SNPs between FASTQ sequences and reference genomes using standard read mapping approaches.
+3)	Run Mash (https://github.com/marbl/Mash; Ondov et al. 2016. DOI: 10.1186/s13059-016-0997-x) and plot the estimated genetic distances as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
 Automatic downloads:
 - queryNCBI.pl downloads genomes from the NCBI Genomes FTP site. The Tab/CSV-delimited input lists can be generated from NCBI's Genome Assembly and Annotation reports (e.g. http://www.ncbi.nlm.nih.gov/genome/genomes/186?#).
