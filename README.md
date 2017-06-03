@@ -1,5 +1,4 @@
-# SSRG
-A Simple Pipeline to Assess Genetic Diversity Between Bacterial Genomes
+# SSRG - A Simple Pipeline to Assess Genetic Diversity Between Bacterial Genomes
 
 This simple pipeline can:
 1)	Calculate pairwise SNPs between FASTQ sequences and reference genomes using standard read mapping approaches.
