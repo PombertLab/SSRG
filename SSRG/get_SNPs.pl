@@ -7,16 +7,18 @@ use warnings;
 use Getopt::Long qw(GetOptions);
 
 ## User-defined environment variables.
-## Change these to reflect your settings or leave blank (e.g. $bwa = '';) if set in $PATH
-my $samtools = '/opt/samtools-1.3.1/bin/';	## Path to samtools 1.3.1+ - http://www.htslib.org/
-my $bcftools = '/opt/bcftools-1.3.1/';		## Path to bcftools 1.3.1+ - http://www.htslib.org/
-my $bwa = '/usr/bin/';				## Path to BWA - http://bio-bwa.sourceforge.net/
-my $bowtie2 = '/opt/bowtie2-2.3.1/';		## Path to Bowtie2 - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
-my $hisat2 = '/opt/hisat2-2.0.4/';		## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
-my $freebayes = '/opt/freebayes/bin/';		## Path to FreeBayes -  https://github.com/ekg/freebayes
-my $varscan = '/opt/varscan/';			## Path to VarScan2 jar file to use -  https://github.com/dkoboldt/varscan
-my $mash = '/opt/Mash/bin/';			## Path to Mash - https://github.com/marbl/Mash
 my $varjar = 'VarScan.v2.4.3.jar';		## Define which VarScan2 jar file to use
+
+## Leave these blank (e.g. $samtools = '';) if programs are set in $PATH. Alternatively, you can insert here the installation directories (e.g. $samtools = '/opt/samtools-1.3.1/bin/') to reflect your settings.
+my $samtools = '';	## Path to samtools 1.3.1+ - http://www.htslib.org/
+my $bcftools = '';		## Path to bcftools 1.3.1+ - http://www.htslib.org/
+my $bwa = '';				## Path to BWA - http://bio-bwa.sourceforge.net/
+my $bowtie2 = '';		## Path to Bowtie2 - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
+my $hisat2 = '';		## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
+my $freebayes = '';		## Path to FreeBayes -  https://github.com/ekg/freebayes
+my $varscan = '';			## Path to VarScan2 jar file to use -  https://github.com/dkoboldt/varscan
+my $mash = '';			## Path to Mash - https://github.com/marbl/Mash
+
 
 ## Usage definition
 my $usage = "\nUSAGE = perl get_SNPs.pl [options]\n
