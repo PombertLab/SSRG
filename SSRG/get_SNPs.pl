@@ -9,7 +9,8 @@ use Getopt::Long qw(GetOptions);
 ## User-defined environment variables.
 my $varjar = 'VarScan.v2.4.3.jar';		## Define which VarScan2 jar file to use
 
-## Leave these blank (e.g. $samtools = '';) if programs are set in $PATH. Alternatively, you can insert here the installation directories (e.g. $samtools = '/opt/samtools-1.3.1/bin/') to reflect your settings.
+## Leave these blank (e.g. $samtools = '';) if programs are set in $PATH. Alternatively, you can insert here the installation directories
+## (e.g. $samtools = '/opt/samtools-1.3.1/bin/') to reflect your settings.
 my $samtools = '';	## Path to samtools 1.3.1+ - http://www.htslib.org/
 my $bcftools = '';		## Path to bcftools 1.3.1+ - http://www.htslib.org/
 my $bwa = '';				## Path to BWA - http://bio-bwa.sourceforge.net/
