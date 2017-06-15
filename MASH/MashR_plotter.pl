@@ -4,7 +4,7 @@
 # Requires R, R-devel
 # Requires the Rtsne, gplots, ggplot2, ggfortify, cluster, plotly (for MDS), RColorBrewer, and ape R packages
 # E.g. to install the Rtsne package in R: type install.packages("Rtsne")
-# Version 0.4c
+# Version 0.4d
 
 use strict;
 use warnings;
@@ -227,6 +227,7 @@ sub Rhm { ## Generating R script, headers and matrix
 	open IN, "<$input" or die "Cannot open $input\n";
 	open OUT, ">$rscript";
 	print OUT '#!/usr/bin/Rscript'."\n";
+	print OUT 'message ("'."\nPlotting $input\:\n".'")'."\n";
 	print OUT 'distance_matrix <- read.csv("'."$input".'")'."\n";
 }
 
