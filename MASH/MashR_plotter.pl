@@ -4,7 +4,7 @@
 # Requires R, R-devel
 # Requires the Rtsne, gplots, ggplot2, ggfortify, cluster, plotly (for MDS), RColorBrewer, and ape R packages
 # E.g. to install the Rtsne package in R: type install.packages("Rtsne")
-# Version 0.4d
+# Version 0.4e
 
 use strict;
 use warnings;
@@ -211,7 +211,8 @@ elsif ($type eq 'heatmap'){
 }
 
 ## Running R script
-system "chmod a+x $rscript\; ./$rscript";
+my $pwd = `pwd`; chomp $pwd;
+system "chmod a+x $pwd/$rscript\; $pwd/$rscript";
 
 ## Subroutines
 sub Format {
