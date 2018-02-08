@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2018
-## Version 1.5: fixed file path issues; varscan jar file can now be defined from the command line 
+## Version 1.5a: fixed file path issues; varscan jar file can now be defined from the command line; added verbosity 
 
 use strict;
 use warnings;
@@ -150,7 +150,7 @@ if ($mh){
  }
 
 ## Running read mapping/SNP calling
-my $fasta = undef; my $fastq = undef; my $file = undef; my $fa = undef; my $dir;
+my $fasta = undef; my $fastq = undef; my $file = undef; my $fa = undef; my $dir; my $qdir;
 foreach (@fasta){ ## Creating indexes
 	$fasta = $_; ($fa, $dir) = fileparse($fasta);
 	if ($mapper eq 'bwa'){system "$bwa"."bwa index -a is $_";}
@@ -163,9 +163,11 @@ print LOG "Time required to create all indexes: $index_time seconds\n";
 if (@fastq){ ## Single ends mode
 	foreach (@fastq){
 		$fastq = $_;
-		$file = fileparse($fastq); print "FASTQ parsed as: $file\n"; ## Debugging print statement
+		print "\n## FASTQ information:\n";
+		($file, $qdir) = fileparse($fastq); print "FASTQ parsed as: $file\n"; print "FASTQ input DIR parsed as: $qdir\n"; ## Debugging print statement
 		foreach (@fasta){
-			$fasta = $_; ($fa, $dir) = fileparse($fasta); print "FASTA parsed as: $fa\n"; print "Input DIR parsed as: $dir\n"; ## Debugging print statement
+			print "\n## FASTA information:\n";
+			$fasta = $_; ($fa, $dir) = fileparse($fasta); print "FASTA parsed as: $fa\n"; print "FASTA input DIR parsed as: $dir\n"; ## Debugging print statement
 			my $mstart = localtime();
 			print MAP "\n".'###'." Mapping started on $mstart\n";
 			print MAP "\n$fastq vs. $fasta\n";
@@ -185,10 +187,12 @@ if (@fastq){ ## Single ends mode
 if (@pe1 && @pe2){ ## Paired ends mode
 	while (my $pe1 = shift@pe1){
 		my $pe2 = shift@pe2;
-		$file = fileparse($pe1); print "R1 FASTQ parsed as: $file\n"; ## Debugging print statement
-		my $r2 = fileparse($pe2); print "R2 FASTQ parsed as: $r2\n"; ## Debugging print statement
+		print "\n## FASTQ information:\n";
+		($file, $qdir) = fileparse($pe1); print "R1 FASTQ parsed as: $file\n"; ## Debugging print statement
+		my $r2 = fileparse($pe2); print "R2 FASTQ parsed as: $r2\n"; print "FASTQ input DIR parsed as: $qdir\n";## Debugging print statement
 		foreach (@fasta){
-			$fasta = $_; ($fa, $dir) = fileparse($fasta); print "FASTA parsed as: $fa\n"; print "Input DIR parsed as: $dir\n"; ## Debugging print statement
+			print "\n## FASTA information:\n";
+			$fasta = $_; ($fa, $dir) = fileparse($fasta); print "FASTA parsed as: $fa\n"; print "FASTA input DIR parsed as: $dir\n"; ## Debugging print statement
 			my $mstart = localtime();
 			print MAP "\n".'###'." Mapping started on $mstart\n";
 			print MAP "\n$pe1 + $pe2 vs. $fasta\n";
