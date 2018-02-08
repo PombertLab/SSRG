@@ -21,7 +21,7 @@ my $mash = '';			## Path to Mash - https://github.com/marbl/Mash
 ## Usage definition
 my $usage = "\nUSAGE = perl get_SNPs.pl [options]\n
 EXAMPLE (simple): get_SNPs.pl -fa *.fasta -fq *.fastq
-EXAMPLE (advanced): get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller freebayes --threads 16
+EXAMPLE (advanced): get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller varscan2 --var ./VarScan.v2.4.3.jar --threads 16
 EXAMPLE (paired ends): get_SNPs.pl --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --caller freebayes --threads 16\n";
 my $hint = "Type get_SNPs.pl -h (--help) for list of options\n";
 die "$usage\n$hint\n" unless@ARGV;
@@ -152,7 +152,7 @@ if ($mh){
 ## Running read mapping/SNP calling
 my $fasta = undef; my $fastq = undef; my $file = undef; my $fa = undef; my $dir;
 foreach (@fasta){ ## Creating indexes
-	$fa = fileparse($_);
+	$fasta = $_; ($fa, $dir) = fileparse($fasta);
 	if ($mapper eq 'bwa'){system "$bwa"."bwa index -a is $_";}
 	elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2-build --threads $threads $_ $fa.bt2";}
 	elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2-build $_ $fa.ht";}
