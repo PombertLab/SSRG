@@ -186,6 +186,7 @@ if (@pe1 && @pe2){ ## Paired ends mode
 	while (my $pe1 = shift@pe1){
 		my $pe2 = shift@pe2;
 		$file = fileparse($pe1); print "R1 FASTQ parsed as: $file\n"; ## Debugging print statement
+		my $r2 = fileparse($pe2); print "R2 FASTQ parsed as: $r2\n"; ## Debugging print statement
 		foreach (@fasta){
 			$fasta = $_; ($fa, $dir) = fileparse($fasta); print "FASTA parsed as: $fa\n"; print "Input DIR parsed as: $dir\n"; ## Debugging print statement
 			my $mstart = localtime();
