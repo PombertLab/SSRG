@@ -1,23 +1,20 @@
 #!/usr/bin/perl
-## Pombert JF, Illinois Tech - 2017
-## Version 1.4a
+## Pombert JF, Illinois Tech - 2018
+## Version 1.5: fixed file path issues; varscan jar file can now be defined from the command line 
 
 use strict;
 use warnings;
+use File::Basename;
 use Getopt::Long qw(GetOptions);
 
-## User-defined environment variables.
-my $varjar = 'VarScan.v2.4.3.jar';		## Define which VarScan2 jar file to use
-
-## Leave these blank (e.g. $samtools = '';) if programs are set in $PATH. Alternatively, you can insert here the installation directories
-## (e.g. $samtools = '/opt/samtools-1.3.1/bin/') to reflect your settings.
+## User-defined environment variables. ## Leave these blank (e.g. $samtools = '';) if programs are set in $PATH.
+## Alternatively, you can insert here the installation directories (e.g. $samtools = '/opt/samtools-1.3.1/bin/') to reflect your settings.
 my $samtools = '';	## Path to samtools 1.3.1+ - http://www.htslib.org/
 my $bcftools = '';		## Path to bcftools 1.3.1+ - http://www.htslib.org/
 my $bwa = '';				## Path to BWA - http://bio-bwa.sourceforge.net/
 my $bowtie2 = '';		## Path to Bowtie2 - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
 my $hisat2 = '';		## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
 my $freebayes = '';		## Path to FreeBayes -  https://github.com/ekg/freebayes
-my $varscan = '';			## Path to VarScan2 jar file to use -  https://github.com/dkoboldt/varscan
 my $mash = '';			## Path to Mash - https://github.com/marbl/Mash
 
 
@@ -54,7 +51,8 @@ OPTIONS:
 -sam		Keeps SAM files generated; SAM files can be quite large
 
 ## VarScan2 parameters (see http://dkoboldt.github.io/varscan/using-varscan.html)
--indel				Calculates indels 	## Runs mpileup2indel
+-var				[default: /opt/varscan/VarScan.v2.4.3.jar]	## Which varscan jar file to use
+-indel							## Calculates indels (runs mpileup2indel)
 -mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
 -mr (--min-reads2)		[default: 5]		## Minimum supporting reads at a position to call variants
 -maq (--min-avg-qual)		[default: 28]		## Minimum base quality at a position to count a read
@@ -86,6 +84,7 @@ my @pe1;
 my @pe2;
 my $maxins = '750'; 
 ## VarScan
+my $varjar = '/opt/varscan/VarScan.v2.4.3.jar';		## Define which VarScan2 jar file to use
 my $indel = '';
 my $mc = 15;
 my $mr = 5;
@@ -113,6 +112,7 @@ GetOptions(
 	'pe1=s@{1,}' => \@pe1,
 	'pe2=s@{1,}' => \@pe2,
 	'X=i' => \$maxins,
+	'var=s' => \$varjar,
 	'indel' => \$indel,
 	'mc|min-coverage=i' => \$mc,
 	'mr|min-reads2=i' => \$mr,
@@ -150,11 +150,12 @@ if ($mh){
  }
 
 ## Running read mapping/SNP calling
-my $fasta = undef; my $fastq = undef; my $file = undef;
+my $fasta = undef; my $fastq = undef; my $file = undef; my $fa = undef; my $dir;
 foreach (@fasta){ ## Creating indexes
+	$fa = fileparse($_);
 	if ($mapper eq 'bwa'){system "$bwa"."bwa index -a is $_";}
-	elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2-build --threads $threads $_ $_.bt2";}
-	elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2-build $_ $_.ht";}
+	elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2-build --threads $threads $_ $fa.bt2";}
+	elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2-build $_ $fa.ht";}
 }
 my $index_time = time - $tstart;
 print LOG "Time required to create all indexes: $index_time seconds\n";
@@ -162,21 +163,21 @@ print LOG "Time required to create all indexes: $index_time seconds\n";
 if (@fastq){ ## Single ends mode
 	foreach (@fastq){
 		$fastq = $_;
-		$file = $fastq;
+		$file = fileparse($fastq); print "FASTQ parsed as: $file\n"; ## Debugging print statement
 		foreach (@fasta){
-			$fasta = $_;
+			$fasta = $_; ($fa, $dir) = fileparse($fasta); print "FASTA parsed as: $fa\n"; print "Input DIR parsed as: $dir\n"; ## Debugging print statement
 			my $mstart = localtime();
 			print MAP "\n".'###'." Mapping started on $mstart\n";
 			print MAP "\n$fastq vs. $fasta\n";
-			if ($mapper eq 'bwa'){system "$bwa"."bwa $algo -t $threads $fasta $fastq -f $file.$fasta.$mapper.sam 2>> mapping.$mapper.log";} ## Appending STDERR to mapping.$mapper.log"
-			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 -p $threads -x $fasta.bt2 -U $fastq -S $file.$fasta.$mapper.sam 2>> mapping.$mapper.log";} 
-			elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 -x $fasta.ht -U $fastq --no-spliced-alignment -S $file.$fasta.$mapper.sam 2>> mapping.$mapper.log";}
+			if ($mapper eq 'bwa'){system "$bwa"."bwa $algo -t $threads $fasta $fastq -f $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} ## Appending STDERR to mapping.$mapper.log"
+			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 -p $threads -x $fa.bt2 -U $fastq -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} 
+			elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 -x $fa.ht -U $fastq --no-spliced-alignment -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
 			samtools();
 			variant();
 			stats(); logs(); ## Printing stats
 			## Cleaning SAM/BAM files
-			unless ($bam) {system "rm $file.$fasta.$mapper.bam";}
-			unless ($sam) {system "rm $file.$fasta.$mapper.sam";}
+			unless ($bam) {system "rm $file.$fa.$mapper.bam";}
+			unless ($sam) {system "rm $file.$fa.$mapper.sam";}
 		}
 	}
 }
@@ -184,29 +185,29 @@ if (@fastq){ ## Single ends mode
 if (@pe1 && @pe2){ ## Paired ends mode
 	while (my $pe1 = shift@pe1){
 		my $pe2 = shift@pe2;
-		$file = $pe1;
+		$file = fileparse($pe1); print "R1 FASTQ parsed as: $file\n"; ## Debugging print statement
 		foreach (@fasta){
-			$fasta = $_;
+			$fasta = $_; ($fa, $dir) = fileparse($fasta); print "FASTA parsed as: $fa\n"; print "Input DIR parsed as: $dir\n"; ## Debugging print statement
 			my $mstart = localtime();
 			print MAP "\n".'###'." Mapping started on $mstart\n";
 			print MAP "\n$pe1 + $pe2 vs. $fasta\n";
-			if ($mapper eq 'bwa'){system "$bwa"."bwa $algo -t $threads $fasta $pe1 $pe2 -f $file.$fasta.$mapper.sam 2>> mapping.$mapper.log";} ## Appending STDERR to mapping.$mapper.log"
-			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 -p $threads -x $fasta.bt2 -X $maxins -1 $pe1 -2 $pe2 -S $file.$fasta.$mapper.sam 2>> mapping.$mapper.log";} 
-			elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 -x $fasta.ht -1 $pe1 -2 $pe2 --no-spliced-alignment -S $file.$fasta.$mapper.sam 2>> mapping.$mapper.log";}
+			if ($mapper eq 'bwa'){system "$bwa"."bwa $algo -t $threads $fasta $pe1 $pe2 -f $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} ## Appending STDERR to mapping.$mapper.log"
+			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 -p $threads -x $fa.bt2 -X $maxins -1 $pe1 -2 $pe2 -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} 
+			elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 -x $fa.ht -1 $pe1 -2 $pe2 --no-spliced-alignment -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
 			samtools();
 			variant();
 			stats(); logs(); ## Printing stats
 			## Cleaning SAM/BAM files
-			unless ($bam) {system "rm $file.$fasta.$mapper.bam";}
-			unless ($sam) {system "rm $file.$fasta.$mapper.sam";}
+			unless ($bam) {system "rm $file.$fa.$mapper.bam";}
+			unless ($sam) {system "rm $file.$fa.$mapper.sam";}
 		}
 	}
 }
 
 ## Cleaning up
-if ($mapper eq 'bwa'){system "mkdir $mapper.indexes; mv *.amb *.ann *.bwt *.fai *.pac *.sa $mapper.indexes/";}
-elsif ($mapper eq 'bowtie2'){system "mkdir $mapper.indexes; mv *.bt2 *.fai $mapper.indexes/";}
-elsif ($mapper eq 'hisat2'){system "mkdir $mapper.indexes; mv *.ht2 *.fai $mapper.indexes/";}
+if ($mapper eq 'bwa'){system "mkdir $mapper.indexes; mv ${dir}*.amb ${dir}*.ann ${dir}*.bwt ${dir}*.fai ${dir}*.pac ${dir}*.sa $mapper.indexes/";}
+elsif ($mapper eq 'bowtie2'){system "mkdir $mapper.indexes; mv *.bt2 ${dir}*.fai $mapper.indexes/";}
+elsif ($mapper eq 'hisat2'){system "mkdir $mapper.indexes; mv *.ht2 ${dir}*.fai $mapper.indexes/";}
 system "mkdir $mapper.$caller.VCFs; mv *.vcf $mapper.$caller.VCFs/";
 system "mkdir $mapper.$caller.coverage; mv *.$mapper.coverage $mapper.$caller.coverage/";
 system "mkdir $mapper.$caller.stats; mv *.$mapper.stats $mapper.$caller.stats/";
@@ -224,32 +225,32 @@ print LOG "Average time per pairwise comparison: $average_time seconds\n";
 
 ### Subroutines ###
 sub samtools{
-	system "$samtools"."samtools view -@ $threads -bS $file.$fasta.$mapper.sam -o $file.$fasta.bam";
-	system "$samtools"."samtools sort -@ $threads -o $file.$fasta.$mapper.bam $file.$fasta.bam";
-	system "$samtools"."samtools depth -aa $file.$fasta.$mapper.bam > $file.$fasta.$mapper.coverage"; ## Printing per base coverage information
-	system "rm $file.$fasta.bam"; ## Discarding unsorted BAM file
+	system "$samtools"."samtools view -@ $threads -bS $file.$fa.$mapper.sam -o $file.$fa.bam";
+	system "$samtools"."samtools sort -@ $threads -o $file.$fa.$mapper.bam $file.$fa.bam";
+	system "$samtools"."samtools depth -aa $file.$fa.$mapper.bam > $file.$fa.$mapper.coverage"; ## Printing per base coverage information
+	system "rm $file.$fa.bam"; ## Discarding unsorted BAM file
 }
 
 sub variant{
 	if ($caller eq 'varscan2'){
-		system "$samtools"."samtools mpileup -f $fasta $file.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $file.$fasta.$mapper.SNP.vcf";
-		if ($indel){system "$samtools"."samtools mpileup -f $fasta $file.$fasta.$mapper.bam | java -jar $varscan$varjar mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $file.$fasta.$mapper.indel.vcf";}
+		system "$samtools"."samtools mpileup -f $fasta $file.$fa.$mapper.bam | java -jar $varjar mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $file.$fa.$mapper.SNP.vcf";
+		if ($indel){system "$samtools"."samtools mpileup -f $fasta $file.$fa.$mapper.bam | java -jar $varjar mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $file.$fa.$mapper.indel.vcf";}
 	}
 	elsif ($caller eq 'bcftools'){
-		system "$samtools"."samtools mpileup -ugf $fasta $file.$fasta.$mapper.bam | $bcftools"."bcftools call -vmO v -V indels --ploidy $ploidy --output $file.$fasta.$mapper.SNP.vcf";
-		if ($indel){system "$samtools"."samtools mpileup -ugf $fasta $file.$fasta.$mapper.bam | $bcftools"."bcftools call -vmO v -V snps --ploidy $ploidy --output $file.$fasta.$mapper.indel.vcf";}
+		system "$samtools"."samtools mpileup -ugf $fasta $file.$fa.$mapper.bam | $bcftools"."bcftools call -vmO v -V indels --ploidy $ploidy --output $file.$fa.$mapper.SNP.vcf";
+		if ($indel){system "$samtools"."samtools mpileup -ugf $fasta $file.$fa.$mapper.bam | $bcftools"."bcftools call -vmO v -V snps --ploidy $ploidy --output $file.$fa.$mapper.indel.vcf";}
 	}
 	elsif ($caller eq 'freebayes'){ ## single thread only, parallel version behaving wonky
-		system "$samtools"."samtools index $file.$fasta.$mapper.bam";
-		system "$freebayes"."freebayes -f $fasta -p $ploidy $file.$fasta.$mapper.bam > $file.$fasta.$mapper.$caller.SNP.vcf";
-		system "rm $file.$fasta.$mapper.bam.bai";
+		system "$samtools"."samtools index $file.$fa.$mapper.bam";
+		system "$freebayes"."freebayes -f $fasta -p $ploidy $file.$fa.$mapper.bam > $file.$fa.$mapper.$caller.SNP.vcf";
+		system "rm $file.$fa.$mapper.bam.bai";
 	}
 }
 
 sub stats{
-	open COV, "<$file.$fasta.$mapper.coverage";
-	open SN, "<$file.$fasta.$mapper.SNP.vcf";
-	open STATS, ">$file.$fasta.$mapper.stats";
+	open COV, "<$file.$fa.$mapper.coverage";
+	open SN, "<$file.$fa.$mapper.SNP.vcf";
+	open STATS, ">$file.$fa.$mapper.stats";
 	my $total = 0; my $covered = 0; my $nocov = 0; my $max = 0; my $sumcov; my $sn =0;
 	while (my $line = <SN>){
 		if ($line =~ /^#/){next;}
@@ -281,7 +282,7 @@ sub stats{
 	print STATS "Average number of SNPs per Kb: $snkb\n";
 	print STATS "\n## SAMTOOLS flagstat metrics\n";
 	close STATS;
-	system "$samtools"."samtools flagstat $file.$fasta.$mapper.bam >> $file.$fasta.$mapper.stats";
+	system "$samtools"."samtools flagstat $file.$fa.$mapper.bam >> $file.$fa.$mapper.stats";
 }
 
 sub logs{
