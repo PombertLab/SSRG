@@ -167,7 +167,7 @@ if (@fastq){ ## Single ends mode
 		($file, $qdir) = fileparse($fastq); print "FASTQ parsed as: $file\n"; print "FASTQ input DIR parsed as: $qdir\n"; ## Debugging print statement
 		foreach (@fasta){
 			print "\n## FASTA information:\n";
-			$fasta = $_; ($fa, $dir) = fileparse($fasta); print "FASTA parsed as: $fa\n"; print "FASTA input DIR parsed as: $dir\n"; ## Debugging print statement
+			$fasta = $_; ($fa, $dir) = fileparse($fasta); print "FASTA parsed as: $fa\n"; print "FASTA input DIR parsed as: $dir\n\n"; ## Debugging print statement
 			my $mstart = localtime();
 			print MAP "\n".'###'." Mapping started on $mstart\n";
 			print MAP "\n$fastq vs. $fasta\n";
@@ -192,7 +192,7 @@ if (@pe1 && @pe2){ ## Paired ends mode
 		my $r2 = fileparse($pe2); print "R2 FASTQ parsed as: $r2\n"; print "FASTQ input DIR parsed as: $qdir\n";## Debugging print statement
 		foreach (@fasta){
 			print "\n## FASTA information:\n";
-			$fasta = $_; ($fa, $dir) = fileparse($fasta); print "FASTA parsed as: $fa\n"; print "FASTA input DIR parsed as: $dir\n"; ## Debugging print statement
+			$fasta = $_; ($fa, $dir) = fileparse($fasta); print "FASTA parsed as: $fa\n"; print "FASTA input DIR parsed as: $dir\n\n"; ## Debugging print statement
 			my $mstart = localtime();
 			print MAP "\n".'###'." Mapping started on $mstart\n";
 			print MAP "\n$pe1 + $pe2 vs. $fasta\n";
