@@ -166,9 +166,7 @@ if (@fastq){ ## Single ends mode
 			if ($mapper eq 'bwa'){system "$bwa"."bwa $algo -t $threads $fasta $fastq -f $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} ## Appending STDERR to mapping.$mapper.log"
 			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 -p $threads -x $fa.bt2 -U $fastq -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} 
 			elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 -x $fa.ht -U $fastq --no-spliced-alignment -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
-			samtools();
-			variant();
-			stats(); logs(); ## Printing stats
+			samtools();	variant(); stats(); logs(); ## Printing stats
 			## Cleaning SAM/BAM files
 			unless ($bam) {system "rm $file.$fa.$mapper.bam";}
 			unless ($sam) {system "rm $file.$fa.$mapper.sam";}
@@ -192,9 +190,7 @@ if (@pe1 && @pe2){ ## Paired ends mode
 			if ($mapper eq 'bwa'){system "$bwa"."bwa $algo -t $threads $fasta $pe1 $pe2 -f $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} ## Appending STDERR to mapping.$mapper.log"
 			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 -p $threads -x $fa.bt2 -X $maxins -1 $pe1 -2 $pe2 -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} 
 			elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 -x $fa.ht -1 $pe1 -2 $pe2 --no-spliced-alignment -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
-			samtools();
-			variant();
-			stats(); logs(); ## Printing stats
+			samtools();	variant(); stats(); logs(); ## Printing stats
 			## Cleaning SAM/BAM files
 			unless ($bam) {system "rm $file.$fa.$mapper.bam";}
 			unless ($sam) {system "rm $file.$fa.$mapper.sam";}
