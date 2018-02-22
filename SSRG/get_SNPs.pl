@@ -70,16 +70,18 @@ my $help =''; my $vn;
 my $out = 'Mash.txt'; my $mh = ''; my $sort = ''; ## Mash genetic distances (optional)
 ## Mapping
 my $mapper = 'bowtie2';
-my $caller = 'varscan2';
 my $algo = 'bwasw';
 my $threads = 16;
 my $sam = ''; my $bam = '';
 my @fasta; my @fastq;
 my @pe1; my @pe2;
-my $maxins = '750'; 
-## VarScan
-my $varjar = '/opt/varscan/VarScan.v2.4.3.jar';		## Define which VarScan2 jar file to use
+my $maxins = '750';
+## Variant caller
+my $caller = 'varscan2';
 my $type = 'snp';
+my $ploidy = 1;
+## VarScan-specific
+my $varjar = '/opt/varscan/VarScan.v2.4.3.jar';		## Define which VarScan2 jar file to use; or use -var from the CMD line
 my $mc = 15;
 my $mr = 5;
 my $maq = 28;
@@ -87,8 +89,6 @@ my $mvf = '0.2';
 my $mhom = '0.75';
 my $pv = '1e-02';
 my $sf = 0;
-## FreeBayes/BCFtools
-my $ploidy = 1;
 
 GetOptions(
 	'h|help' => \$help,
