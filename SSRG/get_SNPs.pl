@@ -68,7 +68,6 @@ OPTIONS:
 END_OPTIONS
 
 my $help =''; my $vn;
-my $out = 'Mash.txt'; my $mh = ''; my $sort = ''; ## Mash genetic distances (optional)
 ## Mapping
 my $mapper = 'bowtie2';
 my $algo = 'bwasw';
@@ -90,26 +89,23 @@ my $mvf = '0.2';
 my $mhom = '0.75';
 my $pv = '1e-02';
 my $sf = 0;
+## MASH
+my $out = 'Mash.txt'; my $mh = ''; my $sort = ''; 
 
 GetOptions(
-	'h|help' => \$help,
-	'v|version', => \$vn,
-	'mh' => \$mh,
-	'out=s' => \$out,
-	'sort' => \$sort,
+	'h|help' => \$help, 'v|version', => \$vn,
+	## Mapping
 	'mapper=s' => \$mapper,
-	'caller=s' => \$caller,
 	'algo=s' => \$algo,
 	'threads=i' => \$threads,
-	'bam' => \$bam,
-	'sam' => \$sam,
-	'fa|fasta=s@{1,}' => \@fasta,
-	'fq|fastq=s@{1,}' => \@fastq,
-	'pe1=s@{1,}' => \@pe1,
-	'pe2=s@{1,}' => \@pe2,
+	'sam' => \$sam, 'bam' => \$bam,
+	'fa|fasta=s@{1,}' => \@fasta, 'fq|fastq=s@{1,}' => \@fastq,
+	'pe1=s@{1,}' => \@pe1, 'pe2=s@{1,}' => \@pe2,
 	'X=i' => \$maxins,
+	## Variant caller
+	'caller=s' => \$caller, 'type=s' => \$type,	'ploidy=i' => \$ploidy,
+	## VarScan-specific
 	'var=s' => \$varjar,
-	'type=s' => \$type,
 	'mc|min-coverage=i' => \$mc,
 	'mr|min-reads2=i' => \$mr,
 	'maq|min-avg-qual=i' => \$maq,
@@ -117,11 +113,11 @@ GetOptions(
 	'mhom|min-freq-for-hom=s' => \$mhom,
 	'pv|p-value=s' => \$pv,
 	'sf|strand-filter=i' => \$sf,
-	'ploidy=i' => \$ploidy,
+	## MASH
+	'mh' => \$mh, 'out=s' => \$out,	'sort' => \$sort,
 );
 
-if ($help){die "$usage\n$options";}
-if ($vn){die "\nversion $version\n\n";}
+if ($help){die "$usage\n$options";} if ($vn){die "\nversion $version\n\n";}
 
 ## Timestamps and logs
 my $start = localtime();
