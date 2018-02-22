@@ -136,10 +136,7 @@ if ($mh){
 	system "echo Running Mash genetic distance analysis...";
 	system "$mash"."mash sketch -o reference @fasta";
 	system "$mash"."mash dist reference.msh @fasta > $out";
-	if ($sort){
-		system "echo Sorting out Mash results - See $out.sorted";
-		system "sort -gk3 $out > $out.sorted";
-	}
+	if ($sort){system "echo Sorting out Mash results - See $out.sorted"; system "sort -gk3 $out > $out.sorted";}
 	exit;
  }
 
