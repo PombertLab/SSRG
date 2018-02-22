@@ -2,10 +2,7 @@
 ## Pombert JF, Illinois Tech - 2018
 my $version = '1.6'; ## Modified SNPs/indels output so that VarScan runs only once; Changed the CMD line options. See --help. Added verbosity.
 
-use strict;
-use warnings;
-use File::Basename;
-use Getopt::Long qw(GetOptions);
+use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
 
 ## User-defined environment variables. ## Leave these blank (e.g. $samtools = '';) if programs are set in $PATH.
 ## Alternatively, you can insert here the installation directories (e.g. $samtools = '/opt/samtools-1.3.1/bin/') to reflect your settings.
@@ -18,11 +15,15 @@ my $freebayes = '';		## Path to FreeBayes -  https://github.com/ekg/freebayes
 my $mash = '';			## Path to Mash - https://github.com/marbl/Mash
 
 ## Usage definition
-my $usage = "\nUSAGE = perl get_SNPs.pl [options]\n
+my $usage = <<'USAGE';
+
+USAGE = perl get_SNPs.pl [options]
+
 EXAMPLE (simple): get_SNPs.pl -fa *.fasta -fq *.fastq
 EXAMPLE (advanced): get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar --threads 16
 EXAMPLE (paired ends): get_SNPs.pl --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --caller freebayes --threads 16
-EXAMPLE (MASH): get_SNPs.pl -fa *.fasta -out Mash.txt -sort\n";
+EXAMPLE (MASH): get_SNPs.pl -fa *.fasta -out Mash.txt -sort
+USAGE
 my $hint = "Type get_SNPs.pl -h (--help) for list of options\n";
 die "$usage\n$hint\n" unless@ARGV;
 
