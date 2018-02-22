@@ -21,7 +21,8 @@ my $mash = '';			## Path to Mash - https://github.com/marbl/Mash
 my $usage = "\nUSAGE = perl get_SNPs.pl [options]\n
 EXAMPLE (simple): get_SNPs.pl -fa *.fasta -fq *.fastq
 EXAMPLE (advanced): get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar --threads 16
-EXAMPLE (paired ends): get_SNPs.pl --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --caller freebayes --threads 16\n";
+EXAMPLE (paired ends): get_SNPs.pl --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --caller freebayes --threads 16
+EXAMPLE (MASH): get_SNPs.pl -fa *.fasta -out Mash.txt -sort\n";
 my $hint = "Type get_SNPs.pl -h (--help) for list of options\n";
 die "$usage\n$hint\n" unless@ARGV;
 
@@ -30,11 +31,6 @@ my $options = <<'END_OPTIONS';
 OPTIONS:
 -h (--help)	Display this list of options
 -v (--version)	Display script version
-
-### Genetic distances ###
--mh		Evaluate genetic distances using Mash (Ondov et al. DOI: 10.1186/s13059-016-0997-x)
--out		Output file name [default: Mash.txt]
--sort		Sort Mash output by decreasing order of similarity
 
 ### Mapping options ###
 -fa (--fasta)	Reference genome(s) in fasta file
@@ -51,6 +47,7 @@ OPTIONS:
 ### Variant caller options ###
 -caller				[default: varscan2]	## Variant caller: varscan2, bcftools or freebayes
 -type				[default: snp]		## snp, indel, or both
+-ploidy				[default: 1]		## FreeBayes/BCFtools option; change ploidy (if needed)
 
 ### VarScan2 parameters ### see http://dkoboldt.github.io/varscan/using-varscan.html
 -var				[default: /opt/varscan/VarScan.v2.4.3.jar]	## Which varscan jar file to use
@@ -62,27 +59,23 @@ OPTIONS:
 -pv (--p-value)			[default: 1e-02]	## P-value threshold for calling variants 
 -sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
 
-### FreeBayes/BCFtools ### see https://github.com/ekg/freebayes/; https://samtools.github.io/bcftools/bcftools.html
--ploidy				[default: 1]		## Change ploidy (if needed)
+### MASH Genetic distances ### OPTIONAL - see Ondov et al. DOI: 10.1186/s13059-016-0997-x
+-mh		Evaluate genetic distances using Mash ## Quick, does not require read mapping...
+-out		Output file name [default: Mash.txt]
+-sort		Sort Mash output by decreasing order of similarity
 
 END_OPTIONS
 
 my $help =''; my $vn;
-## Genetic distances
-my $mh = '';
-my $out = 'Mash.txt';
-my $sort = '';
+my $out = 'Mash.txt'; my $mh = ''; my $sort = ''; ## Mash genetic distances (optional)
 ## Mapping
 my $mapper = 'bowtie2';
 my $caller = 'varscan2';
 my $algo = 'bwasw';
 my $threads = 16;
-my $bam = '';
-my $sam = '';
-my @fasta;
-my @fastq;
-my @pe1;
-my @pe2;
+my $sam = ''; my $bam = '';
+my @fasta; my @fastq;
+my @pe1; my @pe2;
 my $maxins = '750'; 
 ## VarScan
 my $varjar = '/opt/varscan/VarScan.v2.4.3.jar';		## Define which VarScan2 jar file to use
@@ -150,6 +143,7 @@ if ($mh){
 		system "echo Sorting out Mash results - See $out.sorted";
 		system "sort -gk3 $out > $out.sorted";
 	}
+	exit;
  }
 
 ## Running read mapping/SNP calling
