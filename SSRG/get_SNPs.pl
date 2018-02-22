@@ -81,7 +81,7 @@ my $caller = 'varscan2';
 my $type = 'snp';
 my $ploidy = 1;
 ## VarScan-specific
-my $varjar = '/opt/varscan/VarScan.v2.4.3.jar';		## Define which VarScan2 jar file to use; or use -var from the CMD line
+my $varjar = '/opt/varscan/VarScan.v2.4.3.jar';	## Define which VarScan2 jar file to use; or use -var from the CMD line
 my $mc = 15;
 my $mr = 5;
 my $maq = 28;
@@ -103,7 +103,7 @@ GetOptions(
 	'pe1=s@{1,}' => \@pe1, 'pe2=s@{1,}' => \@pe2,
 	'X=i' => \$maxins,
 	## Variant caller
-	'caller=s' => \$caller, 'type=s' => \$type,	'ploidy=i' => \$ploidy,
+	'caller=s' => \$caller, 'type=s' => \$type, 'ploidy=i' => \$ploidy,
 	## VarScan-specific
 	'var=s' => \$varjar,
 	'mc|min-coverage=i' => \$mc,
