@@ -9,14 +9,13 @@ use Getopt::Long qw(GetOptions);
 
 ## User-defined environment variables. ## Leave these blank (e.g. $samtools = '';) if programs are set in $PATH.
 ## Alternatively, you can insert here the installation directories (e.g. $samtools = '/opt/samtools-1.3.1/bin/') to reflect your settings.
-my $samtools = '';	## Path to samtools 1.3.1+ - http://www.htslib.org/
+my $samtools = '';		## Path to samtools 1.3.1+ - http://www.htslib.org/
 my $bcftools = '';		## Path to bcftools 1.3.1+ - http://www.htslib.org/
-my $bwa = '';				## Path to BWA - http://bio-bwa.sourceforge.net/
+my $bwa = '';			## Path to BWA - http://bio-bwa.sourceforge.net/
 my $bowtie2 = '';		## Path to Bowtie2 - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
 my $hisat2 = '';		## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
 my $freebayes = '';		## Path to FreeBayes -  https://github.com/ekg/freebayes
 my $mash = '';			## Path to Mash - https://github.com/marbl/Mash
-
 
 ## Usage definition
 my $usage = "\nUSAGE = perl get_SNPs.pl [options]\n
