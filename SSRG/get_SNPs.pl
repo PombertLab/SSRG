@@ -15,6 +15,7 @@ my $freebayes = '';		## Path to FreeBayes -  https://github.com/ekg/freebayes
 my $mash = '';			## Path to Mash - https://github.com/marbl/Mash
 
 ## Usage definition
+my $hint = "Type get_SNPs.pl -h (--help) for list of options\n";
 my $usage = <<'USAGE';
 
 USAGE = perl get_SNPs.pl [options]
@@ -24,7 +25,6 @@ EXAMPLE (advanced): get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2
 EXAMPLE (paired ends): get_SNPs.pl --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --caller freebayes --threads 16
 EXAMPLE (MASH): get_SNPs.pl -fa *.fasta -out Mash.txt -sort
 USAGE
-my $hint = "Type get_SNPs.pl -h (--help) for list of options\n";
 die "$usage\n$hint\n" unless@ARGV;
 
 ## Defining options
