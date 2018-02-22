@@ -28,16 +28,15 @@ die "$usage\n$hint\n" unless@ARGV;
 ## Defining options
 my $options = <<'END_OPTIONS';
 OPTIONS:
-
 -h (--help)	Display this list of options
 -v (--version)	Display script version
 
-## Genetic distances
+### Genetic distances ###
 -mh		Evaluate genetic distances using Mash (Ondov et al. DOI: 10.1186/s13059-016-0997-x)
 -out		Output file name [default: Mash.txt]
 -sort		Sort Mash output by decreasing order of similarity
 
-## Mapping options
+### Mapping options ###
 -fa (--fasta)	Reference genome(s) in fasta file
 -fq (--fastq)	Fastq reads (single ends) to be mapped against reference(s)
 -pe1		Fastq reads #1 (paired ends) to be mapped against reference(s)
@@ -49,11 +48,11 @@ OPTIONS:
 -bam		Keeps BAM files generated
 -sam		Keeps SAM files generated; SAM files can be quite large
 
-## Variant caller options
+### Variant caller options ###
 -caller				[default: varscan2]	## Variant caller: varscan2, bcftools or freebayes
 -type				[default: snp]		## snp, indel, or both
 
-## VarScan2 parameters (see http://dkoboldt.github.io/varscan/using-varscan.html)
+### VarScan2 parameters ### see http://dkoboldt.github.io/varscan/using-varscan.html
 -var				[default: /opt/varscan/VarScan.v2.4.3.jar]	## Which varscan jar file to use
 -mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
 -mr (--min-reads2)		[default: 5]		## Minimum supporting reads at a position to call variants
@@ -63,7 +62,7 @@ OPTIONS:
 -pv (--p-value)			[default: 1e-02]	## P-value threshold for calling variants 
 -sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
 
-## FreeBayes/BCFtools (see https://github.com/ekg/freebayes/; https://samtools.github.io/bcftools/bcftools.html)
+### FreeBayes/BCFtools ### see https://github.com/ekg/freebayes/; https://samtools.github.io/bcftools/bcftools.html
 -ploidy				[default: 1]		## Change ploidy (if needed)
 
 END_OPTIONS
