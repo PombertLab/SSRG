@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2018
-## Version 1.5a: fixed file path issues; varscan jar file can now be defined from the command line; added verbosity 
+my $version = '1.6'; ## Modified SNPs/indels output so that VarScan runs only once; Changed the CMD line options. See --help. Added verbosity.
 
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ my $mash = '';			## Path to Mash - https://github.com/marbl/Mash
 ## Usage definition
 my $usage = "\nUSAGE = perl get_SNPs.pl [options]\n
 EXAMPLE (simple): get_SNPs.pl -fa *.fasta -fq *.fastq
-EXAMPLE (advanced): get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller varscan2 --var ./VarScan.v2.4.3.jar --threads 16
+EXAMPLE (advanced): get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar --threads 16
 EXAMPLE (paired ends): get_SNPs.pl --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --caller freebayes --threads 16\n";
 my $hint = "Type get_SNPs.pl -h (--help) for list of options\n";
 die "$usage\n$hint\n" unless@ARGV;
@@ -31,11 +31,12 @@ my $options = <<'END_OPTIONS';
 OPTIONS:
 
 -h (--help)	Display this list of options
+-v (--version)	Display script version
 
 ## Genetic distances
--mh	Evaluate genetic distances using Mash (Ondov et al. DOI: 10.1186/s13059-016-0997-x)
--out	Output file name [default: Mash.txt]
--sort	Sort Mash output by decreasing order of similarity
+-mh		Evaluate genetic distances using Mash (Ondov et al. DOI: 10.1186/s13059-016-0997-x)
+-out		Output file name [default: Mash.txt]
+-sort		Sort Mash output by decreasing order of similarity
 
 ## Mapping options
 -fa (--fasta)	Reference genome(s) in fasta file
@@ -44,15 +45,17 @@ OPTIONS:
 -pe2		Fastq reads #2 (paired ends) to be mapped against reference(s)
 -X		Maximum paired ends insert size (for bowtie2) [default: 750]
 -mapper		Read mapping tool: bwa, bowtie2 or hisat2 [default: bowtie2]
--caller		Variant caller: varscan2, bcftools or freebayes [default: varscan2]
 -algo		BWA mapping algorithm:  bwasw, mem, samse [default: bwasw]
 -threads	Number of processing threads [default: 16]
 -bam		Keeps BAM files generated
 -sam		Keeps SAM files generated; SAM files can be quite large
 
+## Variant caller options
+-caller				[default: varscan2]	## Variant caller: varscan2, bcftools or freebayes
+-type				[default: snp]		## snp, indel, or both
+
 ## VarScan2 parameters (see http://dkoboldt.github.io/varscan/using-varscan.html)
 -var				[default: /opt/varscan/VarScan.v2.4.3.jar]	## Which varscan jar file to use
--indel							## Calculates indels (runs mpileup2indel)
 -mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
 -mr (--min-reads2)		[default: 5]		## Minimum supporting reads at a position to call variants
 -maq (--min-avg-qual)		[default: 28]		## Minimum base quality at a position to count a read
@@ -62,11 +65,11 @@ OPTIONS:
 -sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
 
 ## FreeBayes/BCFtools (see https://github.com/ekg/freebayes/; https://samtools.github.io/bcftools/bcftools.html)
--ploidy			[default: 1]		## Change ploidy (if needed)
+-ploidy				[default: 1]		## Change ploidy (if needed)
 
 END_OPTIONS
 
-my $help ='';
+my $help =''; my $vn;
 ## Genetic distances
 my $mh = '';
 my $out = 'Mash.txt';
@@ -85,7 +88,7 @@ my @pe2;
 my $maxins = '750'; 
 ## VarScan
 my $varjar = '/opt/varscan/VarScan.v2.4.3.jar';		## Define which VarScan2 jar file to use
-my $indel = '';
+my $type = 'snp';
 my $mc = 15;
 my $mr = 5;
 my $maq = 28;
@@ -98,6 +101,7 @@ my $ploidy = 1;
 
 GetOptions(
 	'h|help' => \$help,
+	'v|version', => \$vn,
 	'mh' => \$mh,
 	'out=s' => \$out,
 	'sort' => \$sort,
@@ -113,7 +117,7 @@ GetOptions(
 	'pe2=s@{1,}' => \@pe2,
 	'X=i' => \$maxins,
 	'var=s' => \$varjar,
-	'indel' => \$indel,
+	'type=s' => \$type,
 	'mc|min-coverage=i' => \$mc,
 	'mr|min-reads2=i' => \$mr,
 	'maq|min-avg-qual=i' => \$maq,
@@ -125,6 +129,7 @@ GetOptions(
 );
 
 if ($help){die "$usage\n$options";}
+if ($vn){die "\nversion $version\n\n";}
 
 ## Timestamps and logs
 my $start = localtime();
@@ -171,6 +176,7 @@ if (@fastq){ ## Single ends mode
 			my $mstart = localtime();
 			print MAP "\n".'###'." Mapping started on $mstart\n";
 			print MAP "\n$fastq vs. $fasta\n";
+			print "Mapping $fastq on $fasta with $mapper...\n";
 			if ($mapper eq 'bwa'){system "$bwa"."bwa $algo -t $threads $fasta $fastq -f $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} ## Appending STDERR to mapping.$mapper.log"
 			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 -p $threads -x $fa.bt2 -U $fastq -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} 
 			elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 -x $fa.ht -U $fastq --no-spliced-alignment -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
@@ -196,6 +202,7 @@ if (@pe1 && @pe2){ ## Paired ends mode
 			my $mstart = localtime();
 			print MAP "\n".'###'." Mapping started on $mstart\n";
 			print MAP "\n$pe1 + $pe2 vs. $fasta\n";
+			print "Mapping $pe1 and $pe2 on $fasta with $mapper...\n";
 			if ($mapper eq 'bwa'){system "$bwa"."bwa $algo -t $threads $fasta $pe1 $pe2 -f $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} ## Appending STDERR to mapping.$mapper.log"
 			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 -p $threads -x $fa.bt2 -X $maxins -1 $pe1 -2 $pe2 -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} 
 			elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 -x $fa.ht -1 $pe1 -2 $pe2 --no-spliced-alignment -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
@@ -215,7 +222,7 @@ elsif ($mapper eq 'bowtie2'){system "mkdir $mapper.indexes; mv *.bt2 ${dir}*.fai
 elsif ($mapper eq 'hisat2'){system "mkdir $mapper.indexes; mv *.ht2 ${dir}*.fai $mapper.indexes/";}
 system "mkdir $mapper.$caller.VCFs; mv *.vcf $mapper.$caller.VCFs/";
 system "mkdir $mapper.$caller.coverage; mv *.$mapper.coverage $mapper.$caller.coverage/";
-system "mkdir $mapper.$caller.stats; mv *.$mapper.stats $mapper.$caller.stats/";
+system "mkdir $mapper.$caller.stats; mv *.$mapper.$type.stats $mapper.$caller.stats/";
 
 ## Printing timestamps and logs
 my $end = localtime();
@@ -230,6 +237,7 @@ print LOG "Average time per pairwise comparison: $average_time seconds\n";
 
 ### Subroutines ###
 sub samtools{
+	print "Running samtools on $file.$fa.$mapper.sam...\n";
 	system "$samtools"."samtools view -@ $threads -bS $file.$fa.$mapper.sam -o $file.$fa.bam";
 	system "$samtools"."samtools sort -@ $threads -o $file.$fa.$mapper.bam $file.$fa.bam";
 	system "$samtools"."samtools depth -aa $file.$fa.$mapper.bam > $file.$fa.$mapper.coverage"; ## Printing per base coverage information
@@ -237,13 +245,17 @@ sub samtools{
 }
 
 sub variant{
+	print "Calling variants with $caller on $fasta...\n\n";
 	if ($caller eq 'varscan2'){
-		system "$samtools"."samtools mpileup -f $fasta $file.$fa.$mapper.bam | java -jar $varjar mpileup2snp --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $file.$fa.$mapper.SNP.vcf";
-		if ($indel){system "$samtools"."samtools mpileup -f $fasta $file.$fa.$mapper.bam | java -jar $varjar mpileup2indel --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $file.$fa.$mapper.indel.vcf";}
+		if (($type eq 'snp')||($type eq 'indel')){system "$samtools"."samtools mpileup -f $fasta $file.$fa.$mapper.bam | java -jar $varjar mpileup2$type --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --output-vcf > $file.$fa.$mapper.$type.vcf";}
+		elsif ($type eq 'both'){system "$samtools"."samtools mpileup -f $fasta $file.$fa.$mapper.bam | java -jar $varjar mpileup2cns --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --variants --output-vcf > $file.$fa.$mapper.$type.vcf";}
+		else {print "\nERROR: Unrecognized variant type. Please use: snp, indel, or both\n\n"; exit;}
 	}
 	elsif ($caller eq 'bcftools'){
-		system "$samtools"."samtools mpileup -ugf $fasta $file.$fa.$mapper.bam | $bcftools"."bcftools call -vmO v -V indels --ploidy $ploidy --output $file.$fa.$mapper.SNP.vcf";
-		if ($indel){system "$samtools"."samtools mpileup -ugf $fasta $file.$fa.$mapper.bam | $bcftools"."bcftools call -vmO v -V snps --ploidy $ploidy --output $file.$fa.$mapper.indel.vcf";}
+		if ($type eq 'snp'){system "$samtools"."samtools mpileup -ugf $fasta $file.$fa.$mapper.bam | $bcftools"."bcftools call -vmO v -V indels --ploidy $ploidy --output $file.$fa.$mapper.$type.vcf";}
+		elsif ($type eq 'indel'){system "$samtools"."samtools mpileup -ugf $fasta $file.$fa.$mapper.bam | $bcftools"."bcftools call -vmO v -V snps --ploidy $ploidy --output $file.$fa.$mapper.$type.vcf";}
+		elsif ($type eq 'both'){system "$samtools"."samtools mpileup -ugf $fasta $file.$fa.$mapper.bam | $bcftools"."bcftools call -vmO v --ploidy $ploidy --output $file.$fa.$mapper.$type.vcf";}
+		else {print "\nERROR: Unrecognized variant type. Please use: snp, indel, or both\n\n"; exit;}
 	}
 	elsif ($caller eq 'freebayes'){ ## single thread only, parallel version behaving wonky
 		system "$samtools"."samtools index $file.$fa.$mapper.bam";
@@ -253,9 +265,10 @@ sub variant{
 }
 
 sub stats{
+	print "\nCalculating stats...\n";
 	open COV, "<$file.$fa.$mapper.coverage";
-	open SN, "<$file.$fa.$mapper.SNP.vcf";
-	open STATS, ">$file.$fa.$mapper.stats";
+	open SN, "<$file.$fa.$mapper.$type.vcf";
+	open STATS, ">$file.$fa.$mapper.$type.stats";
 	my $total = 0; my $covered = 0; my $nocov = 0; my $max = 0; my $sumcov; my $sn =0;
 	while (my $line = <SN>){
 		if ($line =~ /^#/){next;}
@@ -283,11 +296,11 @@ sub stats{
 	if ($total == $covered){print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t100%\n";}
 	if ($total != $covered){my $av_cov = sprintf("%.2f%%", ($covered/$total)*100); print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t$av_cov\n";}
 	my $snkb = sprintf("%.2f", ($sn/$covered)*1000);
-	print STATS "Total number of SNPs found: $sn\n";
-	print STATS "Average number of SNPs per Kb: $snkb\n";
+	if ($type eq 'both'){print STATS "Total number of SNPs + indels found: $sn\n"; print STATS "Average number of SNPs + indels per Kb: $snkb\n";}
+	else {print STATS "Total number of $type found: $sn\n"; print STATS "Average number of $type per Kb: $snkb\n";}
 	print STATS "\n## SAMTOOLS flagstat metrics\n";
 	close STATS;
-	system "$samtools"."samtools flagstat $file.$fa.$mapper.bam >> $file.$fa.$mapper.stats";
+	system "$samtools"."samtools flagstat $file.$fa.$mapper.bam >> $file.$fa.$mapper.$type.stats";
 }
 
 sub logs{
