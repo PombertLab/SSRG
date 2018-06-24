@@ -25,8 +25,7 @@ END_OPTIONS
 my $usage = "\nUSAGE = perl SSRG.pl [options] *.fasta\n\n$options";
 die $usage unless(scalar@ARGV>=1);
 
-my $start = localtime();
-my $tstart = time;
+my $start = localtime(); my $tstart = time;
 
 ## Declare options
 my $winsize = 100;
@@ -52,7 +51,6 @@ die $warning1 unless(int($winsize) == $winsize);
 my $warning2 = "Fatal Error: Read size is too small\n";
 die $warning2 unless($winsize > 0 && $slide > 0);
 
-
 ## If Q33 Q=0 is ASCII 33; if Q64 Q=0 is ASCII 64
 my %ASCII = (
 33 => '!', 34 => '"', 35 => '#', 36 => '$', 37 => '%', 38 => '&', 39 => "'", 40 => '(', 
@@ -66,7 +64,6 @@ my %ASCII = (
 97 => 'a', 98 => 'b', 99 => 'c', 100 => 'd', 101 => 'e', 102 => 'f', 103 => 'g', 104 => 'h',
 105 => 'i', 106 => 'j'
 );
-
 
 ## take qscore, calculate appropriate offset, determine correct ASCII character for quality score
 my $offset; ## ASCII offset for quality score
@@ -105,7 +102,6 @@ while (my $fasta = shift @ARGV) {
 		}
 		else{$contigs{$name} .= $line;}	## otherwise, append the line to the hash value of the current contig
 	}
-	
 	## Parse each contig in the forward and reverse directions 
 	while (my $todo = shift@contigs){
 		chomp $todo;
@@ -135,14 +131,11 @@ while (my $fasta = shift @ARGV) {
 	}
 }
 
-my $end = localtime();
-my $time_taken = time -$tstart;
+my $end = localtime(); my $time_taken = time - $tstart;
 
 print "\nSSRG started on: $start\n";
 print "SSRG ended on: $end\n";
 print "Time elapsed: $time_taken seconds\n";
 
-close IN;
-close OUT;
-
+close IN; close OUT;
 exit;
