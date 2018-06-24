@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-
 ## SSRG: Synthetic Short Read Generator
 ## Generates synthetic short reads in Fastq (Q33) format from multifasta files
 ## Pombert JF, Illinois Institute of Technology (2015)
@@ -8,7 +7,6 @@
 
 use strict; use warnings; use Getopt::Long qw(GetOptions);    
 
-## Define command line options:
 my $options = <<'END_OPTIONS';
 OPTIONS: 
  -r (--readsize)	Synthetic reads size [default: 100].
@@ -21,7 +19,6 @@ OPTIONS:
  
  -q64          		Old Illumina Q64 FastQ format [default: Q33 (Sanger)].
 END_OPTIONS
-
 my $usage = "\nUSAGE = perl SSRG.pl [options] *.fasta\n\n$options";
 die $usage unless(scalar@ARGV>=1);
 
@@ -35,16 +32,16 @@ my $qscore = 30;
 my $q64 = '';         ## Default is false so that Q33 format is used
 
 GetOptions(
-'readsize|r=i' => \$winsize,
-'qscore|qs=i' => \$qscore,
-'q64' => \$q64,
-'cov100|c100' => \$cov100);
+	'readsize|r=i' => \$winsize,
+	'qscore|qs=i' => \$qscore,
+	'q64' => \$q64,
+	'cov100|c100' => \$cov100
+);
 
 # Calculate the slide value - if read size is not divisible by 25, truncate decimal slide value to ensure at least 50X or 100X coverage
 $slide = (2/50) * $winsize;       
 if ($cov100){ $slide /= 2;}       # reduce slide to increase coverage to 100X if necessary
 $slide = int($slide);             # truncate to integer value.
-#print "slide = $slide\n";
 
 my $warning1 = "Fatal Error: Read size must be an integer\n";
 die $warning1 unless(int($winsize) == $winsize);
@@ -132,10 +129,8 @@ while (my $fasta = shift @ARGV) {
 }
 
 my $end = localtime(); my $time_taken = time - $tstart;
-
 print "\nSSRG started on: $start\n";
 print "SSRG ended on: $end\n";
 print "Time elapsed: $time_taken seconds\n";
-
 close IN; close OUT;
 exit;
