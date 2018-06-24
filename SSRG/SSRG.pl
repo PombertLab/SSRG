@@ -111,9 +111,9 @@ while (my $fasta = shift @ARGV) {
 		chomp $todo;
 		my $len = length($contigs{$todo});
 		my $seq = $contigs{$todo};
-        my $rev = reverse($seq);	## get the reverse complement of the contig
-        $rev =~ tr/ATGCNRYSWKMBVDHatgcnryswkmbvdh/TACGNYRWSMKVBHDtacgnyrwsmkvbhd/;
-        my $i = 0;
+		my $rev = reverse($seq);	## get the reverse complement of the contig
+		$rev =~ tr/ATGCNRYSWKMBVDHatgcnryswkmbvdh/TACGNYRWSMKVBHDtacgnyrwsmkvbhd/;
+		my $i = 0;
 		while($i <= ($len-$winsize)) { 
 			my $read = substr($seq, $i, $winsize);
 			my $rev_read = substr($rev, $i, $winsize);
