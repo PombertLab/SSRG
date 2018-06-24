@@ -6,10 +6,7 @@
 ## Iva Veseli, Illinois Institute of Technology (2016)
 ## Version 1.2
 
-use strict;
-use warnings;
-use Getopt::Long qw(GetOptions);    
-
+use strict; use warnings; use Getopt::Long qw(GetOptions);    
 
 ## Define command line options:
 my $options = <<'END_OPTIONS';
@@ -73,37 +70,26 @@ my %ASCII = (
 
 ## take qscore, calculate appropriate offset, determine correct ASCII character for quality score
 my $offset; ## ASCII offset for quality score
-if ($q64)
-{
-    #print "Using Q64 format\n";
-    $offset = $qscore + 64;
-}
-else
-{
-    #print "Using Q33 format\n";
-    $offset = $qscore + 33;
-}
-my $score = $ASCII{$offset};  ## the artificial quality score to be assigned in the FastQ output
-
+if ($q64){$offset = $qscore + 64;}	#print "Using Q64 format\n";
+else{$offset = $qscore + 33;}		#print "Using Q33 format\n";
+my $score = $ASCII{$offset};		#the artificial quality score to be assigned in the FastQ output
 
 while (my $fasta = shift @ARGV) {
 	open IN, "<$fasta" or die "cannot open $fasta";
 	$fasta =~ s/\.fasta$//; $fasta =~ s/\.fsa$//; $fasta =~ s/\.fa$//; $fasta =~ s/\.fna$//; ## Removing file extensions
 	open OUT, ">$fasta.$winsize.fastq";
-
-        ##print run stats
-        print "\nInput File:\t$fasta\n";
-        print "Output File:\t$fasta.$winsize.fastq\n";
-        print "Coverage:\t";
-        if ($cov100){ print "100X\n";}
-        else{ print "50X\n";}
-        print "Quality score:\t$qscore\n";
-        if ($q64){ print "Q64 format:\t$score\n";}
-        else{ print "Q33 format:\t$score\n";}
-        print "Read size:\t$winsize\n";
-        print "Slide every:\t$slide nucleotides\n";
-        print "\n\n";
-        
+	##print run stats
+	print "\nInput File:\t$fasta\n";
+	print "Output File:\t$fasta.$winsize.fastq\n";
+	print "Coverage:\t";
+	if ($cov100){ print "100X\n";}
+	else{ print "50X\n";}
+	print "Quality score:\t$qscore\n";
+	if ($q64){ print "Q64 format:\t$score\n";}
+	else{ print "Q33 format:\t$score\n";}
+	print "Read size:\t$winsize\n";
+	print "Slide every:\t$slide nucleotides\n";
+	print "\n\n";
 
 	my @contigs = (); ## Initializing list of contigs per fasta file
 	my %contigs = (); ## Initializing hash of contigs per fasta file: key = contig name; value = sequence
@@ -112,41 +98,39 @@ while (my $fasta = shift @ARGV) {
 	
 	while (my $line = <IN>){
 		chomp $line;
-		if ($line =~ /^>(.*)$/){            ## if line is a header, save the new contig name and add it to hash
+		if ($line =~ /^>(.*)$/){	## if line is a header, save the new contig name and add it to hash
 			$name = $1;
 			push(@contigs, $name);
 			$contigs{$name} = undef;
 		}
-		else{
-			$contigs{$name} .= $line;   ## otherwise, append the line to the hash value of the current contig
-		}
+		else{$contigs{$name} .= $line;}	## otherwise, append the line to the hash value of the current contig
 	}
 	
-        ## Parse each contig in the forward and reverse directions 
+	## Parse each contig in the forward and reverse directions 
 	while (my $todo = shift@contigs){
 		chomp $todo;
 		my $len = length($contigs{$todo});
 		my $seq = $contigs{$todo};
-                my $rev = reverse($seq);            ## get the reverse complement of the contig
-                $rev =~ tr/ATGCNRYSWKMBVDHatgcnryswkmbvdh/TACGNYRWSMKVBHDtacgnyrwsmkvbhd/;
-                my $i = 0;
+        my $rev = reverse($seq);	## get the reverse complement of the contig
+        $rev =~ tr/ATGCNRYSWKMBVDHatgcnryswkmbvdh/TACGNYRWSMKVBHDtacgnyrwsmkvbhd/;
+        my $i = 0;
 		while($i <= ($len-$winsize)) { 
 			my $read = substr($seq, $i, $winsize);
-                        my $rev_read = substr($rev, $i, $winsize);
+            my $rev_read = substr($rev, $i, $winsize);
 			$count++;
-                        ## FastQ output:
+            ## FastQ output:
 			print OUT '@SYNTHREAD_'."$count\n";
 			print OUT "$read\n";
 			print OUT '+'."\n";
 			print OUT "$score" x $winsize;   ## assign fake quality score
 			print OUT "\n";
-                        $count++;
-                        print OUT '@SYNTHREAD_'."$count\n";
-                        print OUT "$rev_read\n";
+            $count++;
+            print OUT '@SYNTHREAD_'."$count\n";
+            print OUT "$rev_read\n";
 			print OUT '+'."\n";
 			print OUT "$score" x $winsize;
 			print OUT "\n";
-                        $i += $slide;                       
+            $i += $slide;                       
 		}
 	}
 }
