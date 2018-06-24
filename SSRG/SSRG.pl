@@ -116,21 +116,21 @@ while (my $fasta = shift @ARGV) {
         my $i = 0;
 		while($i <= ($len-$winsize)) { 
 			my $read = substr($seq, $i, $winsize);
-				my $rev_read = substr($rev, $i, $winsize);
+			my $rev_read = substr($rev, $i, $winsize);
 			$count++;
-				## FastQ output:
+			## FastQ output:
 			print OUT '@SYNTHREAD_'."$count\n";
 			print OUT "$read\n";
 			print OUT '+'."\n";
 			print OUT "$score" x $winsize;   ## assign fake quality score
 			print OUT "\n";
-				$count++;
-				print OUT '@SYNTHREAD_'."$count\n";
-				print OUT "$rev_read\n";
+			$count++;
+			print OUT '@SYNTHREAD_'."$count\n";
+			print OUT "$rev_read\n";
 			print OUT '+'."\n";
 			print OUT "$score" x $winsize;
 			print OUT "\n";
-				$i += $slide;                       
+			$i += $slide;                       
 		}
 	}
 }
