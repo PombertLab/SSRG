@@ -21,7 +21,7 @@ OPTIONS:
  -s (--sdev)		Insert size standard deviation percentage [default: 10]
  -c (--coverage)	Set sequencing depth [default: 50]
  -qs (--qscore)		Quality score associated with each base [default: 30]
- -q64          		Old Illumina Q64 FastQ format [default: Q33 (Sanger)]
+ -q64          		Used the old Illumina Q64 FastQ format instead of the default Q33 Sanger/Illumina 1.8+ encoding
 
 END_OPTIONS
 my $usage = "\nUSAGE = perl SSRG.pl [options] -f *.fasta\n\n$options"; die $usage unless(scalar@ARGV>=1);
@@ -37,9 +37,9 @@ my $insert = 250;
 my $sdev = 10;
 my $mode = 'rand';
 my $slide;
-my $cov = '50';      ## Default is false so that 50X coverage is used 
+my $cov = '50';
 my $qscore = 30;        
-my $q64 = '';         ## Default is false so that Q33 format is used
+my $q64 = '';		## Default is false so that Q33 format is used
 GetOptions(
 	'v|version' => \$ver,
 	'f|fasta=s@{1,}' => \@fasta,
