@@ -53,9 +53,9 @@ OPTIONS:
 ### VarScan2 parameters ### see http://dkoboldt.github.io/varscan/using-varscan.html
 -var				[default: /opt/varscan/VarScan.v2.4.3.jar]	## Which varscan jar file to use
 -mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
--mr (--min-reads2)		[default: 5]		## Minimum supporting reads at a position to call variants
+-mr (--min-reads2)		[default: 15]		## Minimum supporting reads at a position to call variants
 -maq (--min-avg-qual)		[default: 28]		## Minimum base quality at a position to count a read
--mvf (--min-var-freq)		[default: 0.2]		## Minimum variant allele frequency threshold
+-mvf (--min-var-freq)		[default: 0.7]		## Minimum variant allele frequency threshold
 -mhom (--min-freq-for-hom)	[default: 0.75]		## Minimum frequency to call homozygote
 -pv (--p-value)			[default: 1e-02]	## P-value threshold for calling variants 
 -sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
@@ -83,9 +83,9 @@ my $ploidy = 1;
 ## VarScan-specific
 my $varjar = '/opt/varscan/VarScan.v2.4.3.jar';	## Define which VarScan2 jar file to use; or use -var from the CMD line
 my $mc = 15;
-my $mr = 5;
+my $mr = 15;
 my $maq = 28;
-my $mvf = '0.2';
+my $mvf = '0.7';
 my $mhom = '0.75';
 my $pv = '1e-02';
 my $sf = 0;
