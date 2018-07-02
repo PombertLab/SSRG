@@ -5,8 +5,7 @@ use strict;
 use warnings;
 use Getopt::Long qw(GetOptions);
 
-## Path to Mash; leave blank (e.g. $mash = '';) if set in $PATH
-my $mash = '/opt/Mash/bin/';
+my $mash = '';	## Path to Mash; leave blank (e.g. $mash = '';) if set in $PATH
 
 ## Defining options
 my $usage = "
