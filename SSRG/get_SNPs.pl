@@ -279,7 +279,8 @@ sub stats{
 	if ($total != $covered){my $av_cov = sprintf("%.2f%%", ($covered/$total)*100); print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t$av_cov\n";}
 	my $snkb = sprintf("%.2f", ($sn/$covered)*1000);
 	if ($type eq 'both'){print STATS "Total number of SNPs + indels found: $sn\n"; print STATS "Average number of SNPs + indels per Kb: $snkb\n";}
-	else {print STATS "Total number of $type found: $sn\n"; print STATS "Average number of $type per Kb: $snkb\n";}
+	elsif ($type eq 'snp') {print STATS "Total number of SNPs found: $sn\n"; print STATS "Average number of SNPs per Kb: $snkb\n";}
+	elsif ($type eq 'indel') {print STATS "Total number of indels found: $sn\n"; print STATS "Average number of indels per Kb: $snkb\n";}
 	print STATS "\n## SAMTOOLS flagstat metrics\n";
 	close STATS;
 	system "$samtools"."samtools flagstat $file.$fa.$mapper.bam >> $file.$fa.$mapper.$type.stats";
