@@ -12,23 +12,25 @@ my $usage = "
 Mash - https://github.com/marbl/Mash (Ondov et al. DOI: 10.1186/s13059-016-0997-x)
 
 USAGE = perl run_Mash.pl [options]
+
 EXAMPLE = run_Mash.pl --fasta *.fasta --out Mash.txt --sort 
+
 OPTIONS:
---fasta		Reference genome(s) in fasta file
---out		Output file name
---sort		Sort Mash output by decreasing order of similarity
+-f (--fasta)		Reference genome(s) in fasta file
+-o (--out)		Output file name [Default: Mash.txt]
+-s (--sort)		Sort Mash output by decreasing order of similarity
 ";
 
 die "$usage\n" unless@ARGV;
 
 my @fasta;
-my $out = '';
-my $sort = '';
+my $out = 'Mash.txt';
+my $sort;
 
 GetOptions(
-	'fasta=s@{1,}' => \@fasta,
-	'out=s' => \$out,
-	'sort' => \$sort,
+	'f|fasta=s@{1,}' => \@fasta,
+	'o|out=s' => \$out,
+	's|sort' => \$sort,
 );
 
 system "echo Running Mash genetic distance analysis...";
