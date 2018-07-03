@@ -59,8 +59,8 @@ while (my $line = <FASTA>){
 open GFF, "<$gff";
 open TABLE, ">$output.features.tsv";
 open INTER, ">$output.intergenic.tsv";
-print TABLE "Locus_tag\tContig\tType\tStart\tEnd\tStrandedness\tProduct\tVariantPosition\tReference\tVariant\tSynonymy\tGeneticCode\tRefCodon\tVarCodont\tFrequency\tE-value\n";
-print INTER "Contig\tType\tVariantPosition\tReference\tVariant\tFrequency\tE-value\n";
+print TABLE "Locus_tag\tReference Contig\tVCF file\tType\tStart\tEnd\tStrandedness\tProduct\tVariant Position\tReference\tVariant\tSynonymy\tGenetic Code\tRefCodon\tVarCodon\tFrequency\tE-value\n";
+print INTER "Reference Contig\tVCF file\tType\tVariant Position\tReference\tVariant\tFrequency\tE-value\n";
 my %genes, my %features;
 my %hashes;		## hash of hashes for contigs and their feature locations
 my $type; my $start; my $end; my $strand; my $id; my $locus_tag; my $parent; my $product;
@@ -109,7 +109,7 @@ while (my $vcf = shift@vcf){
 					$strand = $features{$hashes{$contig}{$position}[$_]}[3];
 					$parent = $features{$hashes{$contig}{$position}[$_]}[4];
 					$product = $features{$hashes{$contig}{$position}[$_]}[5];
-					print TABLE "$genes{$parent}[4]\t$contig\t$type\t$start\t$end\t$strand\t$product\t$position\t$ref\t$alt\t";
+					print TABLE "$genes{$parent}[4]\t$contig\t$vcf\t$type\t$start\t$end\t$strand\t$product\t$position\t$ref\t$alt\t";
 					if ($type eq 'tRNA'){print TABLE "N\/A\tN\/A\tN\/A\tN\/A\t";}
 					elsif ($type eq 'rRNA'){print TABLE "N\/A\tN\/A\tN\/A\tN\/A\t";}
 					elsif ($type eq 'CDS'){
@@ -177,7 +177,7 @@ while (my $vcf = shift@vcf){
 					print TABLE "$freq\t$evalue\n";
 				}
 			}
-			else {print INTER "$contig\tintergenic\t$position\t$ref\t$alt\t$freq\t$evalue\n"}
+			else {print INTER "$contig\t$vcf\tintergenic\t$position\t$ref\t$alt\t$freq\t$evalue\n"}
 		}
 	}
 }
