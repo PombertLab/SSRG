@@ -1,13 +1,13 @@
 #!/usr/bin/perl
-## Pombert Lab, 2017 Illinois Tech
+## Pombert Lab, 2017-2018 Illinois Tech
 ## Sort SNPs per type (CDS, tRNA, rRNA or intergenic) and synonymous or non-synonymous, if applicable
-my $version = '0.2'; ## Now compatible with NCBI GenBank GFF files
+my $version = '0.3'; ## Now compatible with NCBI GenBank GFF files
 
 use strict; use warnings; use Getopt::Long qw(GetOptions);
 
-my $usage = "USAGE = syn.pl -gcode 01 -fa reference.fasta -gff reference.gff -vcf *.vcf";
-my $hint = "Type syn.pl -h (--help) for list of options\n";
-die "\n$usage\n$hint\n" unless@ARGV;
+my $usage = "USAGE = synonymy.pl -gcode 1 -fa reference.fasta -gff reference.gff -vcf *.vcf -o table_name";
+my $hint = "Type synonymy.pl -h (--help) for list of options\n";
+die "\n$usage\n\n$hint\n" unless@ARGV;
 
 my $options = <<'END_OPTIONS';
 
@@ -17,11 +17,12 @@ OPTIONS:
 -fa (--fasta)	Reference genome in fasta format
 -gff (--gff)	Reference genome annotation in GFF format
 -vcf (--vcf)	SNPs in Variant Calling Format (VCF)
+-o (--output)	Table prefix [Default: synonymy] The .features/.intergenic suffixes and .tsv file extension will be added automatically.
 -gc (--gcode)	NCBI genetic code; e.g.:
-		01 - The Standard Code
-		02 - The Vertebrate Mitochondrial Code
-		03 - The Yeast Mitochondrial Code
-		04 - The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
+		1  - The Standard Code
+		2  - The Vertebrate Mitochondrial Code
+		3  - The Yeast Mitochondrial Code
+		4  - The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
 		11 - The Bacterial, Archaeal and Plant Plastid Code
 		NOTE - For complete list; see https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
 		
@@ -33,6 +34,7 @@ my $vn;
 my $fasta;
 my $gff;
 my @vcf;
+my $output = 'synonymy';
 my $gc = '01';
 GetOptions(
 	'h|help' => \$help,
@@ -40,7 +42,8 @@ GetOptions(
 	'fa|fasta=s' => \$fasta,
 	'gff=s' => \$gff,
 	'vcf=s@{1,}' => \@vcf,
-	'gc|gcode=s' => \$gc
+	'o|output=s' => \$output,
+	'gc|gcode=i' => \$gc
 );
 if ($help){die "\n$usage\n$options";} if ($vn){die "\nversion $version\n\n";}
 
@@ -52,52 +55,65 @@ while (my $line = <FASTA>){
 	if ($line =~ /^>(\S+)/){$contig = $1;}
 	else{$sequences{$contig} .= $line;}
 }
-## Building hashes of features
-open GFF, "<$gff";	
-my %features;
+## Building hashes of features + Init tables
+open GFF, "<$gff";
+open TABLE, ">$output.features.tsv";
+open INTER, ">$output.intergenic.tsv";
+print TABLE "Locus_tag\tContig\tType\tStart\tEnd\tStrandedness\tProduct\tVariantPosition\tReference\tVariant\tSynonymy\tGeneticCode\tRefCodon\tVarCodont\tFrequency\tE-value\n";
+print INTER "Contig\tType\tVariantPosition\tReference\tVariant\tFrequency\tE-value\n";
+my %genes, my %features;
 my %hashes;		## hash of hashes for contigs and their feature locations
+my $type; my $start; my $end; my $strand; my $id; my $locus_tag; my $parent; my $product;
 while (my $line = <GFF>){
 	chomp $line;
 	if ($line =~ /^#/){next;}
 	elsif ($line =~ /^ID=/){next;}
-	elsif ($line =~ /^(\S+)\t.*\t(tRNA|rRNA|CDS|)\t(\d+)\t(\d+)\t\.\t([+-])\t[.012]\tID=(\w+)/){
-		$contig = $1; my $type = $2; my $start = $3; my $end = $4; my $strand = $5; my $locus = $6;
-		$features{$locus}[0] = $type;
-		$features{$locus}[1] = $start;
-		$features{$locus}[2] = $end;
-		$features{$locus}[3] = $strand;
+	elsif ($line =~ /^(\S+)\t.*\t(gene|pseudogene)\t(\d+)\t(\d+)\t\.\t([+-])\t[.012]\tID=(\w+).*\;locus_tag=([A-Za-z0-9 _]+)/){ ## Working on locus_tags
+		$contig = $1; $type = $2; $start = $3; $end = $4; $strand = $5; $id = $6; $locus_tag = $7;
+		$genes{$id}[0] = $contig;
+		$genes{$id}[1] = $start;
+		$genes{$id}[2] = $end;
+		$genes{$id}[3] = $strand;
+		$genes{$id}[4] = $locus_tag;
+	}
+	elsif ($line =~ /^(\S+)\t.*\t(tRNA|rRNA|CDS|)\t(\d+)\t(\d+)\t\.\t([+-])\t[.012]\tID=(\w+).*Parent=([A-Za-z0-9_]+).*product=([A-Za-z0-9 -]+)/){	## Working ion features
+		$contig = $1; $type = $2; $start = $3; $end = $4; $strand = $5; $id = $6; $parent = $7; $product = $8;
+		$features{$id}[0] = $type;
+		$features{$id}[1] = $start;
+		$features{$id}[2] = $end;
+		$features{$id}[3] = $strand;
+		$features{$id}[4] = $parent;
+		$features{$id}[5] = $product;
 		for ($start..$end){
-			push (@{$hashes{$contig}{$_}}, $locus);
-			#print "$contig\t$_\t$locus\n"; ## Debugging
+			push (@{$hashes{$contig}{$_}}, $id);
 		}
 	}	
 }
 ## Working on VCF files
-my $codon; my $snp; my $revcodon; my $revsnp;
+my $codon; my $snp; my $revcodon; my $revsnp; my $locus;
 my %gcodes; gcodes();
 while (my $vcf = shift@vcf){
 	open VCF, "<$vcf";
-	open SORT, ">$vcf.sorted";
 	while (my $line = <VCF>){
 		chomp $line;
 		if ($line =~ /^#/){next;}
-		elsif ($line =~ /^(\S+)\t(\d+)\t\.\t(\w+)\t(\w+)/){
-			$contig = $1; my $position = $2; my $ref = $3; my $alt = $4;
+		else{
+			my @vcf = split("\t", $line); my @params = split(":", $vcf[9]); my $freq = $params[6]; my $evalue = $params[7];
+			$contig = $vcf[0]; my $position = $vcf[1]; my $ref = $vcf[3]; my $alt = $vcf[4];
 			if (exists $hashes{$contig}{$position}){
 				for (0..$#{$hashes{$contig}{$position}}){
-					my $locus = $hashes{$contig}{$position}[$_];
-					my $type = $features{$hashes{$contig}{$position}[$_]}[0];
-					my $start = $features{$hashes{$contig}{$position}[$_]}[1];
-					my $end = $features{$hashes{$contig}{$position}[$_]}[2];
-					my $strand  = $features{$hashes{$contig}{$position}[$_]}[3];
-					print SORT "$type\t";
-					print "$type\t$locus\t$start\t$end\t$strand\n";
-					if ($type eq 'tRNA'){print SORT "Not applicable\t\t\t";}
-					elsif ($type eq 'rRNA'){print SORT "Not applicable\t\t\t";}
+					$locus = $hashes{$contig}{$position}[$_];
+					$type = $features{$hashes{$contig}{$position}[$_]}[0];
+					$start = $features{$hashes{$contig}{$position}[$_]}[1];
+					$end = $features{$hashes{$contig}{$position}[$_]}[2];
+					$strand = $features{$hashes{$contig}{$position}[$_]}[3];
+					$parent = $features{$hashes{$contig}{$position}[$_]}[4];
+					$product = $features{$hashes{$contig}{$position}[$_]}[5];
+					print TABLE "$genes{$parent}[4]\t$contig\t$type\t$start\t$end\t$strand\t$product\t$position\t$ref\t$alt\t";
+					if ($type eq 'tRNA'){print TABLE "N\/A\tN\/A\tN\/A\tN\/A\t";}
+					elsif ($type eq 'rRNA'){print TABLE "N\/A\tN\/A\tN\/A\tN\/A\t";}
 					elsif ($type eq 'CDS'){
 						if (($strand  eq '+') || ($strand  eq 'plus')){
-							#~ my $seq = substr($sequences{$contig}, $start-1, $end-$start+1); ## Debugging
-							#~ print "$seq\n";
 							if (($position - $start) == 0){
 								$codon = substr($sequences{$contig}, $position-1, 3);
 								$snp = $codon; $snp =~ substr($snp, 0, 1, $alt);
@@ -128,10 +144,6 @@ while (my $vcf = shift@vcf){
 							}
 						}
 						elsif (($strand  eq '-') || ($strand  eq 'minus')){
-							#~ my $seq = substr($sequences{$contig}, $start-1, $end-$start+1); ## Debugging
-							#~ my $rev = reverse($seq);
-							#~ $rev =~ tr/ATGCNatgcn/TACGNtacgn/;
-							#~ print "$rev\n"; 
 							if (($end - $position) == 0){
 								$revcodon = substr($sequences{$contig}, $position-3, 3);
 								$revsnp = $revcodon; $revsnp =~ substr($revsnp, 2, 1, $alt);
@@ -162,11 +174,10 @@ while (my $vcf = shift@vcf){
 							}
 						}
 					}
-					#~ print "\ncodon = $codon\talt = $snp\n"; ## Debugging
-					print SORT "$locus\t$line\n";
+					print TABLE "$freq\t$evalue\n";
 				}
 			}
-			else {print SORT "intergenic\tNot applicable\t\t\t\t$line\n"}
+			else {print INTER "$contig\tintergenic\t$position\t$ref\t$alt\t$freq\t$evalue\n"}
 		}
 	}
 }
@@ -178,13 +189,13 @@ sub rev{
 }
 sub translation{
 	$codon = uc($codon); $snp = uc($snp);
-	if ($codon =~ /[^ATGCatgc]/){print SORT "ambiguous bases\t$codon\t$snp\t";}
-	elsif ($gcodes{$gc}{$codon} eq $gcodes{$gc}{$snp}){print SORT "synonym\t$codon\t$snp\t";}
-	elsif ($gcodes{$gc}{$codon} ne $gcodes{$gc}{$snp}){print SORT "non-syn\t$codon\t$snp\t";}
+	if ($codon =~ /[^ATGCatgc]/){print TABLE "ambiguous bases\t$gc\t$codon\t$snp\t";}
+	elsif ($gcodes{$gc}{$codon} eq $gcodes{$gc}{$snp}){print TABLE "synonym\t$gc\t$codon\t$snp\t";}
+	elsif ($gcodes{$gc}{$codon} ne $gcodes{$gc}{$snp}){print TABLE "non-syn\t$gc\t$codon\t$snp\t";}
 }
 sub gcodes{ ## NCBI Genetic codes
 	%gcodes = (
-		'01' => { ## The Standard Code (transl_table=1)
+		1 => { ## The Standard Code (transl_table=1)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => '*', 'TGA' => '*',   
@@ -202,7 +213,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'
 		},
-		'02' => { ## The Vertebrate Mitochondrial Code (transl_table=2)
+		2 => { ## The Vertebrate Mitochondrial Code (transl_table=2)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',  
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => '*', 'TGA' => 'W',
@@ -220,7 +231,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'
 		},
-		'03' => { ## The Yeast Mitochondrial Code (transl_table=3)
+		3 => { ## The Yeast Mitochondrial Code (transl_table=3)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => '*', 'TGA' => 'W',
@@ -238,7 +249,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'
 		},
-		'04' => { ## The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code (transl_table=4)
+		4 => { ## The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code (transl_table=4)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',  
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',  
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => '*', 'TGA' => 'W',  
@@ -256,7 +267,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',  
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G' 
 		},
-		'05' => { ## The Invertebrate Mitochondrial Code (transl_table=5)
+		5 => { ## The Invertebrate Mitochondrial Code (transl_table=5)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',  
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',  
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => '*', 'TGA' => 'W',  
@@ -274,7 +285,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',  
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'  
 		},
-		'06' => { ## The Ciliate, Dasycladacean and Hexamita Nuclear Code (transl_table=6)
+		6 => { ## The Ciliate, Dasycladacean and Hexamita Nuclear Code (transl_table=6)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C', 
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C', 
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => 'Q', 'TGA' => '*', 
@@ -292,7 +303,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G', 
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G' 
 		},
-		'09' => { ## The Echinoderm and Flatworm Mitochondrial Code (transl_table=9)
+		9 => { ## The Echinoderm and Flatworm Mitochondrial Code (transl_table=9)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',  
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',  
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => '*', 'TGA' => 'W',  
@@ -310,7 +321,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',  
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'  
 		},
-		'10' => { ## The Euplotid Nuclear Code (transl_table=10)
+		10 => { ## The Euplotid Nuclear Code (transl_table=10)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => '*', 'TGA' => 'C',
@@ -328,7 +339,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'
 		},
-		'11' => { ## The Bacterial, Archaeal and Plant Plastid Code (transl_table=11)
+		11 => { ## The Bacterial, Archaeal and Plant Plastid Code (transl_table=11)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',  
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',  
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => '*', 'TGA' => '*',  
@@ -346,7 +357,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',  
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'  
 		},
-		'12' => { ## The Alternative Yeast Nuclear Code (transl_table=12)
+		12 => { ## The Alternative Yeast Nuclear Code (transl_table=12)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => '*', 'TGA' => '*',
@@ -364,7 +375,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'
 		},
-		'13' => { ## The Ascidian Mitochondrial Code (transl_table=13)
+		13 => { ## The Ascidian Mitochondrial Code (transl_table=13)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => '*', 'TGA' => 'W',
@@ -382,7 +393,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G',
 		},
-		'14' => { ## The Alternative Flatworm Mitochondrial Code (transl_table=14)
+		14 => { ## The Alternative Flatworm Mitochondrial Code (transl_table=14)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => 'Y', 'TGA' => 'W',
@@ -400,7 +411,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G',
 		},
-		'16' => { ## Chlorophycean Mitochondrial Code (transl_table=16)
+		16 => { ## Chlorophycean Mitochondrial Code (transl_table=16)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => '*', 'TGA' => '*',
@@ -418,7 +429,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'
 		},
-		'21' => { ## Trematode Mitochondrial Code (transl_table=21)
+		21 => { ## Trematode Mitochondrial Code (transl_table=21)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',  
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',  
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => '*', 'TGA' => 'W',  
@@ -436,7 +447,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',  
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'  
 		},
-		'22' => { ## Scenedesmus obliquus Mitochondrial Code (transl_table=22)
+		22 => { ## Scenedesmus obliquus Mitochondrial Code (transl_table=22)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',  
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',  
 			'TTA' => 'L', 'TCA' => '*', 'TAA' => '*', 'TGA' => '*',  
@@ -454,7 +465,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',  
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'  
 		},
-		'23' => { ## Thraustochytrium Mitochondrial Code (transl_table=23)
+		23 => { ## Thraustochytrium Mitochondrial Code (transl_table=23)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => '*', 'TCA' => 'S', 'TAA' => '*', 'TGA' => '*',
@@ -472,7 +483,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'
 		},
-		'24' => { ## Pterobranchia Mitochondrial Code (transl_table=24)
+		24 => { ## Pterobranchia Mitochondrial Code (transl_table=24)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => '*', 'TGA' => 'W',
@@ -490,7 +501,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'
 		},
-		'25' => { ## Candidate Division SR1 and Gracilibacteria Code (transl_table=25)
+		25 => { ## Candidate Division SR1 and Gracilibacteria Code (transl_table=25)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => '*', 'TGA' => 'G',
@@ -508,7 +519,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'
 		},
-		'26' => { ## Pachysolen tannophilus Nuclear Code (transl_table=26)
+		26 => { ## Pachysolen tannophilus Nuclear Code (transl_table=26)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => '*', 'TGA' => '*',
@@ -526,7 +537,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'
 		},
-		'27' => { ## Karyorelict Nuclear (transl_table=27)
+		27 => { ## Karyorelict Nuclear (transl_table=27)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => 'Q', 'TGA' => 'W',
@@ -544,7 +555,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'
 		},
-		'28' => { ## Condylostoma Nuclear (transl_table=28)
+		28 => { ## Condylostoma Nuclear (transl_table=28)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => 'Q', 'TGA' => 'W',
@@ -562,7 +573,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'
 		},
-		'29' => { ## Mesodinium Nuclear (transl_table=29)
+		29 => { ## Mesodinium Nuclear (transl_table=29)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => 'Y', 'TGA' => '*',
@@ -580,7 +591,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'
 		},
-		'30' => { ## Peritrich Nuclear (transl_table=30)
+		30 => { ## Peritrich Nuclear (transl_table=30)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => 'E', 'TGA' => '*',
@@ -598,7 +609,7 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'
 		},
-		'31' => { ## Blastocrithidia Nuclear (transl_table=31)
+		31 => { ## Blastocrithidia Nuclear (transl_table=31)
 			'TTT' => 'F', 'TCT' => 'S', 'TAT' => 'Y', 'TGT' => 'C',
 			'TTC' => 'F', 'TCC' => 'S', 'TAC' => 'Y', 'TGC' => 'C',
 			'TTA' => 'L', 'TCA' => 'S', 'TAA' => 'E', 'TGA' => 'W',
@@ -616,5 +627,5 @@ sub gcodes{ ## NCBI Genetic codes
 			'GTA' => 'V', 'GCA' => 'A', 'GAA' => 'E', 'GGA' => 'G',
 			'GTG' => 'V', 'GCG' => 'A', 'GAG' => 'E', 'GGG' => 'G'
 		},
-);
+	);
 }
