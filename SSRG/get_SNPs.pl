@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2018
-my $version = '1.6'; ## Modified SNPs/indels output so that VarScan runs only once; Changed the CMD line options. See --help. Added verbosity.
+my $version = '1.7';
 
 use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
 
@@ -92,6 +92,9 @@ my $sf = 0;
 ## MASH
 my $out = 'Mash.txt'; my $mh = ''; my $sort = ''; 
 
+open MAP, ">>mapping.$mapper.log"; ## Keep track of read mapper STDERR messages
+print MAP "COMMAND LINE:\nget_SNP.pl @ARGV\n";
+
 GetOptions(
 	'h|help' => \$help, 'v|version', => \$vn,
 	## Mapping
@@ -128,7 +131,7 @@ if (@pe1 && @pe2){$todo += scalar(@pe1)*scalar(@fasta);}
 open LOG, ">time.$mapper.$caller.log"; ## Keep track of running time
 print LOG "Mapping/SNP calling started on: $start\n";
 print LOG "A total of $todo pairwise comparisons will be performed\n";
-open MAP, ">>mapping.$mapper.log"; ## Keep track of read mapper STDERR messages
+print_options();
 my $comparison = 0;
 
 ## Genetic distances with MASH
@@ -291,4 +294,28 @@ sub logs{
 	$comparison++;
 	print LOG "Comparison # $comparison : $file (and mate, if PE) vs. $fasta - cumulative time elapsed: $run_time seconds\n";
 	print MAP "\n".'###'." Mapping ended on $mend\n\n";
+}
+
+sub print_options{
+	print MAP "\nOPTIONS:\n\n";
+	print MAP "get_SNP.pl version: $version\n";
+	print MAP "Number of threads: $threads\n";
+	print MAP "Read mapper: $mapper\n";
+	if ($mapper eq 'bwa'){print MAP "BWA alogrithm: $algo\n";}
+	if ($mapper eq 'bowtie'){print MAP "Max insert size for bowtie: $maxins nt\n";}
+	print MAP "Variant caller: $caller\n";
+	if ($caller eq 'varscan2'){
+		print MAP "   Varscan jar file used: $varjar\n";
+		print MAP "   Minimum read depth at a position to make a call: $mc\n";
+		print MAP "   Minimum supporting reads at a position to call variants: $mr\n";
+		print MAP "   Minimum base quality at a position to count a read: $maq\n";
+		print MAP "   Minimum variant allele frequency threshold: $mvf\n";
+		print MAP "   Minimum frequency to call homozygote: $mhom\n";
+		print MAP "   P-value threshold for calling variants: $pv\n";
+		print MAP "   Strand filter: $sf\t\#\# 1 ignores variants with >90% support on one strand\n";
+	}
+	if ($caller eq "bcftools|freebayes"){print MAP "Setting ploidy to: $ploidy\n";}
+	if ($type eq 'snp'){print MAP "Searching for SNPs...\n";}
+	elsif ($type eq 'indel') {print MAP "Searching for indels...\n";}
+	elsif ($type eq 'both') {print MAP "Searching for SNPs and indels...\n";}
 }
