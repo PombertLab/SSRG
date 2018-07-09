@@ -93,7 +93,7 @@ my $sf = 0;
 my $out = 'Mash.txt'; my $mh = ''; my $sort = ''; 
 
 open MAP, ">>mapping.$mapper.log"; ## Keep track of read mapper STDERR messages
-print MAP "COMMAND LINE:\nget_SNP.pl @ARGV\n";
+print MAP "COMMAND LINE:\nget_SNPs.pl @ARGV\n";
 
 GetOptions(
 	'h|help' => \$help, 'v|version', => \$vn,
