@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2018
-my $version = '1.7';
+my $version = '1.8';
 
 use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
 
@@ -207,6 +207,7 @@ elsif ($mapper eq 'bowtie2'){system "mkdir $mapper.indexes; mv *.bt2 ${dir}*.fai
 elsif ($mapper eq 'hisat2'){system "mkdir $mapper.indexes; mv *.ht2 ${dir}*.fai $mapper.indexes/";}
 system "mkdir $mapper.$caller.VCFs; mv *.vcf $mapper.$caller.VCFs/";
 system "mkdir $mapper.$caller.coverage; mv *.$mapper.coverage $mapper.$caller.coverage/";
+system "mkdir $mapper.$caller.depth; mv *.$mapper.depth $mapper.$caller.depth/";
 system "mkdir $mapper.$caller.stats; mv *.$mapper.$type.stats $mapper.$caller.stats/";
 
 ## Printing timestamps and logs
@@ -254,29 +255,47 @@ sub stats{
 	open COV, "<$file.$fa.$mapper.coverage";
 	open SN, "<$file.$fa.$mapper.$type.vcf";
 	open STATS, ">$file.$fa.$mapper.$type.stats";
+	open DEPTH, ">$file.$fa.$mapper.depth"; print DEPTH "Contig\tAverage depth\tAverage (all contigs)\tDifference\tRatio Contig\/Average\n";
 	my $total = 0; my $covered = 0; my $nocov = 0; my $max = 0; my $sumcov; my $sn =0;
 	while (my $line = <SN>){
 		if ($line =~ /^#/){next;}
 		else {$sn++;}
 	}
+	my %data = (); my @contigs = ();
 	while (my $line = <COV>){
 		chomp $line;
 		$total++; 
-		if ($line =~ /^\S+\s+\d+\s+(\d+)/){
-			my $coverage = $1;
+		if ($line =~ /^(\S+)\s+(\d+)\s+(\d+)/){
+			my $contig = $1; my $position = $2; my $coverage = $3;
 			$sumcov += $coverage;
 			if ($coverage >= 1) {
 				$covered++;
 				if ($coverage > $max){$max = $coverage;}
 			}
 			else {$nocov++;}
+			if (exists $data{$contig}){
+				$data{$contig}[0] += 1; ## Keeping track of contig size 
+				$data{$contig}[1] += $coverage; ## Keeping track of cumulative sequencing depth 
+			}
+			else{
+				$data{$contig}[0] = 1; ## Initializing new contig 
+				$data{$contig}[1] += $coverage; ## Keeping track of cumulative sequencing depth 
+				push (@contigs, $contig);
+			}
 		}
 	}
+	my $avc = sprintf("%.2f", ($sumcov/$total));
+	while (my $tmp = shift@contigs){ ## Printing sequencing depths per contig
+		my $average = ($data{$tmp}[1]/$data{$tmp}[0]);
+		$average = sprintf("%.2f", $average);
+		my $diff = $avc - $average;
+		my $ratio = $average/$avc; $ratio = sprintf("%.2f", $ratio);
+		print DEPTH "$tmp\t$average\t$avc\t$diff\t$ratio\n";
+	} 
 	print STATS "FASTQ file(s) used: $file (and mate, if PE)\n";
 	print STATS "Reference fasta file used: $fasta\n";
 	print STATS "\nTotal number of bases in the reference genome\t$total bp\n"."Number of bases covered by at least one read\t$covered\n". "Number of bases without coverage\t$nocov\n";
 	print STATS "Maximum sequencing depth\t$max"."X\n";
-	my $avc = sprintf("%.2f", ($sumcov/$total));
 	print STATS "Average sequencing depth\t$avc"."X\n";
 	if ($total == $covered){print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t100%\n";}
 	if ($total != $covered){my $av_cov = sprintf("%.2f%%", ($covered/$total)*100); print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t$av_cov\n";}
