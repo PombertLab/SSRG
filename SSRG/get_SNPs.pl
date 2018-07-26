@@ -288,7 +288,7 @@ sub stats{
 	while (my $tmp = shift@contigs){ ## Printing sequencing depths per contig
 		my $average = ($data{$tmp}[1]/$data{$tmp}[0]);
 		$average = sprintf("%.2f", $average);
-		my $diff = $average - $avc;
+		my $diff = $average - $avc; $diff = sprintf("%.2f", $diff);
 		my $ratio = $average/$avc; $ratio = sprintf("%.2f", $ratio);
 		print DEPTH "$tmp\t$average\t$avc\t$diff\t$ratio\n";
 	} 
