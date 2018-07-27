@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2017-2018 Illinois Tech
 ## Sort SNPs per type (CDS, tRNA, rRNA or intergenic) and synonymous or non-synonymous, if applicable
-my $version = '0.3'; ## Now compatible with NCBI GenBank GFF files
+my $version = '0.4'; ## Now compatible with NCBI GenBank GBFF and GFF files
 
 use strict; use warnings; use Getopt::Long qw(GetOptions);
 
-my $usage = "USAGE = synonymy.pl -gcode 1 -fa reference.fasta -gff reference.gff -vcf *.vcf -o table_name";
+my $usage = "USAGE = synonymy.pl -gcode 1 -fa reference.fasta -ref reference.gff -format gb -vcf *.vcf -o table_name";
 my $hint = "Type synonymy.pl -h (--help) for list of options\n";
 die "\n$usage\n\n$hint\n" unless@ARGV;
 
@@ -15,7 +15,8 @@ OPTIONS:
 -h (--help)	Display this list of options
 -v (--version)	Display script version
 -fa (--fasta)	Reference genome in fasta format
--gff (--gff)	Reference genome annotation in GFF format
+-r (--ref)	Reference genome annotation in GBK or GFF format
+-f (--format)	Reference file format; gb or gff [default: gff]
 -vcf (--vcf)	SNPs in Variant Calling Format (VCF)
 -o (--output)	Table prefix [Default: synonymy] The .features/.intergenic suffixes and .tsv file extension will be added automatically.
 -gc (--gcode)	NCBI genetic code; e.g.:
@@ -32,7 +33,8 @@ END_OPTIONS
 my $help;
 my $vn;
 my $fasta;
-my $gff;
+my $ref;
+my $format = 'gff';
 my @vcf;
 my $output = 'synonymy';
 my $gc = '01';
@@ -40,7 +42,8 @@ GetOptions(
 	'h|help' => \$help,
 	'v|version' => \$vn,
 	'fa|fasta=s' => \$fasta,
-	'gff=s' => \$gff,
+	'r|ref=s' => \$ref,
+	'f|format=s' => \$format,
 	'vcf=s@{1,}' => \@vcf,
 	'o|output=s' => \$output,
 	'gc|gcode=i' => \$gc
@@ -55,39 +58,78 @@ while (my $line = <FASTA>){
 	if ($line =~ /^>(\S+)/){$contig = $1;}
 	else{$sequences{$contig} .= $line;}
 }
+
 ## Building hashes of features + Init tables
-open GFF, "<$gff";
+open REF, "<$ref";
 open TABLE, ">$output.features.tsv";
 open INTER, ">$output.intergenic.tsv";
 print TABLE "Locus_tag\tReference Contig\tVCF file\tType\tStart\tEnd\tStrandedness\tProduct\tVariant Position\tReference\tVariant\tSynonymy\tGenetic Code\tRefCodon\tVarCodon\tFrequency\tE-value\n";
 print INTER "Reference Contig\tVCF file\tType\tVariant Position\tReference\tVariant\tFrequency\tE-value\n";
-my %genes, my %features;
-my %hashes;		## hash of hashes for contigs and their feature locations
-my $type; my $start; my $end; my $strand; my $id; my $locus_tag; my $parent; my $product;
-while (my $line = <GFF>){
-	chomp $line;
-	if ($line =~ /^#/){next;}
-	elsif ($line =~ /^ID=/){next;}
-	elsif ($line =~ /^(\S+)\t.*\t(gene|pseudogene)\t(\d+)\t(\d+)\t\.\t([+-])\t[.012]\tID=(\w+).*\;locus_tag=([A-Za-z0-9 _]+)/){ ## Working on locus_tags
-		$contig = $1; $type = $2; $start = $3; $end = $4; $strand = $5; $id = $6; $locus_tag = $7;
-		$genes{$id}[0] = $contig;
-		$genes{$id}[1] = $start;
-		$genes{$id}[2] = $end;
-		$genes{$id}[3] = $strand;
-		$genes{$id}[4] = $locus_tag;
-	}
-	elsif ($line =~ /^(\S+)\t.*\t(tRNA|rRNA|CDS|)\t(\d+)\t(\d+)\t\.\t([+-])\t[.012]\tID=(\w+).*Parent=([A-Za-z0-9_]+).*product=([A-Za-z0-9 -]+)/){	## Working ion features
-		$contig = $1; $type = $2; $start = $3; $end = $4; $strand = $5; $id = $6; $parent = $7; $product = $8;
-		$features{$id}[0] = $type;
-		$features{$id}[1] = $start;
-		$features{$id}[2] = $end;
-		$features{$id}[3] = $strand;
-		$features{$id}[4] = $parent;
-		$features{$id}[5] = $product;
-		for ($start..$end){
-			push (@{$hashes{$contig}{$_}}, $id);
+
+## Must simplify the data structure to one hash of features. Will be easier to adapt for input files. Working multiline would do it.
+my %genes, my %features; my %hashes; ## hash of hashes for contigs and their feature locations
+my $type; my $start; my $end; my $strand; my $id; my $locus_tag; my $parent; my $product; my $key;
+if ($format eq 'gff'){
+	while (my $line = <REF>){
+		chomp $line;
+		## Looking at GFF files
+		if ($line =~ /^#/){next;}
+		elsif ($line =~ /^ID=/){next;}
+		elsif ($line =~ /^(\S+)\t.*\t(gene|pseudogene)\t(\d+)\t(\d+)\t\.\t([+-])\t[.012]\tID=(\w+).*\;locus_tag=([A-Za-z0-9 _]+)/){ ## Working on locus_tags
+			$contig = $1; $type = $2; $start = $3; $end = $4; $strand = $5; $id = $6; $locus_tag = $7;
+			$genes{$id}[0] = $contig;
+			$genes{$id}[1] = $start;
+			$genes{$id}[2] = $end;
+			$genes{$id}[3] = $strand;
+			$genes{$id}[4] = $locus_tag;
 		}
-	}	
+		elsif ($line =~ /^(\S+)\t.*\t(tRNA|rRNA|CDS|)\t(\d+)\t(\d+)\t\.\t([+-])\t[.012]\tID=(\w+).*Parent=([A-Za-z0-9_]+).*product=([A-Za-z0-9 -]+)/){	## Working on features
+			$contig = $1; $type = $2; $start = $3; $end = $4; $strand = $5; $id = $6; $parent = $7; $product = $8;
+			$features{$id}[0] = $type;
+			$features{$id}[1] = $start;
+			$features{$id}[2] = $end;
+			$features{$id}[3] = $strand;
+			$features{$id}[4] = $parent;
+			$features{$id}[5] = $product;
+			print "$contig\t$type\t$strand\t$locus_tag\t$product\n";
+			for ($start..$end){
+				push (@{$hashes{$contig}{$_}}, $id);
+			}
+		}
+	}
+}
+elsif ($format eq 'gb'){
+	my $gbk; while (my $line = <REF>){$gbk .= $line;}
+	my @contigs = split ("\/\/\n", $gbk);
+	while (my $cg = shift @contigs){
+	my @data = split ("ORIGIN.*?\n", $cg); ## $data[0] => annotations, $data[1] => sequences
+	my $sequence = $data[1]; $sequence =~ s/[0-9\s\n]//g;
+	my $locus; ($locus) = ($data[0] =~ /LOCUS\s+(\S+)/);
+	my $contig; ($contig) = ($data[0] =~ /VERSION\s+(\S+)/);
+	print "Working on $locus version $contig\n";
+	my $feat;	($feat) = ($data[0] =~ /FEATURES(.*)/s);
+	my @features = split("     gene            ", $feat);
+		while (my $line = shift@features){
+			if ($line =~ /\s+(CDS|rRNA|tRNA)\s+.*?(\d+)\.\.(\d+)/m){
+				$type = $1; $start = $2; $end = $3;
+				if ($line =~ /complement/){$strand = '-';}
+				else{$strand = '+';}
+				($locus_tag) = ($line =~ /\/locus_tag="(.*?)"/s); $locus_tag =~ s/\s{2,}/ /g; $locus_tag =~ s/\n//g; ## removing new lines, if any
+				($product) = ($line =~ /\/product="(.*?)"/s); $product =~ s/\s{2,}/ /g; $product =~ s/\n//g; ## removing new lines, if any
+				print "$contig\t$type\t$strand\t$locus_tag\t$product\n";
+				$genes{$locus_tag}[0] = $contig;
+				$genes{$locus_tag}[1] = $start; $features{$locus_tag}[1] = $start;
+				$genes{$locus_tag}[2] = $end; $features{$locus_tag}[2] = $end;
+				$genes{$locus_tag}[3] = $strand; $features{$locus_tag}[3] = $strand;
+				$genes{$locus_tag}[4] = $locus_tag; $features{$locus_tag}[4] = $locus_tag;
+				$features{$locus_tag}[0] = $type;
+				$features{$locus_tag}[5] = $product;
+				for ($start..$end){
+					push (@{$hashes{$contig}{$_}}, $locus_tag);
+				}
+			}
+		}
+	}
 }
 ## Working on VCF files
 my $codon; my $snp; my $revcodon; my $revsnp; my $locus;
