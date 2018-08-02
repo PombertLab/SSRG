@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ## SSRG: Synthetic Short Read Generator; generates synthetic short reads in Fastq (Q33) format from multifasta files
 ## Pombert Lab, Illinois Tech (2015-2018)
-my $version = 'Version 1.5';
+my $version = 'Version 1.5a';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions);    
 
@@ -40,6 +40,10 @@ my $slide;
 my $cov = '50';
 my $qscore = 30;        
 my $q64 = '';		## Default is false so that Q33 format is used
+my $date = `date`;
+open LOG, ">>SSRG.log"; ## Keep track of read mapper STDERR messages
+print LOG "$date";
+print LOG "COMMAND LINE:\nSSRG.pl @ARGV\n\n";
 GetOptions(
 	'v|version' => \$ver,
 	'f|fasta=s@{1,}' => \@fasta,
