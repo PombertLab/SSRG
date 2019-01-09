@@ -1,6 +1,6 @@
 #!/usr/bin/perl
-## Pombert JF, Illinois Tech - 2018
-my $version = '1.9';
+## Pombert JF, Illinois Tech - 2019
+my $version = '1.9a';
 
 use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
 
@@ -10,6 +10,8 @@ my $samtools = '';		## Path to samtools 1.3.1+ - http://www.htslib.org/
 my $bcftools = '';		## Path to bcftools 1.3.1+ - http://www.htslib.org/
 my $bwa = '';			## Path to BWA - http://bio-bwa.sourceforge.net/
 my $bowtie2 = '';		## Path to Bowtie2 - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
+my $minimap2 = '';	## Path to Minimap2 - https://github.com/lh3/minimap2
+my $ngmlr = '';		## Path to ngmlr https://github.com/philres/ngmlr
 my $hisat2 = '';		## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
 my $freebayes = '';		## Path to FreeBayes -  https://github.com/ekg/freebayes
 my $mash = '';			## Path to Mash - https://github.com/marbl/Mash
@@ -39,16 +41,19 @@ OPTIONS:
 -fq (--fastq)			Fastq reads (single ends) to be mapped against reference(s)
 -pe1				Fastq reads #1 (paired ends) to be mapped against reference(s)
 -pe2				Fastq reads #2 (paired ends) to be mapped against reference(s)
--X				Maximum paired ends insert size (for bowtie2) [default: 750]
--mapper				Read mapping tool: bwa, bowtie2 or hisat2 [default: bowtie2]
--algo				BWA mapping algorithm:  bwasw, mem, samse [default: bwasw]
+-mapper				Read mapping tool: bwa, bowtie2, minimap2, ngmlr or hisat2 [default: bowtie2]
 -threads			Number of processing threads [default: 16]
 -bam				Keeps BAM files generated
 -sam				Keeps SAM files generated; SAM files can be quite large
 -rmo (--read_mapping_only)	Do not perform variant calling; useful when only interested in bam/sam files and/or mapping stats
 -ns (--no_stats)		Do not calculate stats; stats can take a while to compute for large eukaryote genomes
 
-### Variant caller options ###
+### Mapper-specific options ###
+-X				BOWTIE2 - Maximum paired ends insert size [default: 750]
+-preset			MINIMAP2 - Preset: sr, map-ont, map-pb or asm20 [default: sr]
+-algo			BWA - Mapping algorithm:  bwasw, mem, samse [default: bwasw]
+
+### Variant calling options ###
 -caller				[default: varscan2]	## Variant caller: varscan2, bcftools or freebayes
 -type				[default: snp]		## snp, indel, or both
 -ploidy				[default: 1]		## FreeBayes/BCFtools option; change ploidy (if needed)
@@ -70,18 +75,22 @@ OPTIONS:
 
 END_OPTIONS
 
+my @command = @ARGV; ## Keeping track of command lines for logs later on...
+
 my $help =''; my $vn;
 ## Mapping
 my $mapper = 'bowtie2';
-my $algo = 'bwasw';
 my $threads = 16;
 my $sam = ''; my $bam = '';
 my @fasta; my @fastq;
 my @pe1; my @pe2;
-my $maxins = '750';
 my $rmo;
 my $nostat;
-## Variant caller
+## Mapper-specific
+my $maxins = '750';
+my $preset = 'sr';
+my $algo = 'bwasw';
+## Variant calling
 my $caller = 'varscan2';
 my $type = 'snp';
 my $ploidy = 1;
@@ -97,22 +106,21 @@ my $sf = 0;
 ## MASH
 my $out = 'Mash.txt'; my $mh = ''; my $sort = ''; 
 
-open MAP, ">>mapping.$mapper.log"; ## Keep track of read mapper STDERR messages
-print MAP "COMMAND LINE:\nget_SNPs.pl @ARGV\n";
-
 GetOptions(
 	'h|help' => \$help, 'v|version', => \$vn,
 	## Mapping
 	'mapper=s' => \$mapper,
-	'algo=s' => \$algo,
 	'threads=i' => \$threads,
 	'sam' => \$sam, 'bam' => \$bam,
 	'fa|fasta=s@{1,}' => \@fasta, 'fq|fastq=s@{1,}' => \@fastq,
 	'pe1=s@{1,}' => \@pe1, 'pe2=s@{1,}' => \@pe2,
-	'X=i' => \$maxins,
 	'rmo|read_mapping_only' => \$rmo,
 	'ns|no_stats' => \$nostat,
-	## Variant caller
+	## Mapper-specific
+	'X=i' => \$maxins,
+	'preset=s' => \$preset,
+	'algo=s' => \$algo,	
+	## Variant calling
 	'caller=s' => \$caller, 'type=s' => \$type, 'ploidy=i' => \$ploidy,
 	## VarScan-specific
 	'var=s' => \$varjar,
@@ -132,10 +140,19 @@ if ($help){die "$usage\n$options";} if ($vn){die "\nversion $version\n\n";}
 ## Program checks
 my $prog = `command -v ${samtools}samtools`; chomp $prog; if ($prog eq ''){print "\nERROR: Cannot find SAMtools. Please install SAMtools in your path or include its installation directory at the top of get_SNPs.pl\n\n"; exit;}
 if ($mapper eq 'bowtie2'){my $prog = `command -v ${bowtie2}bowtie2`; chomp $prog; if ($prog eq ''){print "\nERROR: Cannot find Bowtie2. Please install Bowtie2 in your path or include its installation directory at the top of get_SNPs.pl\n\n"; exit;}}
+if ($mapper eq 'minimap2'){my $prog = `command -v ${minimap2}minimap2`; chomp $prog; if ($prog eq ''){print "\nERROR: Cannot find Minimap2. Please install Minimap2 in your path or include its installation directory at the top of get_SNPs.pl\n\n"; exit;}}
+if ($mapper eq 'ngmlr'){my $prog = `command -v ${ngmlr}ngmlr`; chomp $prog; if ($prog eq ''){print "\nERROR: Cannot find ngmlr. Please install ngmlr in your path or include its installation directory at the top of get_SNPs.pl\n\n"; exit;}}
 if ($mapper eq 'bwa'){my $prog = `command -v ${bwa}bwa`; chomp $prog; if ($prog eq ''){print "\nERROR: Cannot find BWA. Please install BWA in your path or include its installation directory at the top of get_SNPs.pl\n\n"; exit;}}
 if ($mapper eq 'hisat2'){my $prog = `command -v ${hisat2}hisat2`; chomp $prog; if ($prog eq ''){print "\nERROR: Cannot find HISAT2. Please install HISAT2 in your path or include its installation directory at the top of get_SNPs.pl\n\n"; exit;}}
 if ($caller eq 'freebayes'){my $prog = `command -v ${freebayes}freebayes`; chomp $prog; if ($prog eq ''){print "\nERROR: Cannot find Freebayes. Please install Freebayes in your path or include its installation directory at the top of get_SNPs.pl\n\n"; exit;}}
 if ($caller eq 'bcftools'){my $prog = `command -v ${bcftools}bcftools`; chomp $prog; if ($prog eq ''){print "\nERROR: Cannot find BCFtools. Please install BCFtools in your path or include its installation directory at the top of get_SNPs.pl\n\n"; exit;}}
+
+## Option checks
+die "\nPlease enter at least one FASTA reference for the mapping before proceeding...\n\n" if (scalar@fasta == 0);
+die "\nPlease enter at least one FASTQ dataset for the mapping before proceeding...\n\n" if ((scalar@fastq == 0)&&(scalar@pe1 == 0));
+die "\nMapper option $mapper is unrecognized. Please use bowtie2, hisat2, bwa, minimap2 or ngmlr...\n\n" unless ($mapper =~ /bowtie2|hisat2|bwa|minimap2|ngmlr/);
+if ($rmo){$caller = 'rmo';} ## Setting the caller variable to rmo (read-mapping only; doesn't make sense to keep the default variant caller for file names if -rmo is enabled...)
+die "Variant caller option $caller is unrecognized. Please use varscan2, bcftools, freebayes...\n" if ($caller !~ /rmo|varscan2|bcftools|freebayes/);
 
 ## Timestamps and logs
 my $start = localtime();
@@ -143,6 +160,8 @@ my $tstart = time;
 my $todo = 0;
 if (@fastq){$todo += scalar(@fastq)*scalar(@fasta);}
 if (@pe1 && @pe2){$todo += scalar(@pe1)*scalar(@fasta);}
+open MAP, ">>mapping.$mapper.log"; ## Keep track of read mapper STDERR messages
+print MAP "COMMAND LINE:\nget_SNPs.pl @command\n";
 open LOG, ">time.$mapper.$caller.log"; ## Keep track of running time
 print LOG "Mapping/SNP calling started on: $start\n";
 print LOG "A total of $todo pairwise comparisons will be performed\n";
@@ -156,12 +175,13 @@ if ($mh){
 	system "$mash"."mash dist reference.msh @fasta > $out";
 	if ($sort){system "echo Sorting out Mash results - See $out.sorted"; system "sort -gk3 $out > $out.sorted";}
 	exit;
- }
+}
 
 ## Running read mapping/SNP calling
 my $fasta = undef; my $fastq = undef; my $file = undef; my $fa = undef; my $dir; my $qdir; my $flagstat = undef;
 foreach (@fasta){ ## Creating indexes
 	$fasta = $_; ($fa, $dir) = fileparse($fasta);
+	die "\nFASTA file named $fasta not found. Please check your command line...\n\n" unless -f $fasta;
 	if ($mapper eq 'bwa'){system "$bwa"."bwa index -a is $_";}
 	elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2-build --threads $threads $_ $fa.bt2";}
 	elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2-build $_ $fa.ht";}
@@ -169,9 +189,10 @@ foreach (@fasta){ ## Creating indexes
 my $index_time = time - $tstart;
 print LOG "Time required to create all indexes: $index_time seconds\n";
 
-if (@fastq){ ## Single ends mode
+if (@fastq){ ## Single end mode
 	foreach (@fastq){
 		$fastq = $_;
+		die "\nFASTQ file named $fastq not found. Please check your command line...\n\n" unless -f $fastq;
 		print "\n## FASTQ information:\n";
 		($file, $qdir) = fileparse($fastq); print "FASTQ parsed as: $file\n"; print "FASTQ input DIR parsed as: $qdir\n"; ## Debugging print statement
 		foreach (@fasta){
@@ -183,6 +204,8 @@ if (@fastq){ ## Single ends mode
 			print "Mapping $fastq on $fasta with $mapper...\n";
 			if ($mapper eq 'bwa'){system "$bwa"."bwa $algo -t $threads $fasta $fastq -f $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} ## Appending STDERR to mapping.$mapper.log"
 			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 -p $threads -x $fa.bt2 -U $fastq -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} 
+			elsif ($mapper eq 'minimap2'){system "$minimap2"."minimap2 --MD -t $threads -L -ax $preset $fasta $fastq 1> $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
+			elsif ($mapper eq 'ngmlr'){system "$ngmlr"."ngmlr -t $threads -r $fasta -q $fastq -o $file.$fa.$mapper.sam 2>&1 | tee mapping.$mapper.log";}
 			elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 -x $fa.ht -U $fastq --no-spliced-alignment -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
 			samtools(); 
 			unless ($rmo){variant();} ## Calling variants
@@ -198,6 +221,8 @@ if (@fastq){ ## Single ends mode
 if (@pe1 && @pe2){ ## Paired ends mode
 	while (my $pe1 = shift@pe1){
 		my $pe2 = shift@pe2;
+		die "\nFASTQ PE1 file named $pe1 not found. Please check your command line...\n\n" unless -f $pe1;
+		die "\nFASTQ PE2 file named $pe2 not found. Please check your command line...\n\n" unless -f $pe2;
 		print "\n## FASTQ information:\n";
 		($file, $qdir) = fileparse($pe1); print "R1 FASTQ parsed as: $file\n"; ## Debugging print statement
 		my $r2 = fileparse($pe2); print "R2 FASTQ parsed as: $r2\n"; print "FASTQ input DIR parsed as: $qdir\n";## Debugging print statement
@@ -211,6 +236,7 @@ if (@pe1 && @pe2){ ## Paired ends mode
 			if ($mapper eq 'bwa'){system "$bwa"."bwa $algo -t $threads $fasta $pe1 $pe2 -f $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} ## Appending STDERR to mapping.$mapper.log"
 			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 -p $threads -x $fa.bt2 -X $maxins -1 $pe1 -2 $pe2 -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} 
 			elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 -x $fa.ht -1 $pe1 -2 $pe2 --no-spliced-alignment -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
+			elsif ($mapper eq 'minimap2'){system "$minimap2"."minimap2 -t $threads -ax $preset $pe1 $pe2 1> $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
 			samtools(); 
 			unless ($rmo){variant();} ## Calling variants
 			unless ($nostat){stats();} ## Printing stats
@@ -226,14 +252,15 @@ if (@pe1 && @pe2){ ## Paired ends mode
 if ($mapper eq 'bwa'){system "mkdir $mapper.indexes; mv ${dir}*.amb ${dir}*.ann ${dir}*.bwt ${dir}*.fai ${dir}*.pac ${dir}*.sa $mapper.indexes/";}
 elsif ($mapper eq 'bowtie2'){system "mkdir $mapper.indexes; mv *.bt2 ${dir}*.fai $mapper.indexes/";}
 elsif ($mapper eq 'hisat2'){system "mkdir $mapper.indexes; mv *.ht2 ${dir}*.fai $mapper.indexes/";}
-if ($bam){system "mkdir $mapper.bam; mv *.bam $mapper.bam/";}
-if ($sam){system "mkdir $mapper.sam; mv *.bam $mapper.sam/";}
+elsif ($mapper eq 'ngmlr'){system "mkdir $mapper.indexes; mv *.ngm $mapper.indexes/";}
+if ($bam){system "mkdir $mapper.BAM; mv *.bam $mapper.BAM/";}
+if ($sam){system "mkdir $mapper.SAM; mv *.sam $mapper.SAM/";}
 unless ($rmo) {system "mkdir $mapper.$caller.VCFs; mv *.vcf $mapper.$caller.VCFs/";}
 unless ($nostat){
-	system "mkdir $mapper.$caller.coverage; mv *.$mapper.coverage $mapper.$caller.coverage/";
 	system "mkdir $mapper.$caller.depth; mv *.$mapper.depth $mapper.$caller.depth/";
 	system "mkdir $mapper.$caller.stats; mv *.$mapper.$type.stats $mapper.$caller.stats/";
 }
+system "mkdir $mapper.$caller.coverage; mv *.$mapper.coverage $mapper.$caller.coverage/";
 
 ## Printing timestamps and logs
 my $end = localtime();
