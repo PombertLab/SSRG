@@ -10,8 +10,8 @@ my $samtools = '';		## Path to samtools 1.3.1+ - http://www.htslib.org/
 my $bcftools = '';		## Path to bcftools 1.3.1+ - http://www.htslib.org/
 my $bwa = '';			## Path to BWA - http://bio-bwa.sourceforge.net/
 my $bowtie2 = '';		## Path to Bowtie2 - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
-my $minimap2 = '';	## Path to Minimap2 - https://github.com/lh3/minimap2
-my $ngmlr = '';		## Path to ngmlr https://github.com/philres/ngmlr
+my $minimap2 = '';		## Path to Minimap2 - https://github.com/lh3/minimap2
+my $ngmlr = '';			## Path to ngmlr https://github.com/philres/ngmlr
 my $hisat2 = '';		## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
 my $freebayes = '';		## Path to FreeBayes -  https://github.com/ekg/freebayes
 my $mash = '';			## Path to Mash - https://github.com/marbl/Mash
@@ -50,8 +50,8 @@ OPTIONS:
 
 ### Mapper-specific options ###
 -X				BOWTIE2 - Maximum paired ends insert size [default: 750]
--preset			MINIMAP2 - Preset: sr, map-ont, map-pb or asm20 [default: sr]
--algo			BWA - Mapping algorithm:  bwasw, mem, samse [default: bwasw]
+-preset				MINIMAP2 - Preset: sr, map-ont, map-pb or asm20 [default: sr]
+-algo				BWA - Mapping algorithm:  bwasw, mem, samse [default: bwasw]
 
 ### Variant calling options ###
 -caller				[default: varscan2]	## Variant caller: varscan2, bcftools or freebayes
