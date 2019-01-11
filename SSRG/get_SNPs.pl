@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2019
-my $version = '1.9a';
+my $version = '1.9b';
 
 use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
 
@@ -51,7 +51,7 @@ OPTIONS:
 ### Mapper-specific options ###
 -X				BOWTIE2 - Maximum paired ends insert size [default: 750]
 -preset				MINIMAP2 - Preset: sr, map-ont, map-pb or asm20 [default: sr]
--algo				BWA - Mapping algorithm:  bwasw, mem, samse [default: bwasw]
+-algo				BWA - Mapping algorithm:  bwasw, mem, samse [default: mem]
 
 ### Variant calling options ###
 -caller				[default: varscan2]	## Variant caller: varscan2, bcftools or freebayes
@@ -89,7 +89,7 @@ my $nostat;
 ## Mapper-specific
 my $maxins = '750';
 my $preset = 'sr';
-my $algo = 'bwasw';
+my $algo = 'mem';
 ## Variant calling
 my $caller = 'varscan2';
 my $type = 'snp';
@@ -202,11 +202,15 @@ if (@fastq){ ## Single end mode
 			print MAP "\n".'###'." Mapping started on $mstart\n";
 			print MAP "\n$fastq vs. $fasta\n";
 			print "Mapping $fastq on $fasta with $mapper...\n";
-			if ($mapper eq 'bwa'){system "$bwa"."bwa $algo -t $threads $fasta $fastq -f $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} ## Appending STDERR to mapping.$mapper.log"
-			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 -p $threads -x $fa.bt2 -U $fastq -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} 
-			elsif ($mapper eq 'minimap2'){system "$minimap2"."minimap2 --MD -t $threads -L -ax $preset $fasta $fastq 1> $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
-			elsif ($mapper eq 'ngmlr'){system "$ngmlr"."ngmlr -t $threads -r $fasta -q $fastq -o $file.$fa.$mapper.sam 2>&1 | tee mapping.$mapper.log";}
-			elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 -x $fa.ht -U $fastq --no-spliced-alignment -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
+			if ($mapper eq 'bwa'){
+				my $rg = ''; if ($algo eq 'mem'){$rg = '-R \@RG\\\\tID:'."$fastq".'\\\\tSM:'."$fasta";} ## If algo = mem, use the -R option to add the read-group (@RG) to SAM/BAM headers
+				system "$bwa"."bwa $algo -t $threads $rg $fasta $fastq -f $file.$fa.$mapper.sam 2>> mapping.$mapper.log";
+			} ## Appending STDERR to mapping.$mapper.log"
+			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 --rg-id $fastq --rg SM:$fasta -p $threads -x $fa.bt2 -U $fastq -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} 
+			elsif ($mapper eq 'minimap2'){system "$minimap2"."minimap2 -t $threads --MD -R \@RG\\\\tID:$fastq\\\\tSM:$fasta -L -ax $preset $fasta $fastq 1> $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}	
+			#-R \@RG\\\\tID:$fastq\\\\tSM:$fasta
+			elsif ($mapper eq 'ngmlr'){system "$ngmlr"."ngmlr -t $threads --rg-id $fastq --rg-sm $fasta -r $fasta -q $fastq -o $file.$fa.$mapper.sam 2>&1 | tee mapping.$mapper.log";}
+			elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 --rg-id $fastq --rg SM:$fasta -x $fa.ht -U $fastq --no-spliced-alignment -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
 			samtools(); 
 			unless ($rmo){variant();} ## Calling variants
 			unless ($nostat){stats();} ## Printing stats
@@ -233,10 +237,13 @@ if (@pe1 && @pe2){ ## Paired ends mode
 			print MAP "\n".'###'." Mapping started on $mstart\n";
 			print MAP "\n$pe1 + $pe2 vs. $fasta\n";
 			print "Mapping $pe1 and $pe2 on $fasta with $mapper...\n";
-			if ($mapper eq 'bwa'){system "$bwa"."bwa $algo -t $threads $fasta $pe1 $pe2 -f $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} ## Appending STDERR to mapping.$mapper.log"
-			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 -p $threads -x $fa.bt2 -X $maxins -1 $pe1 -2 $pe2 -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} 
-			elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 -x $fa.ht -1 $pe1 -2 $pe2 --no-spliced-alignment -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
-			elsif ($mapper eq 'minimap2'){system "$minimap2"."minimap2 -t $threads -ax $preset $pe1 $pe2 1> $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
+			if ($mapper eq 'bwa'){
+				my $rg = ''; if ($algo eq 'mem'){$rg = '-R \@RG\\\\tID:'."$pe1".'\\\\tSM:'."$fasta";} ## If algo = mem, use the -R option to add the read-group (@RG) to SAM/BAM headers
+				system "$bwa"."bwa $algo -t $threads $rg $fasta $pe1 $pe2 -f $file.$fa.$mapper.sam 2>> mapping.$mapper.log";
+			} ## Appending STDERR to mapping.$mapper.log"
+			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 --rg-id $pe1 --rg SM:$fasta -p $threads -x $fa.bt2 -X $maxins -1 $pe1 -2 $pe2 -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} 
+			elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 --rg-id $pe1 --rg SM:$fasta -x $fa.ht -1 $pe1 -2 $pe2 --no-spliced-alignment -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
+			elsif ($mapper eq 'minimap2'){system "$minimap2"."minimap2 -t $threads -R \@RG\\\\tID:$pe1\\\\tSM:$fasta -ax $preset $pe1 $pe2 1> $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
 			samtools(); 
 			unless ($rmo){variant();} ## Calling variants
 			unless ($nostat){stats();} ## Printing stats
