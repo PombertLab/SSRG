@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2019
-my $version = '1.9b';
+my $version = '1.9c';
 
 use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
 
@@ -355,7 +355,7 @@ sub stats{
 			}
 		}
 	}
-	my $avc = sprintf("%.2f", ($sumcov/$total));
+	my $avc; if ($total > 0){$avc = sprintf("%.2f", ($sumcov/$total));}	else{$avc = 0;} ## In case the output of samtools depth -aa generates a blank file (if no read maps to the reference)
 	while (my $tmp = shift@contigs){ ## Printing sequencing depths per contig
 		my $average = ($data{$tmp}[1]/$data{$tmp}[0]);
 		$average = sprintf("%.2f", $average);
