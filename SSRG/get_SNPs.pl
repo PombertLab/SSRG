@@ -367,11 +367,14 @@ sub stats{
 	} 
 	print STATS "FASTQ file(s) used: $file (and mate, if PE)\n";
 	print STATS "Reference fasta file used: $fasta\n";
-	print STATS "\nTotal number of bases in the reference genome\t$total bp\n"."Number of bases covered by at least one read\t$covered\n". "Number of bases without coverage\t$nocov\n";
-	print STATS "Maximum sequencing depth\t$max"."X\n";
-	print STATS "Average sequencing depth\t$avc"."X\n";
-	if ($total == $covered){print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t100%\n";}
-	if ($total != $covered){my $av_cov = sprintf("%.2f%%", ($covered/$total)*100); print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t$av_cov\n";}
+	if ($total > 0){
+		print STATS "\nTotal number of bases in the reference genome\t$total bp\n"."Number of bases covered by at least one read\t$covered\n". "Number of bases without coverage\t$nocov\n";
+		print STATS "Maximum sequencing depth\t$max"."X\n";
+		print STATS "Average sequencing depth\t$avc"."X\n";
+		if ($total == $covered){print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t100%\n";}
+		if ($total != $covered){my $av_cov = sprintf("%.2f%%", ($covered/$total)*100); print STATS "Sequencing breadth (percentage of bases covered by at least one read)\t$av_cov\n";}
+	}
+	else{print STATS "\nNo read was found to map to the reference. The output of samtools depth -aa ($file.$fa.$mapper.coverage) is blank.\n";}
 	unless ($rmo){
 		my $snkb = sprintf("%.2f", ($sn/$covered)*1000);
 		if ($type eq 'both'){print STATS "Total number of SNPs + indels found: $sn\n"; print STATS "Average number of SNPs + indels per Kb: $snkb\n";}
