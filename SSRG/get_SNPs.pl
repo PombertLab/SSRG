@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2019
-my $version = '1.9c';
+my $version = '1.9d';
 
 use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
 
@@ -204,7 +204,7 @@ if (@fastq){ ## Single end mode
 			print "Mapping $fastq on $fasta with $mapper...\n";
 			if ($mapper eq 'bwa'){
 				my $rg = ''; if ($algo eq 'mem'){$rg = '-R \@RG\\\\tID:'."$fastq".'\\\\tSM:'."$fasta";} ## If algo = mem, use the -R option to add the read-group (@RG) to SAM/BAM headers
-				system "$bwa"."bwa $algo -t $threads $rg $fasta $fastq -f $file.$fa.$mapper.sam 2>> mapping.$mapper.log";
+				system "$bwa"."bwa $algo -t $threads $rg $fasta $fastq 1> $file.$fa.$mapper.sam 2>> mapping.$mapper.log";
 			} ## Appending STDERR to mapping.$mapper.log"
 			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 --rg-id $fastq --rg SM:$fasta -p $threads -x $fa.bt2 -U $fastq -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} 
 			elsif ($mapper eq 'minimap2'){system "$minimap2"."minimap2 -t $threads --MD -R \@RG\\\\tID:$fastq\\\\tSM:$fasta -L -ax $preset $fasta $fastq 1> $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}	
