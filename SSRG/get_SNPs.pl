@@ -239,7 +239,7 @@ if (@pe1 && @pe2){ ## Paired ends mode
 			print "Mapping $pe1 and $pe2 on $fasta with $mapper...\n";
 			if ($mapper eq 'bwa'){
 				my $rg = ''; if ($algo eq 'mem'){$rg = '-R \@RG\\\\tID:'."$pe1".'\\\\tSM:'."$fasta";} ## If algo = mem, use the -R option to add the read-group (@RG) to SAM/BAM headers
-				system "$bwa"."bwa $algo -t $threads $rg $fasta $pe1 $pe2 -f $file.$fa.$mapper.sam 2>> mapping.$mapper.log";
+				system "$bwa"."bwa $algo -t $threads $rg $fasta $pe1 $pe2 1> $file.$fa.$mapper.sam 2>> mapping.$mapper.log";
 			} ## Appending STDERR to mapping.$mapper.log"
 			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 --rg-id $pe1 --rg SM:$fasta -p $threads -x $fa.bt2 -X $maxins -1 $pe1 -2 $pe2 -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} 
 			elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 --rg-id $pe1 --rg SM:$fasta -x $fa.ht -1 $pe1 -2 $pe2 --no-spliced-alignment -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
