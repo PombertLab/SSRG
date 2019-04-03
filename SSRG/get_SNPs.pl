@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2019
-my $version = '1.9d';
+my $version = '1.9e';
 
 use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
 
@@ -243,7 +243,7 @@ if (@pe1 && @pe2){ ## Paired ends mode
 			} ## Appending STDERR to mapping.$mapper.log"
 			elsif ($mapper eq 'bowtie2'){system "$bowtie2"."bowtie2 --rg-id $pe1 --rg SM:$fasta -p $threads -x $fa.bt2 -X $maxins -1 $pe1 -2 $pe2 -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";} 
 			elsif ($mapper eq 'hisat2'){system "$hisat2"."hisat2 -p $threads --phred33 --rg-id $pe1 --rg SM:$fasta -x $fa.ht -1 $pe1 -2 $pe2 --no-spliced-alignment -S $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
-			elsif ($mapper eq 'minimap2'){system "$minimap2"."minimap2 -t $threads -R \@RG\\\\tID:$pe1\\\\tSM:$fasta -ax $preset $pe1 $pe2 1> $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
+			elsif ($mapper eq 'minimap2'){system "$minimap2"."minimap2 -t $threads -R \@RG\\\\tID:$pe1\\\\tSM:$fasta -ax $preset $fasta $pe1 $pe2 1> $file.$fa.$mapper.sam 2>> mapping.$mapper.log";}
 			samtools(); 
 			unless ($rmo){variant();} ## Calling variants
 			unless ($nostat){stats();} ## Printing stats
