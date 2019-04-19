@@ -2,6 +2,7 @@
 ## Pombert JF,  Illinois Tech 2016
 ## Retrieve genomes/proteins from the NCBI Nucleotide database using a list of accession numbers (one per line)
 ## Based on NCBI's efetch tool - http://www.ncbi.nlm.nih.gov/books/NBK25499/
+## Version 0.2
 
 use strict;
 use warnings;
@@ -10,9 +11,7 @@ use LWP::Simple;
 
 my $usage = "
 USAGE = queryNuccore.pl [options]
-
 EXAMPLE: queryNuccore.pl -fa -gbk -l accession.txt
-
 OPTIONS:
 -fa (--fasta)	Reference genome(s) in fasta format
 -gb (--genbank)	Reference genome(s) in GenBank format
@@ -62,35 +61,35 @@ while (my $accession = <IN>){
 			my $name = "$accession".'.fasta';
 			my $URL = $efetch.'?db='.$db.'&id='.$accession.'&rettype='.$rettype.'&retmode='.$retmode;
 			system "echo Downloading $accession.fasta ...";
-			getstore($URL, $name);
+			system "curl \'${efetch}?db=${db}&id=${accession}&rettype=${rettype}&retmode=${retmode}\' > $accession.fasta";
 		}
 		if ($genbank){
 			$rettype ='gbwithparts';
 			my $name = "$accession".'.gbk';
 			my $URL = $efetch.'?db='.$db.'&id='.$accession.'&rettype='.$rettype.'&retmode='.$retmode;
 			system "echo Downloading $accession.gbk ...";
-			getstore($URL, $name);
+			system "curl \'${efetch}?db=${db}&id=${accession}&rettype=${rettype}&retmode=${retmode}\' > $accession.gbk";
 		}
 		if ($sequin){
 			$rettype ='';
 			my $name = "$accession".'.sqn';
 			my $URL = $efetch.'?db='.$db.'&id='.$accession.'&rettype='.$rettype.'&retmode='.$retmode;
 			system "echo Downloading $accession.sqn ...";
-			getstore($URL, $name);
+			system "curl \'${efetch}?db=${db}&id=${accession}&rettype=${rettype}&retmode=${retmode}\' > $accession.sqn";
 		}
 		if ($proteins){
 			$rettype ='fasta_cds_na';
 			my $name = "$accession".'.fna';
 			my $URL = $efetch.'?db='.$db.'&id='.$accession.'&rettype='.$rettype.'&retmode='.$retmode;
 			system "echo Downloading $accession.fna ...";
-			getstore($URL, $name);
+			system "curl \'${efetch}?db=${db}&id=${accession}&rettype=${rettype}&retmode=${retmode}\' > $accession.fna";
 		}
 		if ($cds){
 			$rettype ='fasta_cds_aa';
 			my $name = "$accession".'.faa';
 			my $URL = $efetch.'?db='.$db.'&id='.$accession.'&rettype='.$rettype.'&retmode='.$retmode;
 			system "echo Downloading $accession.faa ...";
-			getstore($URL, $name);
+			system "curl \'${efetch}?db=${db}&id=${accession}&rettype=${rettype}&retmode=${retmode}\' > $accession.faa";
 		}
 	}
 }
