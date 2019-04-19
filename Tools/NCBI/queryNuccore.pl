@@ -52,6 +52,7 @@ my $retmode = undef;
 
 while (my $accession = <IN>){
 	chomp $accession;
+	$accession =~ s/ //g;
 	if ($accession =~ /^#/){next;} ## Discarding comments
 	if ($fasta || $genbank || $proteins || $sequin || $cds){
 		$retmode = 'text';
