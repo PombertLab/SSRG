@@ -7,7 +7,6 @@
 use strict;
 use warnings;
 use Getopt::Long qw(GetOptions);
-use LWP::Simple;
 
 my $usage = "
 USAGE = queryNuccore.pl [options]
