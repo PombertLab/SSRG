@@ -47,7 +47,7 @@ my $tstart = time;
 
 open IN, "<$list";
 
-my $efetch = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi';
+my $efetch = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi';
 my $rettype = undef;
 my $retmode = undef;
 
