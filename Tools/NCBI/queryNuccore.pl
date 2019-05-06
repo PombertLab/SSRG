@@ -1,28 +1,32 @@
 #!/usr/bin/perl
-## Pombert JF,  Illinois Tech 2016
+## Pombert JF,  Illinois Tech 2019
 ## Retrieve genomes/proteins from the NCBI Nucleotide database using a list of accession numbers (one per line)
 ## Based on NCBI's efetch tool - http://www.ncbi.nlm.nih.gov/books/NBK25499/
-## Version 0.3
+my $version = 0.3;
+my $name = 'queryNuccore.pl';
 
-use strict;
-use warnings;
-use Getopt::Long qw(GetOptions);
+use strict; use warnings; use Getopt::Long qw(GetOptions);
 
-my $usage = "
-USAGE = queryNuccore.pl [options]
-EXAMPLE: queryNuccore.pl -fa -gbk -l accession.txt
+## Usage definition
+my $usage = <<"OPTIONS";
+
+NAME		$name
+VERSION		$version
+SYNOPSIS	Runs raptorX 3D structure prediction on provided fasta files
+EXAMPLE		queryNuccore.pl -fa -gbk -l accession.txt
+
 OPTIONS:
--fa (--fasta)	Reference genome(s) in fasta format
--gb (--genbank)	Reference genome(s) in GenBank format
--sqn (--sequin)	Reference genome(s) in Sequin ASN format
+-fa (--fasta)		Reference genome(s) in fasta format
+-gb (--genbank)		Reference genome(s) in GenBank format
+-sqn (--sequin)		Reference genome(s) in Sequin ASN format
 -db (--database)	NCBI database to be queried [default: nuccore]
--p (--proteins)	Protein sequences (amino acids)
--c (--cds)	Protein sequences (nucleotides)
--l (--list)	Accession numbers list, one accession per line
-";
+-p (--proteins)		Protein sequences (amino acids)
+-c (--cds)		Protein sequences (nucleotides)
+-l (--list)		Accession numbers list, one accession per line
+OPTIONS
 die "$usage\n" unless@ARGV;
 
-## Options
+## Defining options
 my $fasta;
 my $genbank;
 my $proteins;
@@ -41,15 +45,13 @@ GetOptions(
 	'db|database=s' => \$db,
 );
 
+## Downloading data from Nuccore
 my $start = localtime();
 my $tstart = time;
-
 open IN, "<$list";
-
 my $efetch = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi';
 my $rettype = undef;
 my $retmode = undef;
-
 while (my $accession = <IN>){
 	chomp $accession;
 	$accession =~ s/ //g;
