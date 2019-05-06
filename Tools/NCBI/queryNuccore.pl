@@ -2,7 +2,7 @@
 ## Pombert JF,  Illinois Tech 2016
 ## Retrieve genomes/proteins from the NCBI Nucleotide database using a list of accession numbers (one per line)
 ## Based on NCBI's efetch tool - http://www.ncbi.nlm.nih.gov/books/NBK25499/
-## Version 0.2
+## Version 0.3
 
 use strict;
 use warnings;
@@ -77,14 +77,14 @@ while (my $accession = <IN>){
 			system "echo Downloading $accession.sqn ...";
 			system "curl \'${efetch}?db=${db}&id=${accession}&rettype=${rettype}&retmode=${retmode}\' > $accession.sqn";
 		}
-		if ($proteins){
+		if ($cds){
 			$rettype ='fasta_cds_na';
 			my $name = "$accession".'.fna';
 			my $URL = $efetch.'?db='.$db.'&id='.$accession.'&rettype='.$rettype.'&retmode='.$retmode;
 			system "echo Downloading $accession.fna ...";
 			system "curl \'${efetch}?db=${db}&id=${accession}&rettype=${rettype}&retmode=${retmode}\' > $accession.fna";
 		}
-		if ($cds){
+		if ($proteins){
 			$rettype ='fasta_cds_aa';
 			my $name = "$accession".'.faa';
 			my $URL = $efetch.'?db='.$db.'&id='.$accession.'&rettype='.$rettype.'&retmode='.$retmode;
