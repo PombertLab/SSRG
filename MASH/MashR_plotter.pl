@@ -17,7 +17,7 @@ REQUIREMENTS	R, R-devel
 		To install packages in R: type install.packages("Rtsne")
 
 USAGE			MashR_plotter.pl [OPTIONS]
-EXAMPLE (simple):	MashR_plotter.pl -i Mash.mashdist.csv -o image_01
+EXAMPLE (simple):	MashR_plotter.pl -i Mash.csv -o image_01
 EXAMPLE (advanced):	MashR_plotter.pl -type cluster -m tsne -i Mash.csv -R Mash.R -t pdf -o image_01 -pe 30 -it 500
 USAGE
 die "$usage\n$hint\n\n" unless@ARGV;
