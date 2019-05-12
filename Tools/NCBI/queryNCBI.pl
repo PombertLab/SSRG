@@ -1,60 +1,55 @@
 #!/usr/bin/perl
-## Pombert JF,  Illinois Tech 2016
-## Retrieve multifasta files from NCBI's FTP
-## TAB/CSV-delimited lists can be generated from NCBI's Genome Assembly and Annotation reports
-## v1.1
+## Pombert JF,  Illinois Tech 2019
+my $version = '1.2';
+my $name = 'queryNCBI.pl';
 
-use strict;
-use warnings;
-use Getopt::Long qw(GetOptions);
+use strict; use warnings; use Getopt::Long qw(GetOptions);
 
-my $usage = 'USAGE = queryNCBI.pl [OPTIONS] -l genome_list.csv
+## Usage definition
+my $usage = <<"OPTIONS";
+
+NAME		$name
+VERSION		$version
+SYNOPSIS	Retrieve multifasta files from NCBI's FTP
+		TAB/CSV-delimited lists can be generated from NCBI's Genome Assembly and Annotation reports, e.g.:
+		1) goto http://www.ncbi.nlm.nih.gov/genome/genomes/159?
+		2) click on the Download Table link in the upper right corner 
+		
+EXAMPLE		queryNCBI.pl -l genome_list.csv -fa -gb -p
 
 OPTIONS:
--fa (--fasta)	Retrieve fasta files
 -l (--list)	TAB/CSV-delimited list from NCBI
+-fa (--fasta)	Retrieve fasta files
+-gb (--genbank)	Retrieve GenBank annotation files (if available)
+-p (--protein)	Retrieve protein sequences (if available)
+-cds		Retrieve protein coding sequences (if available)
+OPTIONS
+die "$usage\n" unless @ARGV;
 
-## If available in GenBank:
--gb (--genbank)	Retrieve GenBank annotation files
--p (--protein)	Retrieve protein sequences
--g (--gene)	Retrieve gene sequences
--cds		Retrieve protein coding sequences
-';
-
-die "\n$usage
-list =	TAB/CSV-delimited list generated from NCBI's Genome Assembly and Annotation reports, e.g.:
-	1) goto http://www.ncbi.nlm.nih.gov/genome/genomes/159?
-	2) click on the Download Table link in the upper right corner 
-\n" unless@ARGV;
-
-my $fasta = '';
-my $gbk = '';
-my $list = '';
-my $protein = '';
-my $gene = '';
-my $cds = '';
+## Defining options
+my $fasta;
+my $gbk;
+my $list;
+my $protein;
+my $cds;
 GetOptions(
 	'fa|fasta' => \$fasta,
 	'gb|genbank' => \$gbk,
 	'p|protein' => \$protein,
 	'cds' => \$cds,
-	'g|gene' => \$gene,
 	'l|list=s' => \$list
 );
 
-my $start = localtime();
-my $tstart = time;
-
+## Downloading data from NCBI
+my $start = localtime(); my $tstart = time;
 system "dos2unix $list"; ## making sure that the line breaks are in UNIX format
 open IN, "<$list";
-
 my $url = undef;
 my $accession = undef;
 my $fa = '_genomic.fna.gz';
 my $gb = '_genomic.gbff.gz';
 my $prot = '_protein.faa.gz';
 my $cd = '_cds_from_genomic.fna.gz';
-my $fna = '_cds_from_genomic.fna.gz';
 
 while (my $line = <IN>){
 	chomp $line;
@@ -62,20 +57,13 @@ while (my $line = <IN>){
 	if ($line =~ /^#/){next;} ## Discarding comments
 	else {
 		my @genome = split(/\t|,/, $line);
-		
 		## Organism info
-		my $organism = $genome[0];
-		my $genus = undef;
-		my $species = undef;
-		if ($organism =~ /^(\w+)\s+(\w+)/){$genus = $1; $species = $2;} ## Getting rid of random strain tags
-		
+		my $organism = $genome[0]; my $genus = undef; my $species = undef;
+		if ($organism =~ /^(\S+)\s+(\S+)/){$genus = $1; $species = $2;} ## Getting rid of random strain tags
 		# Strain info
 		my $strain = $genome[1]; $strain =~ s/ /_/g; $strain =~ s/\//_/g; $strain =~ s/\|/_/g; ## Substituting problematic characters with underscores
-		
 		# Accession info
-		my $genbankFTP = $genome[$#genome];
-		if ($genbankFTP =~ /.*\/(\S+)$/){$accession = $1;}
-		
+		my $genbankFTP = $genome[$#genome]; if ($genbankFTP =~ /.*\/(\S+)$/){$accession = $1;}
 		## Downloading files
 		if ($fasta){
 			my $filename = $accession."$fa";
@@ -98,13 +86,6 @@ while (my $line = <IN>){
 			system "mv $filename  $genus".'_'."$species".'_'."$strain".'.faa.gz'; ## renaming file according to human readable species/strains name
 			system "gunzip $genus".'_'."$species".'_'."$strain".'.faa.gz'; ## decompressing file
 		}
-		if ($gene){
-			my $filename = $accession."$fna";
-			$url = $genbankFTP.'/'.$accession.$fna;
-			system "wget $url"; ## Fetching compressed file
-			system "mv $filename  $genus".'_'."$species".'_'."$strain".'.fna.gz'; ## renaming file according to human readable species/strains name
-			system "gunzip $genus".'_'."$species".'_'."$strain".'.fna.gz'; ## decompressing file
-		}
 		if ($cds){
 			my $filename = $accession."$cd";
 			$url = $genbankFTP.'/'.$accession.$cd;
@@ -114,10 +95,7 @@ while (my $line = <IN>){
 		}
 	}
 }
-	
-my $end = localtime();
-my $time_taken = time -$tstart;
-
+my $end = localtime(); my $time_taken = time - $tstart;
 print "\nDownloads started on: $start\n";
 print "Downloads completed on: $end\n";
 print "Time elapsed: $time_taken seconds\n";
