@@ -1,16 +1,24 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2017-2018 Illinois Tech
-## Sort SNPs per type (CDS, tRNA, rRNA or intergenic) and synonymous or non-synonymous, if applicable
 my $version = '0.4'; ## Now compatible with NCBI GenBank GBFF and GFF files
+my $name = 'synonymy.pl';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions);
 
-my $usage = "USAGE = synonymy.pl -gcode 1 -fa reference.fasta -ref reference.gff -format gb -vcf *.vcf -o table_name";
+## Usage definition
 my $hint = "Type synonymy.pl -h (--help) for list of options\n";
-die "\n$usage\n\n$hint\n" unless@ARGV;
+my $usage = <<"OPTIONS";
+
+NAME		$name
+VERSION		$version
+SYNOPSIS	Sort SNPs per type (CDS, tRNA, rRNA or intergenic) and synonymous or non-synonymous, if applicable
+		## Does not work with introns yet
+		
+USAGE		synonymy.pl -gcode 1 -fa reference.fasta -ref reference.gff -format gb -vcf *.vcf -o table_name
+OPTIONS
+die "$usage\n$hint\n" unless@ARGV;
 
 my $options = <<'END_OPTIONS';
-
 OPTIONS:
 -h (--help)	Display this list of options
 -v (--version)	Display script version
@@ -26,7 +34,6 @@ OPTIONS:
 		4  - The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
 		11 - The Bacterial, Archaeal and Plant Plastid Code
 		NOTE - For complete list; see https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
-		
 END_OPTIONS
 
 ## GetOptions
@@ -48,7 +55,7 @@ GetOptions(
 	'o|output=s' => \$output,
 	'gc|gcode=i' => \$gc
 );
-if ($help){die "\n$usage\n$options";} if ($vn){die "\nversion $version\n\n";}
+if ($help){die "$usage\n$options\n";} if ($vn){die "\nversion $version\n\n";}
 
 ## Building hash of sequences
 open FASTA, "<$fasta";

@@ -1,53 +1,60 @@
 #!/usr/bin/perl
+## Pombert lab, 2019
+my $version = '1.1c';
+my $name = 'MashToDistanceCSV.pl';
 
-## Pombert lab, 2016
-## Convert MASH output to CSV format
-## Version 1.1b
+use strict; use warnings; use Getopt::Long qw(GetOptions);
 
-use strict;
-use warnings;
+## Defining options
+my $options = <<"OPTIONS";
 
-my $usage = "perl MashToDistanceCSV.pl Mash.txt\n";
-die $usage unless @ARGV;
+NAME		$name
+VERSION		$version
+SYNOPSIS	Converts the Mash output to a CSV matrix for easy plotting with R
+USAGE		MashToDistanceCSV.pl -i Mash.txt -o Mash
 
-while (my $file = shift@ARGV){
-	open IN, "<$file";
-	$file =~ s/.txt//;
-	open MASH, ">$file.mashdist.csv";
-	open CORR, ">$file.alternatedist.csv";
-	
-	my %hash = ();
-	my %dist = ();
-	my @OTU = ();
-	
-	print MASH "OTU";
-	print CORR "OTU";
-	while (my $line = <IN>){
-		chomp $line;
-		if ($line =~ /^(\S+)\t(\S+)\t(\S+)\t(\S+)\t(\d+)\/(\d+)$/){ ## https://github.com/marbl/Mash/blob/master/doc/sphinx/tutorials.rst
-			my $reference = $1;
-			my $query = $2;
-			my $mashdist= $3;
-			my $pval = $4;
-			my $similarity = "$5".'/'."$6";
-			my $distance = 1-($5/$6); ## Applying an alternate method to calculate genetic distances, i.e. 1 - proportion of kmers shared; e.g. 1 - 857/1000 = 0.143.
-			if (exists $hash{$reference}){
-				$hash{$reference} .= "\,$mashdist";
-				$dist{$reference} .= "\,$distance";
-			}
-			else{
-				$hash{$reference} .= "\,$mashdist";
-				$dist{$reference} .= "\,$distance";
-				push (@OTU, $reference);
-			}
-		}
+OPTIONS:
+-i (--input)		Mash output file (unsorted)
+-o (--out)		Output file prefix [Default: Mash]
+OPTIONS
+die "$options\n" unless @ARGV;
+
+my $mash;
+my $out = 'Mash';
+GetOptions(
+	'i|input=s' => \$mash,
+	'o|out=s' => \$out,
+);
+
+## Reformatting Mash output to a CSV matrix
+open IN, "<$mash";
+open MASH, ">$out.csv"; open CORR, ">$out.alternatedist.csv";
+print MASH "OTU"; print CORR "OTU";
+my %hash = (); my %dist = (); my @OTU = ();
+while (my $line = <IN>){
+	chomp $line;
+	my @columns = split ("\t", $line); ## https://github.com/marbl/Mash/blob/master/doc/sphinx/tutorials.rst
+	my $reference = $columns[0];
+	my $query = $columns[1];
+	my $mashdist = $columns[2];
+	my $pval = $columns[3];
+	my ($numerator, $denominator) = $columns[4] =~ /(\d+)\/(\d+)/;
+	my $similarity = $numerator/$denominator;
+	my $distance = 1 - $similarity; ## Applying an alternate method to calculate genetic distances, i.e. 1 - proportion of kmers shared; e.g. 1 - 857/1000 = 0.143.
+	if (exists $hash{$reference}){
+		$hash{$reference} .= "\,$mashdist";
+		$dist{$reference} .= "\,$distance";
 	}
-	foreach (@OTU) {my $sp = $_;  $sp =~ s/.fasta$//; print MASH "\,$sp"; print CORR "\,$sp";}
-	print MASH "\n";
-	print CORR "\n";
-	while (my $taxa = shift@OTU){
-		my $spp = $taxa; $spp =~ s/.fasta$//;
-		print MASH "$spp"."$hash{$taxa}\n";
-		print CORR "$spp"."$dist{$taxa}\n";
+	else{
+		$hash{$reference} .= "\,$mashdist";
+		$dist{$reference} .= "\,$distance";
+		push (@OTU, $reference);
 	}
+}
+foreach (@OTU) {my $sp = $_;  $sp =~ s/.fasta$//; print MASH "\,$sp"; print CORR "\,$sp";}
+print MASH "\n"; print CORR "\n";
+while (my $taxa = shift@OTU){
+	my $spp = $taxa; $spp =~ s/.fasta$//;
+	print MASH "$spp"."$hash{$taxa}\n";
+	print CORR "$spp"."$dist{$taxa}\n";
 }

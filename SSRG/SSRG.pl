@@ -1,12 +1,16 @@
 #!/usr/bin/perl
 ## SSRG: Synthetic Short Read Generator; generates synthetic short reads in Fastq (Q33) format from multifasta files
 ## Pombert Lab, Illinois Tech (2015-2018)
-my $version = 'Version 1.5a';
+my $version = '1.5a';
+my $name = 'SSRG.pl';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions);    
 
-my $options = <<'END_OPTIONS';
-FUNCTION = SSRG.pl generates synthetic short reads in Fastq (Q33) format from multifasta files
+my $options = <<"END_OPTIONS";
+
+NAME		$name
+VERSION		$version
+SYNOPSIS	Generates synthetic short reads in Fastq (Q33) format from multifasta files
 
 EXAMPLE (simple): SSRG.pl -f *.fasta
 EXAMPLE (advanced): SSRG.pl -f *.fasta -r 250 -i 350 -s 20 -m rand -c 25 

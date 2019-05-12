@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2019
 my $version = '1.9f';
+my $name = 'get_SNPs.pl';
 
 use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
 
@@ -17,9 +18,14 @@ my $freebayes = '';		## Path to FreeBayes -  https://github.com/ekg/freebayes
 
 ## Usage definition
 my $hint = "Type get_SNPs.pl -h (--help) for list of options\n";
-my $usage = <<'USAGE';
+my $usage = <<"USAGE";
 
-USAGE = perl get_SNPs.pl [options]
+NAME		$name
+VERSION		$version
+SYNOPSIS	Automates read-mapping of FASTQ datasets against reference sequence(s) and
+		performs variant calling (if desired)
+		
+USAGE		get_SNPs.pl [options]
 
 EXAMPLE (simple): get_SNPs.pl -fa *.fasta -fq *.fastq
 EXAMPLE (advanced): get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar --threads 16
