@@ -18,7 +18,7 @@ REQUIREMENTS	R, R-devel
 
 USAGE			MashR_plotter.pl [OPTIONS]
 EXAMPLE (simple):	MashR_plotter.pl -i Mash.mashdist.csv -o image_01
-EXAMPLE (advanced):	MashR_plotter.pl -type cluster -m tsne -i Mash.mashdist.csv -R Mash.R -t pdf -o image_01 -pe 30 -it 500
+EXAMPLE (advanced):	MashR_plotter.pl -type cluster -m tsne -i Mash.csv -R Mash.R -t pdf -o image_01 -pe 30 -it 500
 USAGE
 die "$usage\n$hint\n\n" unless@ARGV;
 
@@ -28,7 +28,7 @@ OPTIONS:
 --help (-h)		Display this list of options
 --type (-t)		Plot type: cluster, tree, heatmap [Default: cluster]
 --method (-m)		Dimensionality reduction method for clusters (mds, tsne) [Default: mds]
---input (-i)		Input file [Default: Mash.mashdist.csv]
+--input (-i)		Input file [Default: Mash.csv]
 --rscript (-R)		R script output name generated [Default: Mash.R]
 --format (-f)		Image format (pdf, svg, jpeg, png) [Default: pdf]
 --output (-o)		Output plot name [Default: plot]
@@ -80,7 +80,7 @@ my $labels;
 my $nclust = 10;
 my $cmode = 'rainbow';
 my $og;
-my $input = 'Mash.mashdist.csv';
+my $input = 'Mash.csv';
 my $rscript = 'Mash.R';
 my $format = 'pdf';
 my $perplexity = '30';
