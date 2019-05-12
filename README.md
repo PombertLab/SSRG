@@ -16,7 +16,7 @@ SSRG (read mapping/variant calling):
 
 MASH (genetic distance estimations):
 -	run_Mash.pl runs the genetic distance estimation tool from Ondov et al. 2016. DOI: 10.1186/s13059-016-0997-x.
--	MashToDistanceCSV.pl converts the output of Mash to distance matrices.
+-	MashToDistanceMatrix.pl converts the output of Mash to distance matrices.
 -	MashR_plotter.pl plots Mash-derived distance matrices as heatmaps, phylogenetic trees, or clusters.
 
 Requirements:
