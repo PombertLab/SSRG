@@ -29,6 +29,8 @@ Compatible read aligners
 - BWA version 0.7.12 - http://bio-bwa.sourceforge.net/ (Li et al. 2010. DOI: 10.1093/bioinformatics/btp698)
 - Bowtie2 version 2.2.9 or above - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml (Langmead et al. 2012. DOI: 10.1038/nmeth.1923)
 - HISAT2 version 2.0 or above - https://ccb.jhu.edu/software/hisat2/index.shtml (Kim et al. 2015. DOI: 10.1038/nmeth.3317)
+- Minimap2 version 2.14 or above - https://github.com/lh3/minimap2 (Li, H. 2018. DOI: 10.1093/bioinformatics/bty191)
+- NGMLR version 0.2.7 or above (partial support) - https://github.com/philres/ngmlr (Sedlazeck et al. 2018. DOI: 10.1038/s41592-018-0001-7)
 
 Compatible variant callers
 - VarScan2 version 2.4.2 or above - http://dkoboldt.github.io/varscan/ (Koboldt et al. 2012. DOI: 10.1101/gr.129684.111)
