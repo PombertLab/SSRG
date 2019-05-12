@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2019
-my $version = '1.9e';
+my $version = '1.9f';
 
 use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
 
@@ -14,7 +14,6 @@ my $minimap2 = '';		## Path to Minimap2 - https://github.com/lh3/minimap2
 my $ngmlr = '';			## Path to ngmlr https://github.com/philres/ngmlr
 my $hisat2 = '';		## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
 my $freebayes = '';		## Path to FreeBayes -  https://github.com/ekg/freebayes
-my $mash = '';			## Path to Mash - https://github.com/marbl/Mash
 
 ## Usage definition
 my $hint = "Type get_SNPs.pl -h (--help) for list of options\n";
@@ -26,7 +25,6 @@ EXAMPLE (simple): get_SNPs.pl -fa *.fasta -fq *.fastq
 EXAMPLE (advanced): get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar --threads 16
 EXAMPLE (paired ends): get_SNPs.pl --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --caller freebayes --threads 16
 EXAMPLE (read-mapping only): get_SNPs.pl --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --rmo --bam --threads 16
-EXAMPLE (MASH): get_SNPs.pl -fa *.fasta -out Mash.txt -sort
 USAGE
 die "$usage\n$hint\n" unless@ARGV;
 
@@ -68,11 +66,6 @@ OPTIONS:
 -pv (--p-value)			[default: 1e-02]	## P-value threshold for calling variants 
 -sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
 
-### MASH Genetic distances ### OPTIONAL - see Ondov et al. DOI: 10.1186/s13059-016-0997-x
--mh		Evaluate genetic distances using Mash ## Quick, does not require read mapping...
--out		Output file name [default: Mash.txt]
--sort		Sort Mash output by decreasing order of similarity
-
 END_OPTIONS
 
 my @command = @ARGV; ## Keeping track of command lines for logs later on...
@@ -103,8 +96,6 @@ my $mvf = '0.7';
 my $mhom = '0.75';
 my $pv = '1e-02';
 my $sf = 0;
-## MASH
-my $out = 'Mash.txt'; my $mh = ''; my $sort = ''; 
 
 GetOptions(
 	'h|help' => \$help, 'v|version', => \$vn,
@@ -131,8 +122,6 @@ GetOptions(
 	'mhom|min-freq-for-hom=s' => \$mhom,
 	'pv|p-value=s' => \$pv,
 	'sf|strand-filter=i' => \$sf,
-	## MASH
-	'mh' => \$mh, 'out=s' => \$out,	'sort' => \$sort,
 );
 
 if ($help){die "$usage\n$options";} if ($vn){die "\nversion $version\n\n";}
@@ -167,15 +156,6 @@ print LOG "Mapping/SNP calling started on: $start\n";
 print LOG "A total of $todo pairwise comparisons will be performed\n";
 print_options();
 my $comparison = 0;
-
-## Genetic distances with MASH
-if ($mh){
-	system "echo Running Mash genetic distance analysis...";
-	system "$mash"."mash sketch -o reference @fasta";
-	system "$mash"."mash dist reference.msh @fasta > $out";
-	if ($sort){system "echo Sorting out Mash results - See $out.sorted"; system "sort -gk3 $out > $out.sorted";}
-	exit;
-}
 
 ## Running read mapping/SNP calling
 my $fasta = undef; my $fastq = undef; my $file = undef; my $fa = undef; my $dir; my $qdir; my $flagstat = undef;
