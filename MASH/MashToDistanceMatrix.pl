@@ -11,7 +11,7 @@ my $options = <<"OPTIONS";
 NAME		$name
 VERSION		$version
 SYNOPSIS	Converts the Mash output to a CSV or TSV matrix for easy plotting with R
-USAGE		MashToDistanceMatrix.pl -i Mash.txt -o Mash -t csv
+USAGE		MashToDistanceMatrix.pl -i Mash.txt -o Mash -f csv
 
 OPTIONS:
 -i (--input)		Mash output file [Default: Mash.txt]
