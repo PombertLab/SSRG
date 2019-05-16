@@ -18,7 +18,7 @@ REQUIREMENTS	R, R-devel
 
 USAGE			MashR_plotter.pl [OPTIONS]
 EXAMPLE (simple):	MashR_plotter.pl -i Mash.csv -o image_01
-EXAMPLE (advanced):	MashR_plotter.pl -type cluster -m tsne -i Mash.csv -if csv -R Mash.R -t pdf -o image_01 -pe 30 -it 500
+EXAMPLE (advanced):	MashR_plotter.pl -type cluster -m tsne -i Mash.csv -if csv -R Mash.R -f pdf -o image_01 -pe 30 -it 500
 USAGE
 die "$usage\n$hint\n\n" unless@ARGV;
 
