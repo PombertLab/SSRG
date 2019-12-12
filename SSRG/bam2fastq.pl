@@ -29,7 +29,7 @@ my $prefix = 'reads';
 my $suffix = 'fastq';
 GetOptions(
 	'b|bam=s' => \$bam,
-	't|type=s'	=> \$type,
+	't|type=s' => \$type,
 	'e|extract=s' => \$extract,
 	'p|prefix=s' => \$prefix,
 	's|suffix=s' => \$suffix
@@ -37,9 +37,9 @@ GetOptions(
 
 ## Program + option check
 my $samtools = `command -v samtools`; chomp $samtools; if ($samtools eq ''){print "\nERROR: Cannot find Samtools. Please install Samtools in your path\n\n"; exit;}
-unless (($type eq 'pe') || ($type eq 'se')) {die "\nUnrecognized type $type. Please use 'pe' for paired-ends or 'se' for single ends\n";}
+unless (($type eq 'pe') || ($type eq 'se')) {die "\nUnrecognized type $type. Please use 'pe' for paired-ends or 'se' for single ends.\n";}
 unless (($extract eq 'map') || ($extract eq 'unmap')) {
-	die "\nUnrecognized reads to extact: $extract. Please enter 'map' or 'unmap' to extract reads that map or do not map to the reference(s), respectively\n";
+	die "\nUnrecognized reads to extact: $extract. Please enter 'map' or 'unmap' to extract reads that map or do not map to the reference(s), respectively.\n";
 }
 
 ## Extracting reads from BAM files with samtools bam2fq
