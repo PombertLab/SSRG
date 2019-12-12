@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+## Pombert Lab, IIT, 2019
+my $name = 'bam2fastq.pl';
+my $version = '0.1';
+
+use strict; use warnings; use Getopt::Long qw(GetOptions);
+
+my $usage = <<"OPTIONS";
+NAME		$name
+VERSION		$version
+SYNOPSIS	Extract sequencing reads in FASTQ format from BAM alignment files
+REQUIREMENTS	Samtools 1.3.1+
+
+USAGE		bam2fastq.pl -b file.bam -t pe -e map -p reads -s fastq
+
+OPTIONS:
+-b (--bam)	BAM alignment file
+-t (--type)	Alignment type: pe (paired ends) or single [Default: pe]
+-e (--extract)	Reads to extract: map, unmap [Default: map]
+-p (--prefix)	Output file(s) prefix [Default: reads]
+-s (--suffix)	Output file(s) suffix [Default: fastq]
+OPTIONS
+die "$usage\n" unless @ARGV;
+
+my $bam;
+my $type = 'pe';
+my $extract = 'map';
+my $prefix = 'reads';
+my $suffix = 'fastq';
+GetOptions(
+	'b|bam=s' => \$bam,
+	't|type=s'	=> \$type,
+	'e|extract=s' => \$extract,
+	'p|prefix=s' => \$prefix,
+	's|suffix=s' => \$suffix
+);
+
+## Program + option check
+my $samtools = `command -v samtools`; chomp $samtools; if ($samtools eq ''){print "\nERROR: Cannot find Samtools. Please install Samtools in your path\n\n"; exit;}
+unless (($type eq 'pe') || ($type eq 'se')) {die "\nUnrecognized type $type. Please use 'pe' for paired-ends or 'se' for single ends\n";}
+unless (($extract eq 'map') || ($extract eq 'unmap')) {
+	die "\nUnrecognized reads to extact: $extract. Please enter 'map' or 'unmap' to extract reads that map or do not map to the reference(s), respectively\n";
+}
+
+## Extracting reads from BAM files with samtools bam2fq
+if ($type eq 'se'){ ## Single ends
+	if ($extract eq 'map'){system "samtools bam2fq -F 4 $bam > $prefix.$suffix";}
+	elsif ($extract eq 'unmap'){system "samtools bam2fq -f 4 $bam > $prefix.$suffix";}
+}
+elsif ($type eq 'pe'){ ## Paired ends (illumina)
+	if ($extract eq 'map'){ ## R1 + R2 mapped
+		system "samtools bam2fq -f 1 -F 12 -1 ${prefix}_R1.$suffix -2 ${prefix}_R2.$suffix $bam";
+	}
+	elsif ($extract eq 'unmap'){ ## R1 + R2 didn’t map
+		system "samtools bam2fq -f 12 -F 256 -1 ${prefix}_R1.$suffix -2 ${prefix}_R2.$suffix $bam";	
+	}
+}
