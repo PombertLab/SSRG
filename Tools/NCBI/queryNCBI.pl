@@ -1,6 +1,6 @@
 #!/usr/bin/perl
-## Pombert JF,  Illinois Tech 2019
-my $version = '1.2';
+## Pombert JF,  Illinois Tech 2020
+my $version = '1.3';
 my $name = 'queryNCBI.pl';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions);
@@ -61,7 +61,7 @@ while (my $line = <IN>){
 		my $organism = $genome[0]; my $genus = undef; my $species = undef;
 		if ($organism =~ /^(\S+)\s+(\S+)/){$genus = $1; $species = $2;} ## Getting rid of random strain tags
 		# Strain info
-		my $strain = $genome[1]; $strain =~ s/ /_/g; $strain =~ s/\//_/g; $strain =~ s/\|/_/g; ## Substituting problematic characters with underscores
+		my $strain = $genome[2]; $strain =~ s/ /_/g; $strain =~ s/\//_/g; $strain =~ s/\|/_/g; ## Substituting problematic characters with underscores
 		# Accession info
 		my $genbankFTP = $genome[$#genome]; if ($genbankFTP =~ /.*\/(\S+)$/){$accession = $1;}
 		## Downloading files
