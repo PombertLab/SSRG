@@ -61,7 +61,7 @@ while (my $line = <IN>){
 		my $organism = $genome[0]; my $genus = undef; my $species = undef;
 		if ($organism =~ /^(\S+)\s+(\S+)/){$genus = $1; $species = $2;} ## Getting rid of random strain tags
 		# Strain info
-		my $strain = $genome[2]; $strain =~ s/ /_/g; $strain =~ s/\//_/g; $strain =~ s/\|/_/g; $strain =~ s/\./_/g; ## Substituting problematic characters with underscores
+		my $strain = $genome[2]; $strain =~ s/ /_/g; $strain =~ s/\//_/g; $strain =~ s/\|/_/g; $strain =~ s/\./_/g; $strain =~ s/\(//g; $strain =~ s/\)//g; ## Deleting or substituting problematic characters with underscores
 		# Accession info
 		my $genbankFTP = $genome[$#genome]; if ($genbankFTP =~ /.*\/(\S+)$/){$accession = $1;}
 		## Downloading files
