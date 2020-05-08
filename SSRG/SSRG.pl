@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ## SSRG: Synthetic Short Read Generator; generates synthetic short reads in Fastq (Q33) format from multifasta files
-## Pombert Lab, Illinois Tech (2015-2018)
-my $version = '1.5a';
+## Pombert Lab, Illinois Tech (2015-2020)
+my $version = '1.6';
 my $name = 'SSRG.pl';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions);    
@@ -12,12 +12,13 @@ NAME		$name
 VERSION		$version
 SYNOPSIS	Generates synthetic short reads in Fastq (Q33) format from multifasta files
 
-EXAMPLE (simple): SSRG.pl -f *.fasta
-EXAMPLE (advanced): SSRG.pl -f *.fasta -r 250 -i 350 -s 20 -m rand -c 25 
+EXAMPLE (simple): $name -f *.fasta
+EXAMPLE (advanced): $name -f *.fasta -r 250 -i 350 -s 20 -m rand -c 25 
 
 OPTIONS: 
  -v (--version)		Display SSRG.pl version number
- -f (--fasta)		Fasta/multifasta input file
+ -f (--fasta)		Fasta/multifasta input file(s)
+ -l (--list)		List of fasta input file(s), one per line
  -r (--readsize)	Synthetic reads size [default: 100]
  -m (--mode)		Sliding windows or random selection (slide or rand) [default: rand]
  -t (--type)		Single or paired ends (se or pe) [default: pe]
@@ -35,6 +36,7 @@ my $start = localtime(); my $tstart = time;
 ## Declare options
 my $ver;
 my @fasta;
+my $list;
 my $readsize = 100;
 my $type = 'pe';
 my $insert = 250;
@@ -51,6 +53,7 @@ print LOG "COMMAND LINE:\nSSRG.pl @ARGV\n\n";
 GetOptions(
 	'v|version' => \$ver,
 	'f|fasta=s@{1,}' => \@fasta,
+	'l|list=s' =>	\$list,
 	'readsize|r=s' => \$readsize,
 	'm|mode=s' => \$mode,
 	'i|insert=i' => \$insert,
@@ -60,6 +63,7 @@ GetOptions(
 	'q64' => \$q64,
 	'c|coverage=s' => \$cov
 );
+
 if ($ver){die "SSRG.pl $version\n";}
 my $warning1 = "\nFatal Error: Read size must be an integer\n"; die $warning1 unless(int($readsize) == $readsize);
 my $warning2 = "\nFatal Error: Insert size \($insert\) is smaller than read size \($readsize\). Please use a larger insert size.\n\n"; if ($type eq 'pe'){die $warning2 if ($insert < $readsize);}
@@ -70,8 +74,18 @@ my %ASCII = ASCII(); my $offset; my $score; qscore(); ## ASCII offset for qualit
 my $fasta;		## Init fasta file
 my $count = 0;	## Read number counter to be auto-incremented
 my $read; my $rev_read; my $pe1; my $pe2; my $rev1; my $rev2; ## Init read variables
+if ($list){
+	open LIST, "<", "$list" or die "cannot open $list";
+	print "\nSequences listed in $list:\n";
+	while (my $line = <LIST>){
+		chomp $line;
+		my $fasta = `printf $line`; ## Converting shortcuts (e.g. ~, $HOME) to absolute paths
+		print "$fasta\n";
+		push (@fasta, $fasta);
+	}
+}
 while ($fasta = shift @fasta) {
-	open IN, "<$fasta" or die "cannot open $fasta";
+	open IN, "<", "$fasta" or die "cannot open $fasta";
 	$fasta =~ s/\.fasta$//; $fasta =~ s/\.fsa$//; $fasta =~ s/\.fa$//; $fasta =~ s/\.fna$//; ## Removing file extensions
 	if($type eq 'se'){open SE, ">$fasta.$readsize.SE.fastq";}
 	elsif($type eq 'pe'){open R1, ">$fasta.$readsize.R1.fastq"; open R2, ">$fasta.$readsize.R2.fastq";}
