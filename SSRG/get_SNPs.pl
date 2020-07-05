@@ -1,6 +1,6 @@
 #!/usr/bin/perl
-## Pombert JF, Illinois Tech - 2019
-my $version = '1.9f';
+## Pombert JF, Illinois Tech - 2020
+my $version = '1.9g';
 my $name = 'get_SNPs.pl';
 
 use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
@@ -19,14 +19,12 @@ my $freebayes = '';		## Path to FreeBayes -  https://github.com/ekg/freebayes
 ## Usage definition
 my $hint = "Type get_SNPs.pl -h (--help) for list of options\n";
 my $usage = <<"USAGE";
-
 NAME		$name
 VERSION		$version
 SYNOPSIS	Automates read-mapping of FASTQ datasets against reference sequence(s) and
 		performs variant calling (if desired)
 		
 USAGE		get_SNPs.pl [options]
-
 EXAMPLE (simple): get_SNPs.pl -fa *.fasta -fq *.fastq
 EXAMPLE (advanced): get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar --threads 16
 EXAMPLE (paired ends): get_SNPs.pl --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --caller freebayes --threads 16
@@ -39,7 +37,6 @@ my $options = <<'END_OPTIONS';
 OPTIONS:
 -h (--help)	Display this list of options
 -v (--version)	Display script version
-
 ### Mapping options ###
 -fa (--fasta)			Reference genome(s) in fasta file
 -fq (--fastq)			Fastq reads (single ends) to be mapped against reference(s)
@@ -51,17 +48,14 @@ OPTIONS:
 -sam				Keeps SAM files generated; SAM files can be quite large
 -rmo (--read_mapping_only)	Do not perform variant calling; useful when only interested in bam/sam files and/or mapping stats
 -ns (--no_stats)		Do not calculate stats; stats can take a while to compute for large eukaryote genomes
-
 ### Mapper-specific options ###
 -X				BOWTIE2 - Maximum paired ends insert size [default: 750]
 -preset				MINIMAP2 - Preset: sr, map-ont, map-pb or asm20 [default: sr]
 -algo				BWA - Mapping algorithm:  bwasw, mem, samse [default: mem]
-
 ### Variant calling options ###
 -caller				[default: varscan2]	## Variant caller: varscan2, bcftools or freebayes
 -type				[default: snp]		## snp, indel, or both
 -ploidy				[default: 1]		## FreeBayes/BCFtools option; change ploidy (if needed)
-
 ### VarScan2 parameters ### see http://dkoboldt.github.io/varscan/using-varscan.html
 -var				[default: /opt/varscan/VarScan.v2.4.3.jar]	## Which varscan jar file to use
 -mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
@@ -71,7 +65,6 @@ OPTIONS:
 -mhom (--min-freq-for-hom)	[default: 0.75]		## Minimum frequency to call homozygote
 -pv (--p-value)			[default: 1e-02]	## P-value threshold for calling variants 
 -sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
-
 END_OPTIONS
 
 my @command = @ARGV; ## Keeping track of command lines for logs later on...
@@ -290,10 +283,10 @@ sub variant{
 			elsif ($type eq 'both'){system "$samtools"."samtools mpileup -f $fasta $file.$fa.$mapper.bam | java -jar $varjar mpileup2cns --min-coverage $mc --min-reads2 $mr --min-avg-qual $maq --min-var-freq $mvf --min-freq-for-hom $mhom --p-value $pv --strand-filter $sf --variants --output-vcf > $file.$fa.$mapper.$type.vcf";}
 			else {print "\nERROR: Unrecognized variant type. Please use: snp, indel, or both\n\n"; exit;}
 		}
-		elsif ($caller eq 'bcftools'){
-			if ($type eq 'snp'){system "$samtools"."samtools mpileup -ugf $fasta $file.$fa.$mapper.bam | $bcftools"."bcftools call -vmO v -V indels --ploidy $ploidy --output $file.$fa.$mapper.$type.vcf";}
-			elsif ($type eq 'indel'){system "$samtools"."samtools mpileup -ugf $fasta $file.$fa.$mapper.bam | $bcftools"."bcftools call -vmO v -V snps --ploidy $ploidy --output $file.$fa.$mapper.$type.vcf";}
-			elsif ($type eq 'both'){system "$samtools"."samtools mpileup -ugf $fasta $file.$fa.$mapper.bam | $bcftools"."bcftools call -vmO v --ploidy $ploidy --output $file.$fa.$mapper.$type.vcf";}
+		elsif ($caller eq 'bcftools'){ ## tested with 1.10.2
+			if ($type eq 'snp'){system "$bcftools"."bcftools mpileup -f $fasta $file.$fa.$mapper.bam | $bcftools"."bcftools call -vmO v -V indels --ploidy $ploidy --output $file.$fa.$mapper.$type.vcf";}
+			elsif ($type eq 'indel'){system "$bcftools"."bcftools mpileup -f $fasta $file.$fa.$mapper.bam | $bcftools"."bcftools call -vmO v -V snps --ploidy $ploidy --output $file.$fa.$mapper.$type.vcf";}
+			elsif ($type eq 'both'){system "$bcftools"."bcftools mpileup -f $fasta $file.$fa.$mapper.bam | $bcftools"."bcftools call -vmO v --ploidy $ploidy --output $file.$fa.$mapper.$type.vcf";}
 			else {print "\nERROR: Unrecognized variant type. Please use: snp, indel, or both\n\n"; exit;}
 		}
 		elsif ($caller eq 'freebayes'){ ## single thread only, parallel version behaving wonky
