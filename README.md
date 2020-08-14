@@ -6,6 +6,7 @@ The SSRG pipeline was created as a simple, focused tool to investigate SNPs betw
 * [Requirements](#requirements)
 * [Workflows](#workflows)
 * [Installation](#installation)
+* [References](#references)
 
 #### Introduction
 Assessing the genetic diversity between genomes often involves the calculation of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels). This is usually done by mapping short accurate sequencing reads from one or more species against a reference genome, from which variants are called. This approach works well when short read data from published genomes are available in public repositories, which is not always the case, especially now that bacterial genome sequencing is shifting towards the use of long read technologies. While genomes and/or long reads can be aligned against each other, the results are often suboptimal when the investigated chromosomes are highly reorganized, which can cause the mapping to fail. A simple solution to this problem is to deconstruct the genomes or long reads into shorter fragments, a shotgun approach, and to use these smaller synthetic reads as input for mapping.
@@ -74,12 +75,22 @@ chmod a+x SNPs/*.pl; chmod a+x SNPs/*/*.pl
 ```
 Install the scripts in your $PATH (e.g. by adding to your ~/.bash_profile). To install for all users, you can create a shell script in /etc/profile.d/ on most Linux systems. For example:
 ```bash
-sudo export PATH=$PATH:/path/to/SNPs" >> /etc/profile.d/SSRG.sh;\
-sudo export PATH=$PATH:/path/to/SNPs/SSRG/" >>/etc/profile.d/SSRG.sh;\
-sudo export PATH=$PATH:/path/to/SNPs/MASH/" >> /etc/profile.d/SSRG.sh;\
-sudo export PATH=$PATH:/path/to/SNPs/Tools/NCBI/" >> /etc/profile.d/SSRG.sh;\
+sudo export PATH="$PATH:/path/to/SNPs" >> /etc/profile.d/SSRG.sh; \
+sudo export PATH="$PATH:/path/to/SNPs/SSRG/" >> /etc/profile.d/SSRG.sh; \
+sudo export PATH="$PATH:/path/to/SNPs/MASH/" >> /etc/profile.d/SSRG.sh; \
+sudo export PATH="$PATH:/path/to/SNPs/Tools/NCBI/" >> /etc/profile.d/SSRG.sh;
 ```
 In the above, replace **/path/to/SNPs** by your installation directory.
+
+###### Installing R packages dependencies
+To install R packages for all users, type the following:
+```bash
+sudo R
+```
+```R
+install.packages c("Rcpp", "gplots", "ggplot2", "ggfortify", "RColorBrewer", "plotly", "ape", "Rtsne")
+quit()
+```
 
 ###### Optional
 If desired, update the VarScan default location in the corresponding line in [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl):
@@ -102,13 +113,8 @@ my $hisat2 = '';		## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.
 my $freebayes = '';		## Path to FreeBayes -  https://github.com/ekg/freebayes
 ```
 
-Installing R packages dependencies
-To install R packages for all users, type the following:
-1)	sudo R
-2)	install.packages c("Rcpp", "gplots", "ggplot2", "ggfortify", "RColorBrewer", "plotly", "ape", "Rtsne")
-3)	quit()
 
-
+#### References
 
 
 
