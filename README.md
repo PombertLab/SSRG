@@ -9,8 +9,12 @@ People interested in genetic distances should use the genetic distance estimatio
 
 ### Table of contents
 * [Introduction](#introduction)
-* [Requirements](#requirements)
 * [Installation](#installation)
+  * [Requirements](#requirements)
+  * [Compatible read aligners](#compatible-read-aligners)
+  * [Compatible variant callers](#compatible-variant-callers)
+  * [Downloading from GitHub](#downloading-from-github)
+  * [Installing dependepencies](#installing-dependepencies)
 * [Howto](#howto)
   * [Read mapping + variant calling](#read-mapping-and-variant-calling)
   * [Genetic distance estimation](#genetic-distance-estimation)
@@ -30,7 +34,8 @@ Assessing the genetic diversity between genomes often involves the calculation o
 2)	Calculate pairwise SNPs between FASTQ sequences and reference genomes using standard read mapping approaches.
 3)	Run [Mash](https://github.com/marbl/Mash) and plot the estimated genetic distances as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
-### Requirements
+### Installation
+###### Requirements
 - Unix/Linux or MacOS X
 - Perl 5, R, and Java (for VarScan)
 - [Samtools](http://www.htslib.org/) 1.3.1+
@@ -48,26 +53,7 @@ Assessing the genetic diversity between genomes often involves the calculation o
 - [BCFtools](http://samtools.github.io/bcftools/) 1.3.1+
 - [FreeBayes](https://github.com/ekg/freebayes)
 
-### Installation
-###### On Fedora/Red Hat
-```bash
-sudo dnf install \
-  perl \
-  R \
-  bwa \
-  boost \
-  boost-devel \
-  zlib \
-  zlib-devel \
-  gsl \
-  gsl-devel \
-  autoconf \
-  automake \
-  java-1.?.?-openjdk \
-  java-1.?.?-openjdk-devel
-```
-
-###### Downloading/installing from GitHub
+###### Downloading from GitHub
 ```bash
 git clone --recursive https://github.com/PombertLab/SNPs.git
 chmod a+x SNPs/*.pl; chmod a+x SNPs/*/*.pl
@@ -81,8 +67,25 @@ sudo export PATH="$PATH:/path/to/SNPs/Tools/NCBI/" >> /etc/profile.d/SSRG.sh;
 ```
 In the above, replace **/path/to/SNPs** by your installation directory.
 
-###### Installing R packages dependencies
-To install R packages for all users, type the following:
+###### Installing dependepencies
+On Fedora/RedHat:
+```bash
+sudo dnf install \
+  perl \
+  R \
+  boost \
+  boost-devel \
+  zlib \
+  zlib-devel \
+  gsl \
+  gsl-devel \
+  autoconf \
+  automake \
+  java-1.?.?-openjdk \
+  java-1.?.?-openjdk-devel
+```
+
+To install R packages dependencies for all users, type the following:
 ```bash
 sudo R
 ```
