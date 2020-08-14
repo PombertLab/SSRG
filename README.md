@@ -3,9 +3,9 @@ The SSRG pipeline was created as a simple, focused tool to investigate genetic d
 1.	Read-mapping/variant calling
 2.	Genetic distance estimation
 
-Users interested in point mutations should use the read-mapping/variant calling workflow. The unique feature of the SSRG pipeline resides in the creation of synthetic short reads from complete or draft genomes, which can then be fed to the read mapping/variant calling tools. Note that this approach works only for haploid genomes. Alternatively, users can also select any compatible FASTQ datasets to use with the pipeline.
+People interested in point mutations should use the read-mapping/variant calling workflow. The unique feature of the SSRG pipeline resides in the creation of synthetic short reads from complete or draft genomes, which can then be fed to the read mapping/variant calling tools. Note that this approach works only for haploid genomes. Alternatively, users can also select any compatible FASTQ datasets to use with the pipeline.
 
-Users only interested in genetic distances should use the genetic distance estimation workflow. This workflow is based on [Mash](https://github.com/marbl/Mash), an excellent tool developed by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/). Genetic distances can be plotted as as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
+People interested in genetic distances should use the genetic distance estimation workflow. This workflow is based on [Mash](https://github.com/marbl/Mash), an excellent tool developed by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/). Genetic distances can be plotted as as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
 ### Table of contents
 * [Introduction](#introduction)
@@ -21,9 +21,9 @@ Users only interested in genetic distances should use the genetic distance estim
 Assessing the genetic diversity between genomes often involves the calculation of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels). This is usually done by mapping short accurate sequencing reads from one or more species against a reference genome, from which variants are called. This approach works well when short read data from published genomes are available in public repositories but that is not always the case, especially now that genome sequencing is shifting towards the use of long read technologies. While genomes and/or long reads can be aligned against each other, the results are often suboptimal when the investigated chromosomes are highly reorganized, which can cause the mapping to fail. A simple solution to this problem is to deconstruct the genomes or long reads into shorter fragments —a shotgun approach— and to use these smaller synthetic reads as input for mapping.
 
 ###### Deconstructing genomes into synthetic reads has the following advantages:
--	This approach allows the comparisons of genomes for which sequencing read datasets are not available in public repositories.
--	This approach helps standardize datasets by providing reads with the exact same parameters. For example, genomes generated from [Illumina](https://www.illumina.com/), [PacBio](https://www.pacb.com/) and/or [Oxford Nanopore](https://nanoporetech.com/) data can now be compared without fuss.
--	Because bases from complete or draft genomes have been queried multiple times by the sequencing depth, the underlying confidence in the base being called is thus higher than from a single sequencing read. This in turn leads to fewer false positives caused by sequencing errors.
+-	It enables the comparisons of genomes for which sequencing read datasets are not available in public repositories.
+-	It helps standardize datasets by providing reads with the exact same parameters. For example, genomes generated from [Illumina](https://www.illumina.com/), [PacBio](https://www.pacb.com/) and/or [Oxford Nanopore](https://nanoporetech.com/) data can now be compared without fuss.
+-	Because bases from complete or draft genomes have been queried multiple times by the sequencing depth, the underlying confidence in the base being called is thus higher than from a single sequencing read. This in turn should lead to fewer false positives caused by sequencing errors.
 
 ###### The SSRG pipeline currently can:
 1)	Download genomes automatically from NCBI using a CSV/Tab-delimited list of desired operational taxonomic units (OTU)
