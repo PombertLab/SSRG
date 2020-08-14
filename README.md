@@ -19,25 +19,25 @@ Assessing the genetic diversity between genomes often involves the calculation o
 ***The SSRG pipeline currently can:***
 1)	Download genomes automatically from NCBI using a CSV/Tab-delimited list of desired operational taxonomic units (OTU)
 2)	Calculate pairwise SNPs between FASTQ sequences and reference genomes using standard read mapping approaches.
-3)	Run Mash [1] (https://github.com/marbl/Mash; Ondov et al. 2016. DOI: 10.1186/s13059-016-0997-x) and plot the estimated genetic distances as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
+3)	Run [Mash](https://github.com/marbl/Mash) (Ondov et al. 2016. DOI: 10.1186/s13059-016-0997-x) and plot the estimated genetic distances as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
 ### Requirements
 - Unix/Linux or MacOS X
 - Perl 5, R, and Java (for VarScan)
-- Samtools version 1.3.1+ - http://www.htslib.org/ (Li et al. 2009. DOI: 10.1093/bioinformatics/btp352)
-- Mash - https://github.com/marbl/Mash (Ondov et al. 2016. DOI: 10.1186/s13059-016-0997-x)
+- [Samtools](http://www.htslib.org/) 1.3.1+ (Li et al. 2009. DOI: 10.1093/bioinformatics/btp352)
+- [Mash](https://github.com/marbl/Mash) (Ondov et al. 2016. DOI: 10.1186/s13059-016-0997-x)
 
 ###### Compatible read aligners
-- BWA version 0.7.12 - http://bio-bwa.sourceforge.net/ (Li et al. 2010. DOI: 10.1093/bioinformatics/btp698)
-- Bowtie2 version 2.2.9 or above - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml (Langmead et al. 2012. DOI: 10.1038/nmeth.1923)
-- HISAT2 version 2.0 or above - https://ccb.jhu.edu/software/hisat2/index.shtml (Kim et al. 2015. DOI: 10.1038/nmeth.3317)
-- Minimap2 version 2.14 or above - https://github.com/lh3/minimap2 (Li, H. 2018. DOI: 10.1093/bioinformatics/bty191)
-- NGMLR version 0.2.7 or above (partial support) - https://github.com/philres/ngmlr (Sedlazeck et al. 2018. DOI: 10.1038/s41592-018-0001-7)
+- [BWA](http://bio-bwa.sourceforge.net/) 0.7.12+ (Li et al. 2010. DOI: 10.1093/bioinformatics/btp698)
+- [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) 2.2.9+ (Langmead et al. 2012. DOI: 10.1038/nmeth.1923)
+- [HISAT2](https://ccb.jhu.edu/software/hisat2/index.shtml) 2.0+ (Kim et al. 2015. DOI: 10.1038/nmeth.3317)
+- [Minimap2](https://github.com/lh3/minimap2) 2.14+ (Li, H. 2018. DOI: 10.1093/bioinformatics/bty191)
+- [NGMLR](https://github.com/philres/ngmlr) 0.2.7+ (partial support; Sedlazeck et al. 2018. DOI: 10.1038/s41592-018-0001-7)
 
 ###### Compatible variant callers
-- VarScan2 version 2.4.2 or above - http://dkoboldt.github.io/varscan/ (Koboldt et al. 2012. DOI: 10.1101/gr.129684.111)
-- BCFtools version 1.3.1 or above - http://samtools.github.io/bcftools/
-- FreeBayes - https://github.com/ekg/freebayes (Garrison et al. 2012. arXiv preprint arXiv:1207.3907 [q-bio.GN])
+- [VarScan2](http://dkoboldt.github.io/varscan/) 2.4.2+ (Koboldt et al. 2012. DOI: 10.1101/gr.129684.111)
+- [BCFtools](http://samtools.github.io/bcftools/) 1.3.1+
+- [FreeBayes](https://github.com/ekg/freebayes) (Garrison et al. 2012. arXiv preprint arXiv:1207.3907 [q-bio.GN])
 
 ### Workflows
 The SSRG pipeline features two independent workflows:
