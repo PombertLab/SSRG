@@ -73,7 +73,7 @@ Assessing the genetic diversity between genomes often involves the calculation o
 ### Workflows
 The SSRG pipeline features two independent workflows:
 1.	Read-mapping/variant calling
-2.	Genetic distances estimation
+2.	Genetic distance estimation
 
 Users interested in point mutations should use the read-mapping/variant calling workflow. Users only interested in genetic distances should use the genetic distances estimation workflow. This workflow is based on [Mash](https://github.com/marbl/Mash), an excellent tool developed by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/). The Mash workflow does not identify point mutations.
 
