@@ -2,11 +2,46 @@
 The SSRG pipeline was created as a simple, focused tool to investigate SNPs between prokaryote genomes. The pipeline uses the common SNP-calling approach of read-mapping against references, standardizes experimental conditions for more accurate SNP comparisons, and integrates ubiquitous methodologies for both analysis and visualization. The unique feature of the SSRG pipeline resides in the creation of synthetic short reads from complete or draft genomes, which can then be fed to the read mapping/variant calling tools. Note that this approach works only for haploid genomes. Alternatively, users can also select any compatible FASTQ datasets to use with the pipeline.
 
 ### Table of contents
+* [Quick usage](#quick-usage)
 * [Introduction](#introduction)
 * [Requirements](#requirements)
 * [Workflows](#workflows)
 * [Installation](#installation)
 * [References](#references)
+
+### Quick usage
+##### Creating short read datasets with [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl)
+```Bash
+SSRG.pl -f *.fasta -t PE -r 250 -i 350 -c 25 
+```
+Quick options for SSRG.pl are:
+```
+ -f (--fasta)		Fasta/multifasta file(s)
+ -t (--type)		Single (SE) or paired ends (PE) [default: PE]
+ -r (--readsize)	Desired read size [default: 150]
+ -i (--insert)		PE insert size [default: 350]
+ -c (--coverage)	Desired sequencing depth [default: 50]
+```
+
+##### Performing read mapping with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl)
+###### Read mapping only
+```
+get_SNPs.pl --threads 16 --fa *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --mapper minimap2 --rmo --bam
+```
+###### Read mapping + variant calling
+```
+get_SNPs.pl --threads 16 --fa *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --mapper minimap2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar
+```
+Quick options for get_SNPs.pl are:
+```
+-threads			Number of processing threads [default: 16]
+-fa (--fasta)			Reference genome(s) in fasta file
+-pe1				Fastq reads #1 (paired ends) to be mapped against reference(s)
+-pe2				Fastq reads #2 (paired ends) to be mapped against reference(s)
+-mapper				Read mapping tool: bwa, bowtie2, minimap2, ngmlr or hisat2 [default: bowtie2]
+-bam				Keeps BAM files generated
+-rmo (--read_mapping_only)	Do not perform variant calling; useful when only interested in bam/sam files and/or mapping stat
+```
 
 ### Introduction
 Assessing the genetic diversity between genomes often involves the calculation of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels). This is usually done by mapping short accurate sequencing reads from one or more species against a reference genome, from which variants are called. This approach works well when short read data from published genomes are available in public repositories, which is not always the case, especially now that bacterial genome sequencing is shifting towards the use of long read technologies. While genomes and/or long reads can be aligned against each other, the results are often suboptimal when the investigated chromosomes are highly reorganized, which can cause the mapping to fail. A simple solution to this problem is to deconstruct the genomes or long reads into shorter fragments, a shotgun approach, and to use these smaller synthetic reads as input for mapping.
