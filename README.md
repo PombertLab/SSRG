@@ -13,7 +13,7 @@ Assessing the genetic diversity between genomes often involves the calculation o
 
 Deconstructing genomes into synthetic reads has the following advantages:
 -	This approach allows the comparisons of genomes for which sequencing read datasets are not available in public repositories.
--	This approach helps standardize datasets by providing reads with the exact same parameters. For example, genomes generated from illumina, PacBio and/or Nanopore data can now be compared without fuss.
+-	This approach helps standardize datasets by providing reads with the exact same parameters. For example, genomes generated from [Illumina](https://www.illumina.com/), [PacBio](https://www.pacb.com/) and/or [Oxford Nanopore](https://nanoporetech.com/) data can now be compared without fuss.
 -	Because bases from complete or draft genomes have been queried multiple times by the sequencing depth, the underlying confidence in the base being called is thus higher than from a single sequencing read. This in turn leads to fewer false positives caused by sequencing errors.
 
 The SSRG pipeline currently can:
