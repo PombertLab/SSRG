@@ -2,42 +2,12 @@
 The SSRG pipeline was created as a simple, focused tool to investigate SNPs between prokaryote genomes. The pipeline uses the common SNP calling approach of read mapping against references, standardizes experimental conditions for more accurate SNP comparisons, and integrates ubiquitous methodologies for both analysis and visualization. The unique feature of the SSRG pipeline resides in the creation of synthetic short reads from complete or draft genomes, which can then be fed to the read mapping/variant calling tools. Note that this approach works only for haploid genomes. Alternatively, users can also select any compatible FASTQ datasets to use with the pipeline.
 
 ### Table of contents
-* [Quick usage](#quick-usage)
 * [Introduction](#introduction)
 * [Requirements](#requirements)
-* [Workflows](#workflows)
 * [Installation](#installation)
+* [Workflows](#workflows)
+* [Howto](#howto)
 * [References](#references)
-
-### Quick usage
-#### Read mapping + variant calling
-Creating short read datasets with [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl) (paired ends; 250 bp; 50x sequencing depth) ## Optional
-```Bash
-SSRG.pl -f *.fasta -r 250 
-```
-Performing read mapping with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl)
-- Read mapping only (using minimap2 on a paired end dataset with 16 threads)
-```
-get_SNPs.pl --threads 16 --fa *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --mapper minimap2 --rmo --bam
-```
-- Read mapping (minimap2; paired end dataset) + variant calling (varscan2; SNPs + indels)
-```
-get_SNPs.pl --threads 16 --fa *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --mapper minimap2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar
-```
-
-#### Genetic distance estimations
-Runnning Mash with [run_Mash.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/run_Mash.pl) and converting output to distance matrices with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashToDistanceMatrix.pl)
-```
-run_Mash.pl -f *.fasta -o Mash.txt
-MashToDistanceMatrix.pl  -i Mash.txt -o Mash -f tsv
-```
-Plotting a quick Neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashR_plotter.pl)
-```
-MashR_plotter.pl -i Mash.tsv -if tsv -t tree -newick Mash.txt.tre
-```
-Plotting the same data using dimensionality reduction techniques
-MashR_plotter.pl -t cluster -m tsne -i Mash.tsv -if tsv -o cluster_tsne --format pdf -fs 8 -lb -pe 10
-
 
 ### Introduction
 Assessing the genetic diversity between genomes often involves the calculation of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels). This is usually done by mapping short accurate sequencing reads from one or more species against a reference genome, from which variants are called. This approach works well when short read data from published genomes are available in public repositories, which is not always the case, especially now that bacterial genome sequencing is shifting towards the use of long read technologies. While genomes and/or long reads can be aligned against each other, the results are often suboptimal when the investigated chromosomes are highly reorganized, which can cause the mapping to fail. A simple solution to this problem is to deconstruct the genomes or long reads into shorter fragments, a shotgun approach, and to use these smaller synthetic reads as input for mapping.
@@ -69,16 +39,6 @@ Assessing the genetic diversity between genomes often involves the calculation o
 - [VarScan2](http://dkoboldt.github.io/varscan/) 2.4.2+
 - [BCFtools](http://samtools.github.io/bcftools/) 1.3.1+
 - [FreeBayes](https://github.com/ekg/freebayes)
-
-### Workflows
-The SSRG pipeline features two independent workflows:
-1.	Read-mapping/variant calling
-2.	Genetic distance estimation
-
-Users interested in point mutations should use the read-mapping/variant calling workflow. Users only interested in genetic distances should use the genetic distances estimation workflow. This workflow is based on [Mash](https://github.com/marbl/Mash), an excellent tool developed by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/). The Mash workflow does not identify point mutations.
-
-<p align="center"><img src="https://github.com/PombertLab/SNPs/blob/master/Manual/Workflow.png" alt="Workflow" width="900"></p>
-FIGURE 1 - OVERVIEW OF THE SSRG PIPELINE  I. Genomes can be downloaded automatically from NCBI using provided scripts and custom or NCBI-generated lists. II. SSRG.pl generates FASTQ datasets from FASTA files at user-specified read lengths and desired sequencing depth. Note that this approach should be used only for haploid genomes. SSRG.pl is especially useful to compare genomes in databases for which sequencing reads are unavailable. III. get_SNPs.pl maps FASTQ files against references genomes using BWA [2], Bowtie2 [3], HISAT2 [4], Minimap2 [5] or NGMLR [6] as specified by the user. SNPs and indels (optional) are then calculated with Samtools [7] + VarScan2 [8], BCFtools [9], or FreeBayes [10]. IV. sort_stats.pl generates a tab-delimited table of SNP metrics. V. run_Mash.pl can estimate genetic distances using the MinHash Reduction technique, as implemented in Mash [3]. VI. MashToDistanceCSV.pl converts the output of Mash to distance matrices. VII. MashR_plotter.pl can A) clusters operational taxonomic units (OTUs) according to their estimated genetic distances, using R and either MDS [11] or t-SNE [12,13] algorithms, B) plot Neighbor-joining or UPGMA trees from Mash distances, C) generate clustered heatmaps from these distances.
 
 ### Installation
 ###### On Fedora/Red Hat
@@ -143,6 +103,44 @@ my $ngmlr = '';			## Path to ngmlr https://github.com/philres/ngmlr
 my $hisat2 = '';		## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
 my $freebayes = '';		## Path to FreeBayes -  https://github.com/ekg/freebayes
 ```
+### Workflows
+The SSRG pipeline features two independent workflows:
+1.	Read-mapping/variant calling
+2.	Genetic distance estimation
+
+Users interested in point mutations should use the read-mapping/variant calling workflow. Users only interested in genetic distances should use the genetic distances estimation workflow. This workflow is based on [Mash](https://github.com/marbl/Mash), an excellent tool developed by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/). The Mash workflow does not identify point mutations.
+
+<p align="center"><img src="https://github.com/PombertLab/SNPs/blob/master/Manual/Workflow.png" alt="Workflow" width="900"></p>
+FIGURE 1 - OVERVIEW OF THE SSRG PIPELINE  I. Genomes can be downloaded automatically from NCBI using provided scripts and custom or NCBI-generated lists. II. SSRG.pl generates FASTQ datasets from FASTA files at user-specified read lengths and desired sequencing depth. Note that this approach should be used only for haploid genomes. SSRG.pl is especially useful to compare genomes in databases for which sequencing reads are unavailable. III. get_SNPs.pl maps FASTQ files against references genomes using BWA [2], Bowtie2 [3], HISAT2 [4], Minimap2 [5] or NGMLR [6] as specified by the user. SNPs and indels (optional) are then calculated with Samtools [7] + VarScan2 [8], BCFtools [9], or FreeBayes [10]. IV. sort_stats.pl generates a tab-delimited table of SNP metrics. V. run_Mash.pl can estimate genetic distances using the MinHash Reduction technique, as implemented in Mash [3]. VI. MashToDistanceCSV.pl converts the output of Mash to distance matrices. VII. MashR_plotter.pl can A) clusters operational taxonomic units (OTUs) according to their estimated genetic distances, using R and either MDS [11] or t-SNE [12,13] algorithms, B) plot Neighbor-joining or UPGMA trees from Mash distances, C) generate clustered heatmaps from these distances.
+
+### Howto
+#### Read mapping + variant calling
+Creating short read datasets with [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl) (paired ends; 250 bp; 50x sequencing depth) ## Optional
+```Bash
+SSRG.pl -f *.fasta -r 250 
+```
+Performing read mapping with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl)
+- Read mapping only (using minimap2 on a paired end dataset with 16 threads)
+```
+get_SNPs.pl --threads 16 --fa *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --mapper minimap2 --rmo --bam
+```
+- Read mapping (minimap2; paired end dataset) + variant calling (varscan2; SNPs + indels)
+```
+get_SNPs.pl --threads 16 --fa *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --mapper minimap2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar
+```
+
+#### Genetic distance estimations
+Runnning Mash with [run_Mash.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/run_Mash.pl) and converting output to distance matrices with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashToDistanceMatrix.pl)
+```
+run_Mash.pl -f *.fasta -o Mash.txt
+MashToDistanceMatrix.pl  -i Mash.txt -o Mash -f tsv
+```
+Plotting a quick Neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashR_plotter.pl)
+```
+MashR_plotter.pl -i Mash.tsv -if tsv -t tree -newick Mash.txt.tre
+```
+Plotting the same data using dimensionality reduction techniques
+MashR_plotter.pl -t cluster -m tsne -i Mash.tsv -if tsv -o cluster_tsne --format pdf -fs 8 -lb -pe 10
 
 
 ### References
