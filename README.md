@@ -10,31 +10,33 @@ The SSRG pipeline was created as a simple, focused tool to investigate SNPs betw
 * [References](#references)
 
 ### Quick usage
-##### Creating short read datasets with [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl) (paired ends; 250 bp; 50x sequencing depth)
+#### Read mapping + variant calling
+Creating short read datasets with [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl) (paired ends; 250 bp; 50x sequencing depth)
 ```Bash
 SSRG.pl -f *.fasta -r 250 
 ```
-
-##### Performing read mapping with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl)
-###### Read mapping only (using minimap2 on a paired end dataset with 16 threads)
+Performing read mapping with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl)
+- Read mapping only (using minimap2 on a paired end dataset with 16 threads)
 ```
 get_SNPs.pl --threads 16 --fa *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --mapper minimap2 --rmo --bam
 ```
-###### Read mapping (minimap2; paired end dataset) + variant calling (varscan2; SNPs + indels)
+- Read mapping (minimap2; paired end dataset) + variant calling (varscan2; SNPs + indels)
 ```
 get_SNPs.pl --threads 16 --fa *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --mapper minimap2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar
 ```
 
-##### Creating plots from MASH distances
-###### Runnning Mash and converting output to distance matrices
+#### Genetic distance estimations
+Runnning Mash and converting output to distance matrices
 ```
 run_Mash.pl -f *.fasta -o Mash.txt
 MashToDistanceMatrix.pl  -i Mash.txt -o Mash -f tsv
 ```
-###### Plotting a quick Neighbor-joining tree
+Plotting a quick Neighbor-joining tree
 ```
-MashR_plotter.pl -i Mash.txt.tsv -if tsv -t tree -newick Mash.txt.tre
+MashR_plotter.pl -i Mash.tsv -if tsv -t tree -newick Mash.txt.tre
 ```
+Plotting the same data using dimensionality reduction techniques
+MashR_plotter.pl -t cluster -m tsne -i Mash.tsv -if tsv -o cluster_tsne --format pdf -fs 8 -lb -pe 10
 
 
 ### Introduction
