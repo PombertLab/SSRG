@@ -11,7 +11,7 @@ The SSRG pipeline was created as a simple, focused tool to investigate SNPs betw
 
 ### Quick usage
 #### Read mapping + variant calling
-Creating short read datasets with [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl) (paired ends; 250 bp; 50x sequencing depth)
+Creating short read datasets with [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl) (paired ends; 250 bp; 50x sequencing depth) ## Optional
 ```Bash
 SSRG.pl -f *.fasta -r 250 
 ```
@@ -26,12 +26,12 @@ get_SNPs.pl --threads 16 --fa *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --mapper m
 ```
 
 #### Genetic distance estimations
-Runnning Mash and converting output to distance matrices
+Runnning Mash with [run_Mash.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/run_Mash.pl) and converting output to distance matrices with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashToDistanceMatrix.pl)
 ```
 run_Mash.pl -f *.fasta -o Mash.txt
 MashToDistanceMatrix.pl  -i Mash.txt -o Mash -f tsv
 ```
-Plotting a quick Neighbor-joining tree
+Plotting a quick Neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashR_plotter.pl)
 ```
 MashR_plotter.pl -i Mash.tsv -if tsv -t tree -newick Mash.txt.tre
 ```
