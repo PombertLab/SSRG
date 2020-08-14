@@ -1,11 +1,16 @@
 # SSRG - A simple pipeline to assess genetic diversity between genomes
-The SSRG pipeline was created as a simple, focused tool to investigate SNPs between genomes. The pipeline uses the common SNP calling approach of read mapping against references, standardizes experimental conditions for more accurate SNP comparisons, and integrates ubiquitous methodologies for both analysis and visualization. The unique feature of the SSRG pipeline resides in the creation of synthetic short reads from complete or draft genomes, which can then be fed to the read mapping/variant calling tools. Note that this approach works only for haploid genomes. Alternatively, users can also select any compatible FASTQ datasets to use with the pipeline.
+The SSRG pipeline was created as a simple, focused tool to investigate genetic diversity between genomes. The pipeline features two independent workflows:
+1.	Read-mapping/variant calling
+2.	Genetic distance estimation
+
+Users interested in point mutations should use the read-mapping/variant calling workflow. The unique feature of the SSRG pipeline resides in the creation of synthetic short reads from complete or draft genomes, which can then be fed to the read mapping/variant calling tools. Note that this approach works only for haploid genomes. Alternatively, users can also select any compatible FASTQ datasets to use with the pipeline.
+
+Users only interested in genetic distances should use the genetic distance estimation workflow. This workflow is based on [Mash](https://github.com/marbl/Mash), an excellent tool developed by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/). Genetic distances can be plotted as as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques)
 
 ### Table of contents
 * [Introduction](#introduction)
 * [Requirements](#requirements)
 * [Installation](#installation)
-* [Workflows](#workflows)
 * [Howto](#howto)
   * [Read mapping + variant calling](#read-mapping-and-variant-calling)
   * [Genetic distance estimation](#genetic-distance-estimation)
@@ -106,15 +111,6 @@ my $ngmlr = '';			## Path to ngmlr https://github.com/philres/ngmlr
 my $hisat2 = '';		## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
 my $freebayes = '';		## Path to FreeBayes -  https://github.com/ekg/freebayes
 ```
-### Workflows
-The SSRG pipeline features two independent workflows:
-1.	Read-mapping/variant calling
-2.	Genetic distance estimation
-
-Users interested in point mutations should use the read-mapping/variant calling workflow. Users only interested in genetic distances should use the genetic distances estimation workflow. This workflow is based on [Mash](https://github.com/marbl/Mash), an excellent tool developed by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/). The Mash workflow does not identify point mutations.
-
-<p align="center"><img src="https://github.com/PombertLab/SNPs/blob/master/Manual/Workflow.png" alt="Workflow" width="900"></p>
-FIGURE 1 - OVERVIEW OF THE SSRG PIPELINE  I. Genomes can be downloaded automatically from NCBI using provided scripts and custom or NCBI-generated lists. II. SSRG.pl generates FASTQ datasets from FASTA files at user-specified read lengths and desired sequencing depth. Note that this approach should be used only for haploid genomes. SSRG.pl is especially useful to compare genomes in databases for which sequencing reads are unavailable. III. get_SNPs.pl maps FASTQ files against references genomes using BWA [2], Bowtie2 [3], HISAT2 [4], Minimap2 [5] or NGMLR [6] as specified by the user. SNPs and indels (optional) are then calculated with Samtools [7] + VarScan2 [8], BCFtools [9], or FreeBayes [10]. IV. sort_stats.pl generates a tab-delimited table of SNP metrics. V. run_Mash.pl can estimate genetic distances using the MinHash Reduction technique, as implemented in Mash [3]. VI. MashToDistanceCSV.pl converts the output of Mash to distance matrices. VII. MashR_plotter.pl can A) clusters operational taxonomic units (OTUs) according to their estimated genetic distances, using R and either MDS [11] or t-SNE [12,13] algorithms, B) plot Neighbor-joining or UPGMA trees from Mash distances, C) generate clustered heatmaps from these distances.
 
 ### Howto
 #### Read mapping and variant calling
