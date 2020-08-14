@@ -58,7 +58,9 @@ Assessing the genetic diversity between genomes often involves the calculation o
 git clone --recursive https://github.com/PombertLab/SNPs.git
 chmod a+x SNPs/*.pl; chmod a+x SNPs/*/*.pl
 ```
-Install the scripts in your $PATH (e.g. by adding to your ~/.bash_profile). To install for all users, you can create a shell script in /etc/profile.d/ on most Linux systems. For example:
+Install the scripts in your $PATH (e.g. by adding to your ~/.bash_profile).
+
+To install for all users, a shell script can be created in /etc/profile.d/ on most Linux systems. For example:
 ```bash
 sudo export PATH="$PATH:/path/to/SNPs" >> /etc/profile.d/SSRG.sh; \
 sudo export PATH="$PATH:/path/to/SNPs/SSRG/" >> /etc/profile.d/SSRG.sh; \
