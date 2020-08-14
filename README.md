@@ -12,7 +12,7 @@ The SSRG pipeline was created as a simple, focused tool to investigate SNPs betw
 * [References](#references)
 
 ### Introduction
-###### Why another rad mapping pipeline?
+###### Why another read mapping pipeline?
 Assessing the genetic diversity between genomes often involves the calculation of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels). This is usually done by mapping short accurate sequencing reads from one or more species against a reference genome, from which variants are called. This approach works well when short read data from published genomes are available in public repositories, which is not always the case, especially now that bacterial genome sequencing is shifting towards the use of long read technologies. While genomes and/or long reads can be aligned against each other, the results are often suboptimal when the investigated chromosomes are highly reorganized, which can cause the mapping to fail. A simple solution to this problem is to deconstruct the genomes or long reads into shorter fragments, a shotgun approach, and to use these smaller synthetic reads as input for mapping.
 
 ###### Deconstructing genomes into synthetic reads has the following advantages:
