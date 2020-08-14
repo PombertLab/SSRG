@@ -7,7 +7,7 @@ The SSRG pipeline was created as a simple, focused tool to investigate SNPs betw
 * [Installation](#installation)
 * [Workflows](#workflows)
 * [Howto](#howto)
-  * [Read mapping/variant calling](#read-mapping/variant-calling)
+  * [Read mapping/variant calling](#read-mapping-variant-calling)
   * [Genetic distance estimation](#genetic-distance-estimation)
 * [References](#references)
 
