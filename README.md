@@ -7,7 +7,7 @@ The SSRG pipeline was created as a simple, focused tool to investigate SNPs betw
 * [Installation](#installation)
 * [Workflows](#workflows)
 * [Howto](#howto)
-  * [Read mapping/variant calling](#read-mapping-variant-calling)
+  * [Read mapping + variant calling](#read-mapping-+-variant-calling)
   * [Genetic distance estimation](#genetic-distance-estimation)
 * [References](#references)
 
@@ -116,7 +116,7 @@ Users interested in point mutations should use the read-mapping/variant calling 
 FIGURE 1 - OVERVIEW OF THE SSRG PIPELINE  I. Genomes can be downloaded automatically from NCBI using provided scripts and custom or NCBI-generated lists. II. SSRG.pl generates FASTQ datasets from FASTA files at user-specified read lengths and desired sequencing depth. Note that this approach should be used only for haploid genomes. SSRG.pl is especially useful to compare genomes in databases for which sequencing reads are unavailable. III. get_SNPs.pl maps FASTQ files against references genomes using BWA [2], Bowtie2 [3], HISAT2 [4], Minimap2 [5] or NGMLR [6] as specified by the user. SNPs and indels (optional) are then calculated with Samtools [7] + VarScan2 [8], BCFtools [9], or FreeBayes [10]. IV. sort_stats.pl generates a tab-delimited table of SNP metrics. V. run_Mash.pl can estimate genetic distances using the MinHash Reduction technique, as implemented in Mash [3]. VI. MashToDistanceCSV.pl converts the output of Mash to distance matrices. VII. MashR_plotter.pl can A) clusters operational taxonomic units (OTUs) according to their estimated genetic distances, using R and either MDS [11] or t-SNE [12,13] algorithms, B) plot Neighbor-joining or UPGMA trees from Mash distances, C) generate clustered heatmaps from these distances.
 
 ### Howto
-#### Read mapping/variant calling
+#### Read mapping + variant calling
 Creating short read datasets with [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl) (paired ends; 250 bp; 50x sequencing depth) ## Optional
 ```Bash
 SSRG.pl -f *.fasta -r 250 
