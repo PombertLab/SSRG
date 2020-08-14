@@ -36,7 +36,7 @@ Assessing the genetic diversity between genomes often involves the calculation o
 
 ### Installation
 ###### Requirements
-- Unix/Linux or MacOS X
+- Unix/Linux, MacOS X, or WSL2
 - Perl 5, R, and Java (for VarScan)
 - [Samtools](http://www.htslib.org/) 1.3.1+
 - [Mash](https://github.com/marbl/Mash)
