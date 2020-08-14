@@ -5,7 +5,7 @@ The SSRG pipeline was created as a simple, focused tool to investigate genetic d
 
 Users interested in point mutations should use the read-mapping/variant calling workflow. The unique feature of the SSRG pipeline resides in the creation of synthetic short reads from complete or draft genomes, which can then be fed to the read mapping/variant calling tools. Note that this approach works only for haploid genomes. Alternatively, users can also select any compatible FASTQ datasets to use with the pipeline.
 
-Users only interested in genetic distances should use the genetic distance estimation workflow. This workflow is based on [Mash](https://github.com/marbl/Mash), an excellent tool developed by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/). Genetic distances can be plotted as as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques)
+Users only interested in genetic distances should use the genetic distance estimation workflow. This workflow is based on [Mash](https://github.com/marbl/Mash), an excellent tool developed by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/). Genetic distances can be plotted as as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
 ### Table of contents
 * [Introduction](#introduction)
