@@ -19,7 +19,7 @@ Assessing the genetic diversity between genomes often involves the calculation o
 ***The SSRG pipeline currently can:***
 1)	Download genomes automatically from NCBI using a CSV/Tab-delimited list of desired operational taxonomic units (OTU)
 2)	Calculate pairwise SNPs between FASTQ sequences and reference genomes using standard read mapping approaches.
-3)	Run [Mash](https://github.com/marbl/Mash) (Ondov et al. 2016. DOI: 10.1186/s13059-016-0997-x) and plot the estimated genetic distances as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
+3)	Run [Mash](https://github.com/marbl/Mash) and plot the estimated genetic distances as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
 ### Requirements
 - Unix/Linux or MacOS X
