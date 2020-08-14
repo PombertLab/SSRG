@@ -8,7 +8,7 @@ The SSRG pipeline was created as a simple, focused tool to investigate SNPs betw
 * [Installation](#installation)
 * [References](#references)
 
-#### Introduction
+### Introduction
 Assessing the genetic diversity between genomes often involves the calculation of single nucleotide polymorphisms (SNPs) and insertions/deletions (indels). This is usually done by mapping short accurate sequencing reads from one or more species against a reference genome, from which variants are called. This approach works well when short read data from published genomes are available in public repositories, which is not always the case, especially now that bacterial genome sequencing is shifting towards the use of long read technologies. While genomes and/or long reads can be aligned against each other, the results are often suboptimal when the investigated chromosomes are highly reorganized, which can cause the mapping to fail. A simple solution to this problem is to deconstruct the genomes or long reads into shorter fragments, a shotgun approach, and to use these smaller synthetic reads as input for mapping.
 
 ***Deconstructing genomes into synthetic reads has the following advantages:***
@@ -16,12 +16,12 @@ Assessing the genetic diversity between genomes often involves the calculation o
 -	This approach helps standardize datasets by providing reads with the exact same parameters. For example, genomes generated from [Illumina](https://www.illumina.com/), [PacBio](https://www.pacb.com/) and/or [Oxford Nanopore](https://nanoporetech.com/) data can now be compared without fuss.
 -	Because bases from complete or draft genomes have been queried multiple times by the sequencing depth, the underlying confidence in the base being called is thus higher than from a single sequencing read. This in turn leads to fewer false positives caused by sequencing errors.
 
-The SSRG pipeline currently can:
+***The SSRG pipeline currently can:***
 1)	Download genomes automatically from NCBI using a CSV/Tab-delimited list of desired operational taxonomic units (OTU)
 2)	Calculate pairwise SNPs between FASTQ sequences and reference genomes using standard read mapping approaches.
 3)	Run Mash [1] (https://github.com/marbl/Mash; Ondov et al. 2016. DOI: 10.1186/s13059-016-0997-x) and plot the estimated genetic distances as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
-#### Requirements
+### Requirements
 - Unix/Linux or MacOS X
 - Perl 5, R, and Java (for VarScan)
 - Samtools version 1.3.1+ - http://www.htslib.org/ (Li et al. 2009. DOI: 10.1093/bioinformatics/btp352)
@@ -39,7 +39,7 @@ The SSRG pipeline currently can:
 - BCFtools version 1.3.1 or above - http://samtools.github.io/bcftools/
 - FreeBayes - https://github.com/ekg/freebayes (Garrison et al. 2012. arXiv preprint arXiv:1207.3907 [q-bio.GN])
 
-#### Workflows
+### Workflows
 The SSRG pipeline features two independent workflows:
 I.	Read-mapping/variant calling
 II.	Genetic distances estimation
@@ -49,7 +49,7 @@ Users interested in point mutations should use the read-mapping/variant calling 
 <p align="center"><img src="https://github.com/PombertLab/SNPs/blob/master/Manual/Workflow.png" alt="Workflow" width="1000"></p>
 **FIGURE 1 - OVERVIEW OF THE SSRG PIPELINE**  I. Genomes can be downloaded automatically from NCBI using provided scripts and custom or NCBI-generated lists. II. SSRG.pl generates FASTQ datasets from FASTA files at user-specified read lengths and desired sequencing depth. Note that this approach should be used only for haploid genomes. SSRG.pl is especially useful to compare genomes in databases for which sequencing reads are unavailable. III. get_SNPs.pl maps FASTQ files against references genomes using BWA [2], Bowtie2 [3], HISAT2 [4], Minimap2 [5] or NGMLR [6] as specified by the user. SNPs and indels (optional) are then calculated with Samtools [7] + VarScan2 [8], BCFtools [9], or FreeBayes [10]. IV. sort_stats.pl generates a tab-delimited table of SNP metrics. V. run_Mash.pl can estimate genetic distances using the MinHash Reduction technique, as implemented in Mash [3]. VI. MashToDistanceCSV.pl converts the output of Mash to distance matrices. VII. MashR_plotter.pl can A) clusters operational taxonomic units (OTUs) according to their estimated genetic distances, using R and either MDS [11] or t-SNE [12,13] algorithms, B) plot Neighbor-joining or UPGMA trees from Mash distances, C) generate clustered heatmaps from these distances.
 
-#### Installation
+### Installation
 ###### On Fedora/Red Hat
 ```bash
 sudo dnf install \
@@ -114,7 +114,7 @@ my $freebayes = '';		## Path to FreeBayes -  https://github.com/ekg/freebayes
 ```
 
 
-#### References
+### References
 
 
 
