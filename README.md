@@ -71,7 +71,7 @@ source ~/.bash_profile
 ```
 
 ###### Installing dependepencies
-On Fedora/RedHat:
+***On Fedora/RedHat:***
 ```bash
 sudo dnf install \
   perl \
