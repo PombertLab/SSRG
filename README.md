@@ -111,7 +111,9 @@ quit()
 
 ***Installing Mash, read mappers and variants callers***
 
-Mash dependency-free binaries are available [here](https://github.com/marbl/Mash/releases).
+[Mash](https://github.com/marbl/Mash) is available [here](https://github.com/marbl/Mash/releases).
+
+[Minimap2](https://github.com/lh3/minimap2) is available [here](https://github.com/lh3/minimap2#install).
 
 ###### Optional
 If desired, update the VarScan default location in the corresponding line in [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl):
