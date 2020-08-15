@@ -60,7 +60,7 @@ git clone --recursive https://github.com/PombertLab/SNPs.git
 chmod a+x `find ./SNPs/ -name *.pl`
 ```
 For ease of use, the SSRG folders should be added to the $PATH variable. Bash users on Fedora/RedHat can type the following commands to add the SNPs folder and its subdirectories to their .bash_profile:
-```
+```bash
 cd ./SNPs; PWD=`pwd`;
 echo 'PATH="$PATH:'"$PWD\"" >> ~/.bash_profile
 echo 'PATH="$PATH:'"$PWD/SSRG\"" >> ~/.bash_profile
@@ -69,15 +69,7 @@ echo 'PATH="$PATH:'"$PWD/Tools/NCBI\"" >> ~/.bash_profile
 echo 'export PATH' >> ~/.bash_profile
 source ~/.bash_profile
 ```
-
-To install for all users, a shell script can be created in /etc/profile.d/ on most Linux systems. For example:
-```bash
-sudo export PATH="$PATH:/path/to/SNPs" >> /etc/profile.d/SSRG.sh; \
-sudo export PATH="$PATH:/path/to/SNPs/SSRG/" >> /etc/profile.d/SSRG.sh; \
-sudo export PATH="$PATH:/path/to/SNPs/MASH/" >> /etc/profile.d/SSRG.sh; \
-sudo export PATH="$PATH:/path/to/SNPs/Tools/NCBI/" >> /etc/profile.d/SSRG.sh;
-```
-In the above, replace **/path/to/SNPs** by your installation directory.
+To install for all users, a shell script can be created in /etc/profile.d/ on most Linux systems. 
 
 ###### Installing dependepencies
 On Fedora/RedHat:
