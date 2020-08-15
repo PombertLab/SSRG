@@ -57,9 +57,18 @@ Assessing the genetic diversity between genomes often involves the calculation o
 ###### Downloading from GitHub
 ```bash
 git clone --recursive https://github.com/PombertLab/SNPs.git
-chmod a+x SNPs/*.pl; chmod a+x SNPs/*/*.pl
+chmod a+x `find ./SNPs/ -name *.pl`
 ```
-Install the scripts in your $PATH (e.g. by adding to your ~/.bash_profile).
+For ease of use, the SSRG folders should be added to the $PATH variable. Bash users on Fedora/RedHat can type the following commands to add the SNPs folder and its subdirectories to their .bash_profile:
+```
+cd ./SNPs; PWD=`pwd`;
+echo 'PATH="$PATH:'"$PWD\"" >> ~/.bash_profile
+echo 'PATH="$PATH:'"$PWD/SSRG\"" >> ~/.bash_profile
+echo 'PATH="$PATH:'"$PWD/MASH\"" >> ~/.bash_profile
+echo 'PATH="$PATH:'"$PWD/Tools/NCBI\"" >> ~/.bash_profile
+echo 'export PATH' >> ~/.bash_profile
+source ~/.bash_profile
+```
 
 To install for all users, a shell script can be created in /etc/profile.d/ on most Linux systems. For example:
 ```bash
