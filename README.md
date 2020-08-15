@@ -71,7 +71,7 @@ source ~/.bash_profile
 ```
 
 ###### Installing dependepencies
-***On Fedora/RedHat:***
+***On Fedora/RedHat***
 ```bash
 sudo dnf install \
   perl \
@@ -91,6 +91,7 @@ sudo dnf install \
 ```
 
 ***R***
+
 To install R dependencies, type:
 ```bash
 R
@@ -109,7 +110,8 @@ quit()
 ```
 
 ***Installing Mash, read mappers and variants callers***
-Mash dependency-free binaries are availeble [here](https://github.com/marbl/Mash/releases)
+
+Mash dependency-free binaries are available [here](https://github.com/marbl/Mash/releases).
 
 ###### Optional
 If desired, update the VarScan default location in the corresponding line in [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl):
