@@ -88,12 +88,13 @@ sudo dnf install \
   java-1.?.?-openjdk-devel
 ```
 
-To install R packages dependencies for all users, type the following:
+To install R packages dependencies, in R type:
 ```bash
-sudo R
+R
 ```
+Then in R, for example, type:
 ```R
-install.packages c("Rcpp", "gplots", "ggplot2", "ggfortify", "RColorBrewer", "plotly", "ape", "Rtsne")
+install.packages("RColorBrewer")
 quit()
 ```
 
