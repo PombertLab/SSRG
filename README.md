@@ -1,6 +1,6 @@
 <p align="center"><img src="https://github.com/PombertLab/SNPs/blob/master/Manual/logo.png" alt="SSRG - A simple pipeline to assess genetic diversity" width="900"></p>
 
-The SSRG pipeline was created as a simple, focused tool to investigate genetic diversity between genomes. The pipeline features two independent workflows:
+The SSRG pipeline was created as a simple and focused tool to investigate genetic diversity between genomes. The pipeline features two independent workflows:
 1.	Read-mapping/variant calling
 2.	Genetic distance estimation
 
