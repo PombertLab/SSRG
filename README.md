@@ -88,11 +88,11 @@ sudo dnf install \
   java-1.?.?-openjdk-devel
 ```
 
-To install R packages dependencies, in R type:
+To install R dependencies, type:
 ```bash
 R
 ```
-Then in R, for example, type:
+Then in R, type:
 ```R
 install.packages("RColorBrewer")
 quit()
