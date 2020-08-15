@@ -84,6 +84,8 @@ sudo dnf install \
   gsl-devel \
   autoconf \
   automake \
+  libcurl-devel \
+  openssl-devel \
   java-1.?.?-openjdk \
   java-1.?.?-openjdk-devel
 ```
@@ -94,7 +96,14 @@ R
 ```
 Then in R, type:
 ```R
+install.packages("ape")
+install.packages("gplots")
+install.packages("ggplot2")
+install.packages("ggfortify")
+install.packages("plotly")
 install.packages("RColorBrewer")
+install.packages("Rcpp")
+install.packages("Rtsne")
 quit()
 ```
 
