@@ -38,7 +38,7 @@ Assessing the genetic diversity between genomes often involves the calculation o
 ### Installation
 ###### Requirements
 - Unix/Linux, MacOS X, or WSL2
-- Perl 5, R, and Java (for VarScan)
+- [Perl 5](https://www.perl.org/), [R](https://www.r-project.org/), and [Java](https://www.java.com/) (for VarScan2)
 - [Samtools](http://www.htslib.org/) 1.3.1+
 - [Mash](https://github.com/marbl/Mash) (for genetic distance estimations)
 
@@ -46,7 +46,7 @@ Assessing the genetic diversity between genomes often involves the calculation o
 - [BWA](http://bio-bwa.sourceforge.net/) 0.7.12+
 - [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) 2.2.9+
 - [HISAT2](https://ccb.jhu.edu/software/hisat2/index.shtml) 2.0+
-- [Minimap2](https://github.com/lh3/minimap2) 2.14+
+- [Minimap2](https://github.com/lh3/minimap2) 2.14+ (recommended)
 - [NGMLR](https://github.com/philres/ngmlr) 0.2.7+ (partial support)
 
 ###### Compatible variant callers
