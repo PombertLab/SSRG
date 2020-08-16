@@ -19,7 +19,7 @@ People interested in genetic distances should use the genetic distance estimatio
   * [Testing the installation](#Testing-the-installation)
 * [Howto](#howto)
   * [Read mapping + variant calling](#read-mapping-and-variant-calling)
-    * [Creating reads with SSRG](#creating-reads-with-SSRG)
+    * [Creating reads with SSRG\.pl](#creating-reads-with-SSRG)
     * [SNP calling with get_SNPs](#SNP-calling-with-get_SNPs)
   * [Genetic distance estimation with Mash](#genetic-distance-estimation-with-Mash)
 * [References](#references)
@@ -151,7 +151,7 @@ Creating short read datasets with [SSRG.pl](https://github.com/PombertLab/SNPs/b
 SSRG.pl -f *.fasta -r 250 
 ```
 
-##### SNP calling with get_SNPs
+##### SNP calling with get_SNPs.pl
 Performing read mapping with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl)
 - Read mapping only (using minimap2 on a paired end dataset with 16 threads)
 ```
