@@ -166,7 +166,7 @@ Options for SSRG.pl are:
 
 
 ##### Read mapping
-[get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) is the main script that handles read mapping a variant calling. The default read mapper in get_SNPs.pl is [Minimap2](https://github.com/lh3/minimap2), and can be changed by invoking the **--mapper** switch from the command line. Users can also change the default read mapper settings by modifying the following line in [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl):
+[get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) is the main script that handles read mapping and variant calling. The default read mapper in get_SNPs.pl is [Minimap2](https://github.com/lh3/minimap2), and can be changed by invoking the **--mapper** switch from the command line. Users can also change the default read mapper settings by modifying the following line in [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl):
 ```perl
 my $mapper = 'minimap2';
 ```
