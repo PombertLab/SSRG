@@ -19,7 +19,9 @@ People interested in genetic distances should use the genetic distance estimatio
   * [Testing the installation](#Testing-the-installation)
 * [Howto](#howto)
   * [Read mapping + variant calling](#read-mapping-and-variant-calling)
-  * [Genetic distance estimation](#genetic-distance-estimation)
+    * [Creating reads with SSRG.pl](#creating-reads-with-SSRG.pl)
+    * [SNP calling with get_SNPs.pl](#SNP-calling-with-get_SNPs.pl)
+  * [Genetic distance estimation with Mash](#genetic-distance-estimation-with-Mash)
 * [References](#references)
 
 ### Introduction
@@ -143,10 +145,13 @@ XXX
 
 ### Howto
 #### Read mapping and variant calling
+##### Creating reads with SSRG.pl
 Creating short read datasets with [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl) (paired ends; 250 bp; 50x sequencing depth) ## Optional
 ```Bash
 SSRG.pl -f *.fasta -r 250 
 ```
+
+##### SNP calling with get_SNPs.pl
 Performing read mapping with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl)
 - Read mapping only (using minimap2 on a paired end dataset with 16 threads)
 ```
@@ -157,7 +162,7 @@ get_SNPs.pl --threads 16 --fa *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --mapper m
 get_SNPs.pl --threads 16 --fa *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --mapper minimap2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar
 ```
 
-#### Genetic distance estimation
+#### Genetic distance estimation with Mash
 Runnning Mash with [run_Mash.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/run_Mash.pl) and converting output to distance matrices with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashToDistanceMatrix.pl)
 ```
 run_Mash.pl -f *.fasta -o Mash.txt
