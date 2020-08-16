@@ -15,12 +15,13 @@ People interested in genetic distances should use the genetic distance estimatio
   * [Compatible read aligners](#compatible-read-aligners)
   * [Compatible variant callers](#compatible-variant-callers)
   * [Downloading from GitHub](#downloading-from-github)
-  * [Installing dependepencies](#installing-dependepencies)
-  * [Testing the installation](#Testing-the-installation)
+  * [Installing dependencies](#installing-dependencies)
+  * [Testing the installation](#testing-the-installation)
 * [Howto](#howto)
   * [Read mapping + variant calling](#read-mapping-and-variant-calling)
-    * [Creating synthetic reads](#creating-synthetic-reads)
-    * [SNP calling with get_SNPs](#SNP-calling-with-get_SNPs)
+    * [Synthetic reads](#synthetic-reads)
+    * [Read mapping](#read-mapping)
+    * [Variant calling](#variant-calling)
   * [Genetic distance estimation with Mash](#genetic-distance-estimation-with-Mash)
 * [References](#references)
 
@@ -145,14 +146,33 @@ XXX
 
 ### Howto
 #### Read mapping and variant calling
-##### Creating synthetic reads
-To...
-Creating short read datasets with [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl) (paired ends; 250 bp; 50x sequencing depth) ## Optional
+##### Synthetic reads
+[SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl) can be used to generate FASTQ datasets from complete or draft genomes (ploidy = 1). For example, to generate FASTQ datasets (paired ends; 250 bp; 50x sequencing depth) from one or more genomes:
 ```Bash
 SSRG.pl -f *.fasta -r 250 
 ```
+Options for SSRG.pl are:
+```
+ -f (--fasta)		Fasta/multifasta file(s)
+ -l (--list)		List of fasta file(s), one per line
+ -r (--readsize)	Desired read size [default: 150]
+ -t (--type)		Read type: single (SE) or paired ends (PE) [default: PE]
+ -i (--insert)		PE insert size [default: 350]
+ -s (--sdev)		PE insert size standard deviation (in percentage) [default: 10]
+ -c (--coverage)	Desired sequencing depth [default: 50]
+ -qs (--qscore)		Quality score associated with each base [default: 30]
+ -q64          		Use the old Illumina Q64 FastQ format instead of the default Q33 Sanger/Illumina 1.8+ encoding
+```
 
-##### SNP calling with get_SNPs.pl
+
+##### Read mapping
+
+XXXX
+
+##### Variant calling
+
+XXXX
+
 Performing read mapping with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl)
 - Read mapping only (using minimap2 on a paired end dataset with 16 threads)
 ```
