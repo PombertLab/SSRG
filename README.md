@@ -131,21 +131,6 @@ my $varjar = '/opt/varscan/VarScan.v2.4.3.jar';
 
 To perform genetic distance estimations, [Mash](https://github.com/marbl/Mash) by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/) is required. It is available [here](https://github.com/marbl/Mash/releases).
 
-###### Optional
-If dependencies are not installed in your $PATH, you can alternatively insert the installation directories at the top of  [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) to reflect your settings:
-```perl
-## User-defined environment variables. ## Leave these blank (e.g. $samtools = '';) if programs are set in $PATH.
-## Alternatively, you can insert here the installation directories (e.g. $samtools = '/opt/samtools-1.3.1/bin/') to reflect your settings.
-my $samtools = '';		## Path to samtools 1.3.1+ - http://www.htslib.org/
-my $bcftools = '';		## Path to bcftools 1.3.1+ - http://www.htslib.org/
-my $bwa = '';			## Path to BWA - http://bio-bwa.sourceforge.net/
-my $bowtie2 = '';		## Path to Bowtie2 - http://bowtie-bio.sourceforge.net/bowtie2/index.shtml
-my $minimap2 = '';		## Path to Minimap2 - https://github.com/lh3/minimap2
-my $ngmlr = '';			## Path to ngmlr https://github.com/philres/ngmlr
-my $hisat2 = '';		## Path to HISAT2 - https://ccb.jhu.edu/software/hisat2/index.shtml
-my $freebayes = '';		## Path to FreeBayes -  https://github.com/ekg/freebayes
-```
-
 ### Howto
 #### Read mapping and variant calling
 Creating short read datasets with [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl) (paired ends; 250 bp; 50x sequencing depth) ## Optional
