@@ -111,30 +111,27 @@ quit()
 
 ***Installing read mappers, variants callers and Mash***
 
-One read mapper and variant caller are required to use [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl). [Minimap2](https://github.com/lh3/minimap2) and [VarScan2](http://dkoboldt.github.io/varscan/) are recommended. Read mappers are available here:
+Read mapping/variant calling with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) require [Samtools](http://www.htslib.org/) 1.3.1+. Read mappers and variant callers to be used with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) can be installed on a need-to basis. [Minimap2](https://github.com/lh3/minimap2) and [VarScan2](http://dkoboldt.github.io/varscan/) are recommended. Read mappers are available here:
 
 - [Minimap2](https://github.com/lh3/minimap2)
 - [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)
 - [NGMLR](https://github.com/philres/ngmlr)
 - [HISAT2](https://ccb.jhu.edu/software/hisat2/index.shtml)
-- [BWA](http://bio-bwa.sourceforge.net/). On Fedora, it also can be installed using the DNF package manager:
+- [BWA](http://bio-bwa.sourceforge.net/). ## On Fedora, BWA can be installed from the DNF package manager:
 ```Bash
 sudo dnf install bwa
 ```
-- [BCFtools](http://samtools.github.io/bcftools/) is available [here](http://samtools.github.io/bcftools/).
-- [FreeBayes](https://github.com/ekg/freebayes) is available [here](https://github.com/ekg/freebayes).
-- [VarScan2](http://dkoboldt.github.io/varscan/) is available [here](http://dkoboldt.github.io/varscan/).
-
-
-To perform genetic distance estimations, by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/) is required. It is available [here](https://github.com/marbl/Mash/releases).
-
-###### Optional
-If desired, update the VarScan default location in the corresponding line in [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl):
+Variant callers are available here:
+- [BCFtools](http://samtools.github.io/bcftools/)
+- [FreeBayes](https://github.com/ekg/freebayes)
+- [VarScan2](http://dkoboldt.github.io/varscan/). ## The default location of the VarScan2 jar file can be updated in [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) by modifying the following line:
 ```perl
 my $varjar = '/opt/varscan/VarScan.v2.4.3.jar';
 ```
-This can also be changed from the command line with the -var option
 
+To perform genetic distance estimations, [Mash](https://github.com/marbl/Mash) by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/) is required. It is available [here](https://github.com/marbl/Mash/releases).
+
+###### Optional
 If dependencies are not installed in your $PATH, you can alternatively insert the installation directories at the top of  [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) to reflect your settings:
 ```perl
 ## User-defined environment variables. ## Leave these blank (e.g. $samtools = '';) if programs are set in $PATH.
