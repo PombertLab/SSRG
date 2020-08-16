@@ -109,11 +109,24 @@ install.packages("Rtsne")
 quit()
 ```
 
-***Installing Mash, read mappers and variants callers***
+***Installing read mappers, variants callers and Mash***
 
-[Mash](https://github.com/marbl/Mash) is available [here](https://github.com/marbl/Mash/releases).
+One read mapper and variant caller are required to use [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl). [Minimap2](https://github.com/lh3/minimap2) and [VarScan2](http://dkoboldt.github.io/varscan/) are recommended. Read mappers are available here:
 
-[Minimap2](https://github.com/lh3/minimap2) is available [here](https://github.com/lh3/minimap2#install).
+- [Minimap2](https://github.com/lh3/minimap2)
+- [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)
+- [NGMLR](https://github.com/philres/ngmlr)
+- [HISAT2](https://ccb.jhu.edu/software/hisat2/index.shtml)
+- [BWA](http://bio-bwa.sourceforge.net/). On Fedora, it also can be installed using the DNF package manager:
+```Bash
+sudo dnf install bwa
+```
+- [BCFtools](http://samtools.github.io/bcftools/) is available [here](http://samtools.github.io/bcftools/).
+- [FreeBayes](https://github.com/ekg/freebayes) is available [here](https://github.com/ekg/freebayes).
+- [VarScan2](http://dkoboldt.github.io/varscan/) is available [here](http://dkoboldt.github.io/varscan/).
+
+
+To perform genetic distance estimations, by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/) is required. It is available [here](https://github.com/marbl/Mash/releases).
 
 ###### Optional
 If desired, update the VarScan default location in the corresponding line in [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl):
