@@ -204,10 +204,40 @@ General and read mapping options for get_SNPs.pl are:
 ```
 
 ##### Variant calling
-
-- Read mapping (minimap2; paired end dataset) + variant calling (varscan2; SNPs + indels)
+The default variant caller in get_SNPs.pl is [VarScan2](http://dkoboldt.github.io/varscan/). Other variant callers are implemented only partially. To perform variant calling with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) using default settings ([Minimap2](https://github.com/lh3/minimap2) + [VarScan2](http://dkoboldt.github.io/varscan/)) and single end datasets, simply type:
+```bash
+get_SNPs.pl -fa *.fasta -fq *.fastq
 ```
-get_SNPs.pl --threads 16 --fa *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --mapper minimap2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar
+
+A more detailed command line using Minimap2, VarScan2, and paired end datasets should look like:
+```bash
+get_SNPs.pl \
+   -threads 16 \
+   -fa *.fasta \
+   -pe1 *R1.fastq \
+   -pe2 *R2.fastq \
+   -mapper minimap2 \
+   -caller varscan2 \
+   -type both \
+   -var ./VarScan.v2.4.3.jar
+```
+
+Variant calling options for get_SNPs.pl are:
+```
+### Variant calling options ###
+-caller				[default: varscan2]	## Variant caller: varscan2, bcftools or freebayes
+-type				[default: snp]		## snp, indel, or both
+-ploidy				[default: 1]		## FreeBayes/BCFtools option; change ploidy (if needed)
+
+### VarScan2 parameters ### see http://dkoboldt.github.io/varscan/using-varscan.html
+-var				[default: /opt/varscan/VarScan.v2.4.3.jar]	## Which varscan jar file to use
+-mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
+-mr (--min-reads2)		[default: 15]		## Minimum supporting reads at a position to call variants
+-maq (--min-avg-qual)		[default: 28]		## Minimum base quality at a position to count a read
+-mvf (--min-var-freq)		[default: 0.7]		## Minimum variant allele frequency threshold
+-mhom (--min-freq-for-hom)	[default: 0.75]		## Minimum frequency to call homozygote
+-pv (--p-value)			[default: 1e-02]	## P-value threshold for calling variants 
+-sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
 ```
 
 #### Genetic distance estimation with Mash
