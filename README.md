@@ -166,18 +166,45 @@ Options for SSRG.pl are:
 
 
 ##### Read mapping
+[get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) is the main script that handles read mapping a variant calling. The default read mapper in getSNPs.pl is [Minimap2](https://github.com/lh3/minimap2), and can be changed by invoking the **--mapper** switch from the command line. Users can also change the default read mapper settings by modifying the following line in [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl):
+```perl
+my $mapper = 'minimap2';
+```
 
-XXXX
+get_SNPs.pl can be used with single or paired ends datasets. BAM files generated during the alignments can be kept with the **--bam** command line switch (BAM files are discarded by default to save on disk space). The **--rmo** option (read mapping only) skips the variant calling process. When combined, the **--rmo** and **--bam** options generate BAM alignment files using the selected read mapper.
+
+To generate BAM files using single end FASTQ datasets using the default read mapper, [Minimap2](https://github.com/lh3/minimap2), with its default sr (short reads) preset:
+```bash
+get_SNPs.pl -fa *.fasta -fq *.fastq -rmo -bam
+```
+
+To generate BAM files using paired end FASTQ datasets, this time using [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) as read mapper:
+```Bash
+get_SNPs.pl -fa *.fasta -pe1 *R1.fastq -pe2 *R2.fastq -mapper bowtie2 -rmo -bam
+```
+
+General and read mapping options for get_SNPs.pl are:
+```
+### Mapping options ###
+-fa (--fasta)			Reference genome(s) in fasta file
+-fq (--fastq)			Fastq reads (single ends) to be mapped against reference(s)
+-pe1				Fastq reads #1 (paired ends) to be mapped against reference(s)
+-pe2				Fastq reads #2 (paired ends) to be mapped against reference(s)
+-mapper				Read mapping tool: bwa, bowtie2, minimap2, ngmlr or hisat2 [default: minimap2]
+-threads			Number of processing threads [default: 16]
+-bam				Keeps BAM files generated
+-sam				Keeps SAM files generated; SAM files can be quite large
+-rmo (--read_mapping_only)	Do not perform variant calling; useful when only interested in bam/sam files and/or mapping stats
+-ns (--no_stats)		Do not calculate stats; stats can take a while to compute for large eukaryote genomes
+
+### Mapper-specific options ###
+-X				BOWTIE2 - Maximum paired ends insert size [default: 750]
+-preset				MINIMAP2 - Preset: sr, map-ont, map-pb or asm20 [default: sr]
+-algo				BWA - Mapping algorithm:  bwasw, mem, samse [default: mem]
+```
 
 ##### Variant calling
 
-XXXX
-
-Performing read mapping with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl)
-- Read mapping only (using minimap2 on a paired end dataset with 16 threads)
-```
-get_SNPs.pl --threads 16 --fa *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --mapper minimap2 --rmo --bam
-```
 - Read mapping (minimap2; paired end dataset) + variant calling (varscan2; SNPs + indels)
 ```
 get_SNPs.pl --threads 16 --fa *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --mapper minimap2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar
