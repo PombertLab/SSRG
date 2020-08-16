@@ -171,7 +171,7 @@ Options for SSRG.pl are:
 my $mapper = 'minimap2';
 ```
 
-get_SNPs.pl can be used with single or paired ends datasets. BAM files generated during the alignments can be kept with the **--bam** command line switch (BAM files are discarded by default to save on disk space). The **--rmo** option (read mapping only) skips the variant calling process. When combined, the **--rmo** and **--bam** options generate BAM alignment files using the selected read mapper.
+[get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) can be used with single or paired ends datasets. BAM files generated during the alignments can be kept with the **--bam** command line switch (BAM files are discarded by default to save on disk space). The **--rmo** option (read mapping only) skips the variant calling process. When combined, the **--rmo** and **--bam** options generate BAM alignment files using the selected read mapper.
 
 To generate BAM alignments with ***single end*** FASTQ datasets using the default read mapper, [Minimap2](https://github.com/lh3/minimap2), with its default sr (short reads) preset:
 ```bash
