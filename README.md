@@ -112,7 +112,9 @@ quit()
 
 ***Installing read mappers, variants callers and Mash***
 
-Read mapping/variant calling with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) require [Samtools](http://www.htslib.org/) 1.3.1+. Read mappers and variant callers to be used with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) can be installed on a need-to basis. [Minimap2](https://github.com/lh3/minimap2) and [VarScan2](http://dkoboldt.github.io/varscan/) are recommended. Read mappers are available here:
+Read mapping/variant calling with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) require [Samtools](http://www.htslib.org/) 1.3.1+. Read mappers and variant callers to be used with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) can be installed on a need-to basis. [Minimap2](https://github.com/lh3/minimap2) and [VarScan2](http://dkoboldt.github.io/varscan/) are recommended.
+
+*Read mappers are available here:*
 
 - [Minimap2](https://github.com/lh3/minimap2)
 - [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)
@@ -122,7 +124,7 @@ Read mapping/variant calling with [get_SNPs.pl](https://github.com/PombertLab/SN
 ```Bash
 sudo dnf install bwa
 ```
-Variant callers are available here:
+*Variant callers are available here:*
 - [BCFtools](http://samtools.github.io/bcftools/)
 - [FreeBayes](https://github.com/ekg/freebayes)
 - [VarScan2](http://dkoboldt.github.io/varscan/). ## The default location of the VarScan2 jar file can be updated in [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) by modifying the following line:
