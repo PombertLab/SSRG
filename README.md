@@ -86,6 +86,7 @@ sudo dnf install \
   automake \
   libcurl-devel \
   openssl-devel \
+  ncurses-devel \
   java-1.?.?-openjdk \
   java-1.?.?-openjdk-devel
 ```
