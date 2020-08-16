@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2020
-my $version = '1.9g';
+my $version = '1.9h';
 my $name = 'get_SNPs.pl';
 
 use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
@@ -42,7 +42,7 @@ OPTIONS:
 -fq (--fastq)			Fastq reads (single ends) to be mapped against reference(s)
 -pe1				Fastq reads #1 (paired ends) to be mapped against reference(s)
 -pe2				Fastq reads #2 (paired ends) to be mapped against reference(s)
--mapper				Read mapping tool: bwa, bowtie2, minimap2, ngmlr or hisat2 [default: bowtie2]
+-mapper				Read mapping tool: bwa, bowtie2, minimap2, ngmlr or hisat2 [default: minimap2]
 -threads			Number of processing threads [default: 16]
 -bam				Keeps BAM files generated
 -sam				Keeps SAM files generated; SAM files can be quite large
@@ -71,7 +71,7 @@ my @command = @ARGV; ## Keeping track of command lines for logs later on...
 
 my $help =''; my $vn;
 ## Mapping
-my $mapper = 'bowtie2';
+my $mapper = 'minimap2';
 my $threads = 16;
 my $sam = ''; my $bam = '';
 my @fasta; my @fastq;
