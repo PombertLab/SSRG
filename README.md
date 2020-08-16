@@ -19,7 +19,7 @@ People interested in genetic distances should use the genetic distance estimatio
   * [Testing the installation](#Testing-the-installation)
 * [Howto](#howto)
   * [Read mapping + variant calling](#read-mapping-and-variant-calling)
-    * [Creating reads with SSRG\.pl](#creating-reads-with-SSRG\.pl)
+    * [Creating reads with SSRG\.pl](#creating-reads-with-SSRG)
     * [SNP calling with get_SNPs](#SNP-calling-with-get_SNPs)
   * [Genetic distance estimation with Mash](#genetic-distance-estimation-with-Mash)
 * [References](#references)
