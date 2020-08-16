@@ -173,12 +173,12 @@ my $mapper = 'minimap2';
 
 get_SNPs.pl can be used with single or paired ends datasets. BAM files generated during the alignments can be kept with the **--bam** command line switch (BAM files are discarded by default to save on disk space). The **--rmo** option (read mapping only) skips the variant calling process. When combined, the **--rmo** and **--bam** options generate BAM alignment files using the selected read mapper.
 
-To generate BAM files using single end FASTQ datasets using the default read mapper, [Minimap2](https://github.com/lh3/minimap2), with its default sr (short reads) preset:
+To generate BAM alignments with ***single end*** FASTQ datasets using the default read mapper, [Minimap2](https://github.com/lh3/minimap2), with its default sr (short reads) preset:
 ```bash
 get_SNPs.pl -fa *.fasta -fq *.fastq -rmo -bam
 ```
 
-To generate BAM files using paired end FASTQ datasets, this time using [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) as read mapper:
+To generate BAM alignments with ***paired end*** FASTQ datasets, this time using [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) as read mapper:
 ```Bash
 get_SNPs.pl -fa *.fasta -pe1 *R1.fastq -pe2 *R2.fastq -mapper bowtie2 -rmo -bam
 ```
