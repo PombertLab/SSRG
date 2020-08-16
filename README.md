@@ -16,45 +16,46 @@ People interested in genetic distances should use the genetic distance estimatio
   * [Compatible variant callers](#compatible-variant-callers)
   * [Downloading from GitHub](#downloading-from-github)
   * [Installing dependepencies](#installing-dependepencies)
+  * [Testing the installation](#Testing-the-installation)
 * [Howto](#howto)
   * [Read mapping + variant calling](#read-mapping-and-variant-calling)
   * [Genetic distance estimation](#genetic-distance-estimation)
 * [References](#references)
 
 ### Introduction
-###### Why another read mapping pipeline?
+##### Why another read mapping pipeline?
 Assessing the genetic diversity between genomes often involves the calculation of ***[single nucleotide polymorphisms](https://ghr.nlm.nih.gov/primer/genomicresearch/snp) (SNPs)*** and ***[insertions/deletions](https://ghr.nlm.nih.gov/primer/mutationsanddisorders/possiblemutations) (indels)***. This is usually done by mapping short accurate sequencing reads from one or more species against a reference genome, from which variants are called. This approach works well when short read data from published genomes are available in public repositories such as [NCBI's SRA](https://www.ncbi.nlm.nih.gov/sra) but that is not always the case, especially now that genome sequencing is shifting towards the use of long read technologies. While genomes and/or long reads can be aligned against each other, the results are often suboptimal when the investigated chromosomes are highly reorganized, which can cause the mapping to fail. A simple solution to this problem is to deconstruct the genomes or long reads randomly into shorter fragments —much like DNA fragmentation protocols used in ***[whole genome sequencing](https://ghr.nlm.nih.gov/primer/testing/sequencing) (WGS)***— and to use these smaller synthetic reads as input for mapping. We have implemented this approach in [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl). Note that this approach is only valid for haploid genomes and should not be used in presence of heterozygosity.
 
-###### Deconstructing genomes into synthetic reads has the following advantages:
+##### Deconstructing genomes into synthetic reads has the following advantages:
 -	It enables comparisons between genomes for which sequencing datasets are not available in public repositories.
 -	It helps standardize datasets by providing reads with the exact same parameters. For example, genomes generated from [Illumina](https://www.illumina.com/), [PacBio](https://www.pacb.com/) and/or [Oxford Nanopore](https://nanoporetech.com/) data can now be compared without fuss.
 -	Because bases from complete or draft genomes have been queried multiple times by the sequencing depth, the underlying confidence in the base being called is higher than from single sequencing reads (assuming of course that the corresponding loci in the assembled genomes are error-free). This in turn should lead to fewer problems caused by sequencing errors.
 
-###### The SSRG pipeline currently can:
+##### The SSRG pipeline currently can:
 1)	Download genomes automatically from NCBI using a CSV/Tab-delimited list of desired operational taxonomic units (OTU)
 2)	Calculate pairwise SNPs between FASTQ sequences and reference genomes using standard read mapping approaches.
 3)	Run [Mash](https://github.com/marbl/Mash) and plot the estimated genetic distances as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
 ### Installation
-###### Requirements
+##### Requirements
 - Unix/Linux, MacOS X, or WSL2
 - [Perl 5](https://www.perl.org/), [R](https://www.r-project.org/), and [Java](https://www.java.com/) (for VarScan2)
 - [Samtools](http://www.htslib.org/) 1.3.1+
 - [Mash](https://github.com/marbl/Mash) (for genetic distance estimations)
 
-###### Compatible read aligners
+##### Compatible read aligners
 - [BWA](http://bio-bwa.sourceforge.net/) 0.7.12+
 - [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) 2.2.9+
 - [HISAT2](https://ccb.jhu.edu/software/hisat2/index.shtml) 2.0+
 - [Minimap2](https://github.com/lh3/minimap2) 2.14+ (recommended)
 - [NGMLR](https://github.com/philres/ngmlr) 0.2.7+ (partial support)
 
-###### Compatible variant callers
+##### Compatible variant callers
 - [VarScan2](http://dkoboldt.github.io/varscan/) 2.4.2+
 - [BCFtools](http://samtools.github.io/bcftools/) 1.3.1+
 - [FreeBayes](https://github.com/ekg/freebayes)
 
-###### Downloading from GitHub
+#### Downloading from GitHub
 ```bash
 git clone --recursive https://github.com/PombertLab/SNPs.git
 chmod a+x `find ./SNPs/ -name *.pl`
@@ -70,8 +71,8 @@ echo 'export PATH' >> ~/.bash_profile
 source ~/.bash_profile
 ```
 
-###### Installing dependepencies
-***On Fedora/RedHat***
+#### Installing dependencies
+##### ***On Fedora/RedHat***
 ```bash
 sudo dnf install \
   perl \
@@ -91,7 +92,7 @@ sudo dnf install \
   java-1.?.?-openjdk-devel
 ```
 
-***R***
+##### ***R***
 
 To install R dependencies, type:
 ```bash
@@ -110,7 +111,7 @@ install.packages("Rtsne")
 quit()
 ```
 
-***Installing read mappers, variants callers and Mash***
+##### ***Installing read mappers, variants callers and Mash***
 
 Read mapping/variant calling with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) require [Samtools](http://www.htslib.org/) 1.3.1+. Read mappers and variant callers to be used with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) can be installed on a need-to basis. [Minimap2](https://github.com/lh3/minimap2) and [VarScan2](http://dkoboldt.github.io/varscan/) are recommended.
 
@@ -133,6 +134,12 @@ my $varjar = '/opt/varscan/VarScan.v2.4.3.jar';
 ```
 
 To perform genetic distance estimations, [Mash](https://github.com/marbl/Mash) by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/) is required. It is available [here](https://github.com/marbl/Mash/releases).
+
+#### Testing the installation
+
+XXX
+XXX
+XXX
 
 ### Howto
 #### Read mapping and variant calling
