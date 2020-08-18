@@ -82,7 +82,7 @@ my $help =''; my $vn;
 ## Mapping
 my $mapper = 'minimap2';
 my $threads = 16;
-my $mem = 32;
+my $mem = 16;
 my $sam = ''; my $bam = '';
 my @fasta; my @fastq;
 my @pe1; my @pe2;
