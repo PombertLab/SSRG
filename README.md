@@ -291,6 +291,7 @@ General and read mapping options for get_SNPs.pl are:
 -pe2				Fastq reads #2 (paired ends) to be mapped against reference(s)
 -mapper				Read mapping tool: bwa, bowtie2, minimap2, ngmlr or hisat2 [default: minimap2]
 -threads			Number of processing threads [default: 16]
+-mem				Max total memory for samtools (in Gb) [default: 16] ## mem/threads = memory per thread
 -bam				Keeps BAM files generated
 -sam				Keeps SAM files generated; SAM files can be quite large
 -rmo (--read_mapping_only)	Do not perform variant calling; useful when only interested in bam/sam files and/or mapping stats
