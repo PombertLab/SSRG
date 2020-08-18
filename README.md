@@ -143,10 +143,45 @@ my $varjar = '/opt/varscan/VarScan.v2.4.3.jar';
 To perform genetic distance estimations, [Mash](https://github.com/marbl/Mash) by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/) is required. It is available [here](https://github.com/marbl/Mash/releases).
 
 #### Testing the installation
+##### SSRG workflow
+XXX
 
-XXX
-XXX
-XXX
+##### MASH workflow
+1. Download a CSV list of *Streptococcus pneumoniae* genomes:
+```bash
+wget https://github.com/PombertLab/SNPs/tree/master/Misc/S_pneumoniae_75.csv
+```
+\## This file was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
+
+2. Download the FASTA files automatically with [queryNCBI.pl](https://github.com/PombertLab/SNPs/blob/master/Tools/NCBI/queryNCBI.pl), then run Mash with [run_Mash.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/run_Mash.pl):
+```bash
+mkdir FASTA; cd FASTA/;
+queryNCBI.pl -l ../S_pneumoniae_75.csv -fa
+run_Mash.pl -f *.fasta -o ../S_pneumoniae_75.mash
+cd ../
+```
+3. Convert the output to a distance matrix with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashToDistanceMatrix.pl):
+```bash
+MashToDistanceMatrix.pl  \
+	-i S_pneumoniae_75.mash \
+	-o S_pneumoniae_75 \
+	-f tsv
+```
+4. Generate a quick neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashR_plotter.pl):
+```bash
+MashR_plotter.pl \
+	-i S_pneumoniae_75.tsv \
+	-if tsv \
+	-t tree \
+	-newick S_pneumoniae_75.tre \
+	-f pdf \
+	-o S_pneumoniae_75_NJ_tree \
+	-he 20
+```
+5. Generate a quick heatmap with [MashR_plotter.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashR_plotter.pl):
+```bash
+
+```
 
 ### Howto
 #### Read mapping and variant calling
