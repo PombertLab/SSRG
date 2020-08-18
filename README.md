@@ -133,7 +133,7 @@ sudo dnf install bwa
 - [FreeBayes](https://github.com/ekg/freebayes)
 - [VarScan2](http://dkoboldt.github.io/varscan/). ## The default location of the VarScan2 jar file can be updated in [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) by modifying the following line:
 ```perl
-my $varjar = '/opt/varscan/VarScan.v2.4.3.jar';
+my $varjar = '/opt/varscan/VarScan.v2.4.4.jar';
 ```
 
 To perform genetic distance estimations, [Mash](https://github.com/marbl/Mash) by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/) is required. It is available [here](https://github.com/marbl/Mash/releases).
