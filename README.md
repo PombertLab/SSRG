@@ -154,7 +154,7 @@ queryNCBI.pl -l S_pneumoniae_3.csv -fa -gb
 SSRG.pl -f *.fasta -r 250
 ```
 
-4a. To test the read-mapping step with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) but skip the variant calling step type:
+4a. To test the read-mapping step with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) but skip variant calling, type:
 ```bash
 get_SNPs.pl \
 	-threads 2 \
