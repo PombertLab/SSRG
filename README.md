@@ -184,6 +184,17 @@ get_SNPs.pl \
 	-var /opt/varscan/VarScan.v2.4.4.jar ## Replace jar file location accordingly
 ```
 
+5. Checking for synonymous/non-synonymous SNPs against a reference genome:
+```bash
+synonymy.pl \
+	-gcode 11 \
+	-fa Streptococcus_pneumoniae_R6.fasta \
+	-ref Streptococcus_pneumoniae_R6.gbk \
+	-format gb \
+	-vcf minimap2.varscan2.VCFs/*.vcf \
+	-o synonymy
+```
+
 ##### MASH workflow
 1. Download a CSV list of 75 *Streptococcus pneumoniae* genomes. ## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
 ```bash
