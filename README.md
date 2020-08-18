@@ -139,8 +139,49 @@ my $varjar = '/opt/varscan/VarScan.v2.4.3.jar';
 To perform genetic distance estimations, [Mash](https://github.com/marbl/Mash) by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/) is required. It is available [here](https://github.com/marbl/Mash/releases).
 
 ### Testing the installation
-##### SSRG workflow
-XXX
+##### SSRG workflow (with Minimap2 and VarScan2)
+1. Download a small CSV list of 3 *Streptococcus pneumoniae* genomes. ## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
+```bash
+wget https://github.com/PombertLab/SNPs/blob/master/Misc/S_pneumoniae_3.csv
+```
+2. Download the corresponding FASTA and GenBank files from NCBI with [queryNCBI.pl](https://github.com/PombertLab/SNPs/blob/master/Tools/NCBI/queryNCBI.pl).
+```bash
+queryNCBI.pl -l S_pneumoniae_3.csv -fa -gb
+```
+
+3. Generate FASTQ datasets from the downloaded genomes with [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl).
+```bash
+SSRG.pl -f *.fasta -r 250
+```
+
+4a. To test the read-mapping step with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) but skip the variant calling step type:
+```bash
+get_SNPs.pl \
+	-threads 2 \
+	-mem 4 \
+	-fa Streptococcus_pneumoniae_R6.fasta \
+	-pe1 *R1.fastq \
+	-pe2 *R2.fastq \
+	-mapper minimap2 \
+	-preset sr \
+	-rmo \
+	-bam
+```
+4b. To test the read-mapping and variant calling steps with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl), type:
+```bash
+## Running get_SNPs.pl with 8 threads, 16 Gb RAM (change according to your settings)
+get_SNPs.pl \
+	-threads 8 \
+	-mem 16 \
+	-fa Streptococcus_pneumoniae_R6.fasta \
+	-pe1 *R1.fastq \
+	-pe2 *R2.fastq \
+	-mapper minimap2 \
+	-preset sr \
+	-bam \
+	-caller varscan2 \
+	-var ./VarScan.v2.4.4.jar
+```
 
 ##### MASH workflow
 1. Download a CSV list of 75 *Streptococcus pneumoniae* genomes. ## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
