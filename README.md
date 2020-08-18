@@ -156,9 +156,10 @@ SSRG.pl -f *.fasta -r 250
 
 4a. To test the read-mapping step with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) but skip variant calling, type:
 ```bash
+## Running get_SNPs.pl with 8 threads, 16 Gb RAM (change according to your settings)
 get_SNPs.pl \
-	-threads 2 \
-	-mem 4 \
+	-threads 8 \
+	-mem 16 \
 	-fa Streptococcus_pneumoniae_R6.fasta \
 	-pe1 *R1.fastq \
 	-pe2 *R2.fastq \
