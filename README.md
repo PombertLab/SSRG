@@ -180,7 +180,31 @@ MashR_plotter.pl \
 ```
 5. Generate a quick heatmap with [MashR_plotter.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashR_plotter.pl):
 ```bash
-
+MashR_plotter.pl \
+	-i S_pneumoniae_75.tsv \
+	-if tsv \
+	-t heatmap \
+	-f pdf \
+	-o S_pneumoniae_75_heatmap \
+	-colors white cyan magenta \
+	-he 20 \
+	-wd 20
+```
+6. Generate a quick t-SNE multidimensional reduction plot with [MashR_plotter.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashR_plotter.pl):
+```bash
+MashR_plotter.pl \
+	-i S_pneumoniae_75.tsv \
+	-if tsv \
+	-t cluster \
+	-m tsne \
+	-pe 15 \
+	-cmode terrain \
+	-f pdf \
+	-o S_pneumoniae_75_tSNE \
+	-he 20 \
+	-wd 20 \
+	-lb \
+	-fs 25
 ```
 
 ### Howto
