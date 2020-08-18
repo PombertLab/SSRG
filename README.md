@@ -238,7 +238,7 @@ MashR_plotter.pl \
 	-he 20 \
 	-wd 20
 ```
-6. Generate a quick t-SNE multidimensional reduction plot with [MashR_plotter.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashR_plotter.pl). The PDF generated should be similar, ***but not identical***, to [S_pneumoniae_75_tSNE.pdf](https://github.com/PombertLab/SNPs/blob/master/Misc/S_pneumoniae_75_tSNE.pdf) from the Misc subdirectory. ## t-SNE graphs are generated using random seeds, which effect how the distances are represented in 2D.
+6. Generate a quick t-SNE multidimensional reduction plot with [MashR_plotter.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashR_plotter.pl). The PDF generated should be similar, ***but not identical***, to [S_pneumoniae_75_tSNE.pdf](https://github.com/PombertLab/SNPs/blob/master/Misc/S_pneumoniae_75_tSNE.pdf) from the Misc subdirectory. ## t-SNE graphs are generated using random seeds, which affect how the distances are represented in 2D.
 ```bash
 MashR_plotter.pl \
 	-i S_pneumoniae_75.tsv \
