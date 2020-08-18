@@ -8,7 +8,7 @@ People interested in ***point mutations*** should use the read-mapping/variant c
 
 People interested in ***genetic distances*** should use the genetic distance estimation workflow. This workflow is based on [Mash](https://github.com/marbl/Mash), an excellent tool developed by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/). Genetic distances can be plotted as as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
-### Table of contents
+## Table of contents
 * [Introduction](#introduction)
 * [Installation](#installation)
   * [Requirements](#requirements)
@@ -29,7 +29,7 @@ People interested in ***genetic distances*** should use the genetic distance est
     * [ZZZ](#ZZZ)
 * [References](#references)
 
-### Introduction
+## Introduction
 ##### Why another read mapping pipeline?
 Assessing the genetic diversity between genomes often involves the calculation of ***[single nucleotide polymorphisms](https://ghr.nlm.nih.gov/primer/genomicresearch/snp) (SNPs)*** and ***[insertions/deletions](https://ghr.nlm.nih.gov/primer/mutationsanddisorders/possiblemutations) (indels)***. This is usually done by mapping short accurate sequencing reads from one or more species against a reference genome, from which variants are called. This approach works well when short read data from published genomes are available in public repositories such as [NCBI's SRA](https://www.ncbi.nlm.nih.gov/sra) but that is not always the case, especially now that genome sequencing is shifting towards the use of long read technologies. While genomes and/or long reads can be aligned against each other, the results are often suboptimal when the investigated chromosomes are highly reorganized, which can cause the mapping to fail. A simple solution to this problem is to deconstruct the genomes or long reads randomly into shorter fragments —much like DNA fragmentation protocols used in ***[whole genome sequencing](https://ghr.nlm.nih.gov/primer/testing/sequencing) (WGS)***— and to use these smaller synthetic reads as input for mapping. We have implemented this approach in [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl). Note that this approach is only valid for haploid genomes and should not be used in presence of heterozygosity.
 
@@ -43,7 +43,7 @@ Assessing the genetic diversity between genomes often involves the calculation o
 2)	Calculate pairwise SNPs between FASTQ sequences and reference genomes using standard read mapping approaches.
 3)	Run [Mash](https://github.com/marbl/Mash) and plot the estimated genetic distances as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
-### Installation
+## Installation
 ##### Requirements
 - Unix/Linux, MacOS X, or WSL2
 - [Perl 5](https://www.perl.org/), [R](https://www.r-project.org/), and [Java](https://www.java.com/) (for VarScan2)
@@ -62,7 +62,7 @@ Assessing the genetic diversity between genomes often involves the calculation o
 - [BCFtools](http://samtools.github.io/bcftools/) 1.3.1+
 - [FreeBayes](https://github.com/ekg/freebayes)
 
-#### Downloading from GitHub
+### Downloading from GitHub
 ```bash
 git clone --recursive https://github.com/PombertLab/SNPs.git
 chmod a+x `find ./SNPs/ -name *.pl`
@@ -78,7 +78,7 @@ echo 'export PATH' >> ~/.bash_profile
 source ~/.bash_profile
 ```
 
-#### Installing dependencies
+### Installing dependencies
 ##### ***On Fedora/RedHat***
 ```bash
 sudo dnf install \
@@ -142,16 +142,15 @@ my $varjar = '/opt/varscan/VarScan.v2.4.3.jar';
 
 To perform genetic distance estimations, [Mash](https://github.com/marbl/Mash) by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/) is required. It is available [here](https://github.com/marbl/Mash/releases).
 
-#### Testing the installation
+### Testing the installation
 ##### SSRG workflow
 XXX
 
 ##### MASH workflow
-1. Download a CSV list of 75 *Streptococcus pneumoniae* genomes:
+1. Download a CSV list of 75 *Streptococcus pneumoniae* genomes. ## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
 ```bash
 wget https://github.com/PombertLab/SNPs/tree/master/Misc/S_pneumoniae_75.csv
 ```
-\## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
 
 2. Download the FASTA files automatically with [queryNCBI.pl](https://github.com/PombertLab/SNPs/blob/master/Tools/NCBI/queryNCBI.pl), then run Mash with [run_Mash.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/run_Mash.pl).
 ```bash
@@ -207,7 +206,7 @@ MashR_plotter.pl \
 	-fs 25
 ```
 
-### Howto
+## Howto
 #### Read mapping and variant calling
 ##### Synthetic reads
 [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl) can be used to generate FASTQ datasets from complete or draft genomes (ploidy = 1). For example, to generate FASTQ datasets (paired ends; 250 bp; 50x sequencing depth) from one or more genomes:
@@ -316,14 +315,14 @@ MashR_plotter.pl -i Mash.tsv -if tsv -t tree -newick Mash.txt.tre
 Plotting the same data using dimensionality reduction techniques
 MashR_plotter.pl -t cluster -m tsne -i Mash.tsv -if tsv -o cluster_tsne --format pdf -fs 8 -lb -pe 10
 
-### Case examples
+## Case examples
 #### XXX
 
 #### YYY
 
 #### ZZZ
 
-### References
+## References
 1.	[Ondov BD, Treangen TJ, Mallonee AB, Bergman NH, Koren S, Phillippy AM. Fast genome and metagenome distance estimation using MinHash](https://pubmed.ncbi.nlm.nih.gov/27323842/) 2016. Genome Biol. 17, 132. PMID: 27323842 PMCID: PMC4915045 DOI: 10.1186/s13059-016-0997-x
 2.	[Li H, Durbin R. Fast and accurate long-read alignment with Burrows-Wheeler transform](https://pubmed.ncbi.nlm.nih.gov/20080505/) 2010. Bioinformatics 26, 589–595. PMID: 20080505 PMCID: PMC2828108 DOI: 10.1093/bioinformatics/btp698
 3.	[Langmead B, Salzberg SL. Fast gapped-read alignment with Bowtie 2](https://pubmed.ncbi.nlm.nih.gov/22388286/) 2012. Nat Methods 9, 357–359. PMID: 22388286 PMCID: PMC3322381 DOI: 10.1038/nmeth.1923
