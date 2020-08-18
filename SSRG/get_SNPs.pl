@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2020
-my $version = '1.9h';
+my $version = '1.9i';
 my $name = 'get_SNPs.pl';
 
 use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
@@ -19,16 +19,19 @@ my $freebayes = '';		## Path to FreeBayes -  https://github.com/ekg/freebayes
 ## Usage definition
 my $hint = "Type get_SNPs.pl -h (--help) for list of options\n";
 my $usage = <<"USAGE";
+
 NAME		$name
 VERSION		$version
 SYNOPSIS	Automates read-mapping of FASTQ datasets against reference sequence(s) and
 		performs variant calling (if desired)
 		
 USAGE		get_SNPs.pl [options]
-EXAMPLE (simple): get_SNPs.pl -fa *.fasta -fq *.fastq
-EXAMPLE (advanced): get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar --threads 16
-EXAMPLE (paired ends): get_SNPs.pl --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --caller freebayes --threads 16
-EXAMPLE (read-mapping only): get_SNPs.pl --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --rmo --bam --threads 16
+
+EXAMPLES:
+simple			get_SNPs.pl -fa *.fasta -fq *.fastq
+advanced		get_SNPs.pl --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar --threads 16
+paired ends		get_SNPs.pl --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --caller freebayes --threads 16
+read-mapping only	get_SNPs.pl --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --rmo --bam --threads 16
 USAGE
 die "$usage\n$hint\n" unless@ARGV;
 
@@ -37,6 +40,7 @@ my $options = <<'END_OPTIONS';
 OPTIONS:
 -h (--help)	Display this list of options
 -v (--version)	Display script version
+
 ### Mapping options ###
 -fa (--fasta)			Reference genome(s) in fasta file
 -fq (--fastq)			Fastq reads (single ends) to be mapped against reference(s)
@@ -44,20 +48,24 @@ OPTIONS:
 -pe2				Fastq reads #2 (paired ends) to be mapped against reference(s)
 -mapper				Read mapping tool: bwa, bowtie2, minimap2, ngmlr or hisat2 [default: minimap2]
 -threads			Number of processing threads [default: 16]
+-mem				Max total memory for samtools (in Gb) [default: 16] ## mem/threads = memory per thread
 -bam				Keeps BAM files generated
 -sam				Keeps SAM files generated; SAM files can be quite large
 -rmo (--read_mapping_only)	Do not perform variant calling; useful when only interested in bam/sam files and/or mapping stats
 -ns (--no_stats)		Do not calculate stats; stats can take a while to compute for large eukaryote genomes
+
 ### Mapper-specific options ###
 -X				BOWTIE2 - Maximum paired ends insert size [default: 750]
 -preset				MINIMAP2 - Preset: sr, map-ont, map-pb or asm20 [default: sr]
 -algo				BWA - Mapping algorithm:  bwasw, mem, samse [default: mem]
+
 ### Variant calling options ###
 -caller				[default: varscan2]	## Variant caller: varscan2, bcftools or freebayes
 -type				[default: snp]		## snp, indel, or both
 -ploidy				[default: 1]		## FreeBayes/BCFtools option; change ploidy (if needed)
+
 ### VarScan2 parameters ### see http://dkoboldt.github.io/varscan/using-varscan.html
--var				[default: /opt/varscan/VarScan.v2.4.3.jar]	## Which varscan jar file to use
+-var				[default: /opt/varscan/VarScan.v2.4.4.jar]	## Which varscan jar file to use
 -mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
 -mr (--min-reads2)		[default: 15]		## Minimum supporting reads at a position to call variants
 -maq (--min-avg-qual)		[default: 28]		## Minimum base quality at a position to count a read
@@ -65,6 +73,7 @@ OPTIONS:
 -mhom (--min-freq-for-hom)	[default: 0.75]		## Minimum frequency to call homozygote
 -pv (--p-value)			[default: 1e-02]	## P-value threshold for calling variants 
 -sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
+
 END_OPTIONS
 
 my @command = @ARGV; ## Keeping track of command lines for logs later on...
@@ -73,6 +82,7 @@ my $help =''; my $vn;
 ## Mapping
 my $mapper = 'minimap2';
 my $threads = 16;
+my $mem = 32;
 my $sam = ''; my $bam = '';
 my @fasta; my @fastq;
 my @pe1; my @pe2;
@@ -87,7 +97,7 @@ my $caller = 'varscan2';
 my $type = 'snp';
 my $ploidy = 1;
 ## VarScan-specific
-my $varjar = '/opt/varscan/VarScan.v2.4.3.jar';	## Define which VarScan2 jar file to use; or use -var from the CMD line
+my $varjar = '/opt/varscan/VarScan.v2.4.4.jar';	## Define which VarScan2 jar file to use; or use -var from the CMD line
 my $mc = 15;
 my $mr = 15;
 my $maq = 28;
@@ -101,6 +111,7 @@ GetOptions(
 	## Mapping
 	'mapper=s' => \$mapper,
 	'threads=i' => \$threads,
+	'mem=i' => \$mem,
 	'sam' => \$sam, 'bam' => \$bam,
 	'fa|fasta=s@{1,}' => \@fasta, 'fq|fastq=s@{1,}' => \@fastq,
 	'pe1=s@{1,}' => \@pe1, 'pe2=s@{1,}' => \@pe2,
@@ -195,7 +206,7 @@ if (@fastq){ ## Single end mode
 			unless ($nostat){stats();} ## Printing stats
 			logs();
 			## Cleaning SAM/BAM files
-			unless ($bam) {system "rm $file.$fa.$mapper.bam";}
+			unless ($bam) {system "rm $file.$fa.$mapper.bam $file.$fa.$mapper.bam.csi";}
 			unless ($sam) {system "rm $file.$fa.$mapper.sam";}
 		}
 	}
@@ -228,7 +239,7 @@ if (@pe1 && @pe2){ ## Paired ends mode
 			unless ($nostat){stats();} ## Printing stats
 			logs();
 			## Cleaning SAM/BAM files
-			unless ($bam) {system "rm $file.$fa.$mapper.bam";}
+			unless ($bam) {system "rm $file.$fa.$mapper.bam $file.$fa.$mapper.bam.csi";}
 			unless ($sam) {system "rm $file.$fa.$mapper.sam";}
 		}
 	}
@@ -239,7 +250,7 @@ if ($mapper eq 'bwa'){system "mkdir $mapper.indexes; mv ${dir}*.amb ${dir}*.ann 
 elsif ($mapper eq 'bowtie2'){system "mkdir $mapper.indexes; mv *.bt2 ${dir}*.fai $mapper.indexes/";}
 elsif ($mapper eq 'hisat2'){system "mkdir $mapper.indexes; mv *.ht2 ${dir}*.fai $mapper.indexes/";}
 elsif ($mapper eq 'ngmlr'){system "mkdir $mapper.indexes; mv *.ngm $mapper.indexes/";}
-if ($bam){system "mkdir $mapper.BAM; mv *.bam $mapper.BAM/";}
+if ($bam){system "mkdir $mapper.BAM; mv *.bam $mapper.BAM/; mv *.csi $mapper.BAM/";}
 if ($sam){system "mkdir $mapper.SAM; mv *.sam $mapper.SAM/";}
 unless ($rmo) {system "mkdir $mapper.$caller.VCFs; mv *.vcf $mapper.$caller.VCFs/";}
 unless ($nostat){
@@ -261,9 +272,12 @@ print LOG "Average time per pairwise comparison: $average_time seconds\n";
 
 ### Subroutines ###
 sub samtools{
+	my $sammem = int(($mem/$threads)*1024);
 	print "Running samtools on $file.$fa.$mapper.sam...\n";
+	print "Using $sammem Mb per thread for samtools\n";
 	system "$samtools"."samtools view -@ $threads -bS $file.$fa.$mapper.sam -o $file.$fa.bam";
-	system "$samtools"."samtools sort -@ $threads -o $file.$fa.$mapper.bam $file.$fa.bam";
+	system "$samtools"."samtools sort -@ $threads -m ${sammem}M -o $file.$fa.$mapper.bam $file.$fa.bam";
+	system "$samtools"."samtools index -@ $threads -m ${sammem}M $file.$fa.$mapper.bam";
 	system "$samtools"."samtools depth -aa $file.$fa.$mapper.bam > $file.$fa.$mapper.coverage"; ## Printing per base coverage information
 	system "rm $file.$fa.bam"; ## Discarding unsorted BAM file
 	$flagstat = `${samtools}samtools flagstat $file.$fa.$mapper.bam`;
