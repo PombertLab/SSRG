@@ -147,11 +147,11 @@ To perform genetic distance estimations, [Mash](https://github.com/marbl/Mash) b
 XXX
 
 ##### MASH workflow
-1. Download a CSV list of *Streptococcus pneumoniae* genomes:
+1. Download a CSV list of 75 *Streptococcus pneumoniae* genomes:
 ```bash
 wget https://github.com/PombertLab/SNPs/tree/master/Misc/S_pneumoniae_75.csv
 ```
-\## This file was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
+\## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
 
 2. Download the FASTA files automatically with [queryNCBI.pl](https://github.com/PombertLab/SNPs/blob/master/Tools/NCBI/queryNCBI.pl), then run Mash with [run_Mash.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/run_Mash.pl):
 ```bash
