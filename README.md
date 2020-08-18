@@ -160,7 +160,7 @@ queryNCBI.pl -l ../S_pneumoniae_75.csv -fa
 run_Mash.pl -f *.fasta -o ../S_pneumoniae_75.mash
 cd ../
 ```
-3. Convert the output to a distance matrix with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashToDistanceMatrix.pl):
+3. Convert the Mash output to a distance matrix with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashToDistanceMatrix.pl):
 ```bash
 MashToDistanceMatrix.pl  \
 	-i S_pneumoniae_75.mash \
