@@ -181,7 +181,7 @@ get_SNPs.pl \
 	-preset sr \
 	-bam \
 	-caller varscan2 \
-	-var ./VarScan.v2.4.4.jar
+	-var /opt/varscan/VarScan.v2.4.4.jar ## Replace jar file location accordingly
 ```
 
 ##### MASH workflow
