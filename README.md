@@ -142,7 +142,7 @@ To perform genetic distance estimations, [Mash](https://github.com/marbl/Mash) b
 ##### SSRG workflow (with Minimap2 and VarScan2)
 1. Download a small CSV list of 3 *Streptococcus pneumoniae* genomes. ## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
 ```bash
-wget https://github.com/PombertLab/SNPs/blob/master/Misc/S_pneumoniae_3.csv
+wget https://raw.githubusercontent.com/PombertLab/SNPs/master/Misc/S_pneumoniae_3.csv
 ```
 2. Download the corresponding FASTA and GenBank files from NCBI with [queryNCBI.pl](https://github.com/PombertLab/SNPs/blob/master/Tools/NCBI/queryNCBI.pl).
 ```bash
@@ -186,7 +186,7 @@ get_SNPs.pl \
 ##### MASH workflow
 1. Download a CSV list of 75 *Streptococcus pneumoniae* genomes. ## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
 ```bash
-wget https://github.com/PombertLab/SNPs/tree/master/Misc/S_pneumoniae_75.csv
+wget https://raw.githubusercontent.com/PombertLab/SNPs/master/Misc/S_pneumoniae_75.csv
 ```
 
 2. Download the FASTA files automatically with [queryNCBI.pl](https://github.com/PombertLab/SNPs/blob/master/Tools/NCBI/queryNCBI.pl), then run Mash with [run_Mash.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/run_Mash.pl).
