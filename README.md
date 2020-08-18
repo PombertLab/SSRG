@@ -17,16 +17,12 @@ People interested in ***genetic distances*** should use the genetic distance est
   * [Downloading from GitHub](#downloading-from-github)
   * [Installing dependencies](#installing-dependencies)
   * [Testing the installation](#testing-the-installation)
-* [Howto](#howto)
+* [Howto (Case examples)](#howto)
   * [Read mapping + variant calling](#read-mapping-and-variant-calling)
     * [Synthetic reads](#synthetic-reads)
     * [Read mapping](#read-mapping)
     * [Variant calling](#variant-calling)
   * [Genetic distance estimation with Mash](#genetic-distance-estimation-with-Mash)
-* [Case examples]
-    * [XXX](#XXX)
-    * [YYY](#YYY)
-    * [ZZZ](#ZZZ)
 * [References](#references)
 
 ## Introduction
@@ -314,13 +310,6 @@ MashR_plotter.pl -i Mash.tsv -if tsv -t tree -newick Mash.txt.tre
 ```
 Plotting the same data using dimensionality reduction techniques
 MashR_plotter.pl -t cluster -m tsne -i Mash.tsv -if tsv -o cluster_tsne --format pdf -fs 8 -lb -pe 10
-
-## Case examples
-#### XXX
-
-#### YYY
-
-#### ZZZ
 
 ## References
 1.	[Ondov BD, Treangen TJ, Mallonee AB, Bergman NH, Koren S, Phillippy AM. Fast genome and metagenome distance estimation using MinHash](https://pubmed.ncbi.nlm.nih.gov/27323842/) 2016. Genome Biol. 17, 132. PMID: 27323842 PMCID: PMC4915045 DOI: 10.1186/s13059-016-0997-x
