@@ -8,6 +8,23 @@ People interested in ***point mutations*** should use the read-mapping/variant c
 
 People interested in ***genetic distances*** should use the genetic distance estimation workflow. This workflow is based on [Mash](https://github.com/marbl/Mash), an excellent tool developed by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/). Genetic distances can be plotted as as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
+## Getting Started
+```bash
+git clone --recursive https://github.com/PombertLab/SNPs.git
+chmod a+x `find ./SNPs/ -name *.pl`
+
+## Point mutations (using minimap2 + VarScan2)
+SSRG.pl -f *.fasta -r 250
+get_SNPs.pl -fa *.fasta -pe1 *R1.fastq -pe2 *R2.fastq
+synonymy.pl -gcode 11 -fa reference.fasta -ref reference.gbk -format gb -vcf *.vcf -o synonymy
+	
+## Genetic distances (using Mash + R)
+run_Mash.pl -f *.fasta -o output.mash
+MashToDistanceMatrix.pl -i output.mash -o matrix -f tsv
+MashR_plotter.pl -i matrix.tsv -if tsv -t tree -f pdf -o tree 		## NJ tree
+MashR_plotter.pl -i matrix.tsv -if tsv -t heatmap -f pdf -o heatmap 	## Heatmap
+```
+
 ## Table of contents
 * [Introduction](#introduction)
 * [Installation](#installation)
