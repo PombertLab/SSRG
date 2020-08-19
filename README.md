@@ -159,7 +159,7 @@ To perform genetic distance estimations, [Mash](https://github.com/marbl/Mash) b
 
 ### Testing the installation
 ##### SSRG workflow
-###### Case example with Minimap2, VarScan2 and 3 Streptococcus pneumoniae genomes
+###### Case example with Minimap2, VarScan2 and 3 *Streptococcus pneumoniae* genomes
 1. Download a small CSV list of 3 *Streptococcus pneumoniae* genomes. ## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
 ```bash
 wget https://raw.githubusercontent.com/PombertLab/SNPs/master/Misc/S_pneumoniae_3.csv
@@ -216,7 +216,7 @@ synonymy.pl \
 ```
 
 ##### Mash workflow
-###### Case example with Mash, R and 75 Streptococcus pneumoniae genomes
+###### Case example with Mash, R and 75 *Streptococcus pneumoniae* genomes
 1. Download a CSV list of 75 *Streptococcus pneumoniae* genomes. ## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
 ```bash
 wget https://raw.githubusercontent.com/PombertLab/SNPs/master/Misc/S_pneumoniae_75.csv
