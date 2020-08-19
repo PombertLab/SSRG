@@ -33,8 +33,8 @@ MashR_plotter.pl -i matrix.tsv -if tsv -t heatmap -f pdf -o heatmap 	## Heatmap
     * [Compatible variant callers](#compatible-variant-callers)
   * [Downloading from GitHub](#downloading-from-github)
   * [Installing dependencies](#installing-dependencies)
-  * [Testing the installation](#testing-the-installation)
-* [Howto (Case examples)](#howto)
+  * [Testing the installation (with cases examples)](#testing-the-installation)
+* [Detailed options](#detailed-options)
   * [Read mapping + variant calling](#read-mapping-and-variant-calling)
     * [Synthetic reads](#synthetic-reads)
     * [Read mapping](#read-mapping)
@@ -272,7 +272,7 @@ MashR_plotter.pl \
 	-fs 25
 ```
 
-## Howto
+## Detailed options
 #### Read mapping and variant calling
 ##### Synthetic reads
 [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl) can be used to generate FASTQ datasets from complete or draft genomes (ploidy = 1). For example, to generate FASTQ datasets (paired ends; 250 bp; 50x sequencing depth) from one or more genomes:
