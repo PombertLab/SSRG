@@ -34,6 +34,8 @@ MashR_plotter.pl -i matrix.tsv -if tsv -t heatmap -f pdf -o heatmap 	## Heatmap
   * [Downloading from GitHub](#downloading-from-github)
   * [Installing dependencies](#installing-dependencies)
   * [Testing the installation (with cases examples)](#testing-the-installation)
+    * [SSRG workflow](#SSRG-workflow)
+    * [Mash workflow](#Mash-workflow)
 * [Detailed options](#detailed-options)
   * [Read mapping + variant calling](#read-mapping-and-variant-calling)
     * [Synthetic reads](#synthetic-reads)
@@ -156,7 +158,8 @@ my $varjar = '/opt/varscan/VarScan.v2.4.4.jar';
 To perform genetic distance estimations, [Mash](https://github.com/marbl/Mash) by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/) is required. It is available [here](https://github.com/marbl/Mash/releases).
 
 ### Testing the installation
-##### SSRG workflow (with Minimap2 and VarScan2)
+##### SSRG workflow
+###### Case example with Minimap2, VarScan2 and 3 Streptococcus pneumoniae genomes
 1. Download a small CSV list of 3 *Streptococcus pneumoniae* genomes. ## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
 ```bash
 wget https://raw.githubusercontent.com/PombertLab/SNPs/master/Misc/S_pneumoniae_3.csv
@@ -212,7 +215,8 @@ synonymy.pl \
 	-o synonymy
 ```
 
-##### MASH workflow
+##### Mash workflow
+###### Case example with Mash, R and 75 Streptococcus pneumoniae genomes
 1. Download a CSV list of 75 *Streptococcus pneumoniae* genomes. ## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
 ```bash
 wget https://raw.githubusercontent.com/PombertLab/SNPs/master/Misc/S_pneumoniae_75.csv
