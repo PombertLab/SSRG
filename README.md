@@ -14,7 +14,7 @@ git clone --recursive https://github.com/PombertLab/SNPs.git
 chmod a+x `find ./SNPs/ -name *.pl`
 
 ## Point mutations (using minimap2 + VarScan2)
-SSRG.pl -f *.fasta -r 250
+SSRG.pl -f *.fasta -r 250 ## Only for haploid genomes
 get_SNPs.pl -fa *.fasta -pe1 *R1.fastq -pe2 *R2.fastq
 synonymy.pl -gcode 11 -fa reference.fasta -ref reference.gbk -format gb -vcf *.vcf -o synonymy
 	
