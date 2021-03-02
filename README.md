@@ -42,6 +42,7 @@ MashR_plotter.pl -i matrix.tsv -if tsv -t heatmap -f pdf -o heatmap 	## Heatmap
     * [Read mapping](#read-mapping)
     * [Variant calling](#variant-calling)
   * [Genetic distance estimation with Mash](#genetic-distance-estimation-with-Mash)
+* [Funding and acknowledgments](#Funding-and-acknowledgments)
 * [References](#references)
 
 ## Introduction
@@ -385,6 +386,9 @@ MashR_plotter.pl -i Mash.tsv -if tsv -t tree -newick Mash.txt.tre
 ```
 Plotting the same data using dimensionality reduction techniques
 MashR_plotter.pl -t cluster -m tsne -i Mash.tsv -if tsv -o cluster_tsne --format pdf -fs 8 -lb -pe 10
+
+## Funding and acknowledgments
+This work was supported in part by the National Institute of Allergy and Infectious Diseases of the National Institutes of Health (award number R15AI128627) to Jean-Francois Pombert. The content is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health.
 
 ## References
 1.	[Ondov BD, Treangen TJ, Mallonee AB, Bergman NH, Koren S, Phillippy AM. Fast genome and metagenome distance estimation using MinHash](https://pubmed.ncbi.nlm.nih.gov/27323842/) 2016. Genome Biol. 17, 132. PMID: 27323842 PMCID: PMC4915045 DOI: 10.1186/s13059-016-0997-x
