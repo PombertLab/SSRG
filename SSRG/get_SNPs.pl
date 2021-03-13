@@ -143,9 +143,9 @@ chkinstall('samtools');
 if ($mapper =~ /bowtie2|hisat2|bwa|minimap2|ngmlr/){ chkinstall($mapper);}
 else {die "\nMapper option $mapper is unrecognized. Please use bowtie2, hisat2, bwa, minimap2 or ngmlr...\n\n";}
 if ($caller =~ /freebayes|bcftools/){ chkinstall($caller);}
-elsif ($caller eq 'varscan2'){
-	unless (-f $caller){ die "Cannot find varscan jar file: $varjar\n";}
-}
+# elsif ($caller eq 'varscan2'){
+# 	unless (-f $caller){ die "Cannot find varscan jar file: $varjar\n";}
+# }
 else {die "\nVariant caller option $caller is unrecognized. Please use varscan2, bcftools, freebayes...\n\n";}
 
 
