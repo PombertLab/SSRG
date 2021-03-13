@@ -379,8 +379,8 @@ unless ($rmo) {
 	mkdir ("$mapper.$caller.VCFs",0755);
 	system "mv *.vcf $mapper.$caller.VCFs/";}
 unless ($nostat){
-	mkdir ("mapper.$caller.depth",0755);
-	mkdir ("mapper.$caller.stats",0755);
+	mkdir ("$mapper.$caller.depth",0755);
+	mkdir ("$mapper.$caller.stats",0755);
 	system "mv *.$mapper.depth $mapper.$caller.depth/";
 	system "mv *.$mapper.$type.stats $mapper.$caller.stats/";
 }
