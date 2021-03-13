@@ -10,8 +10,8 @@ People interested in ***genetic distances*** should use the genetic distance est
 
 ## Getting Started
 ```Bash
-git clone https://github.com/PombertLab/SNPs.git
-cd SNPs/
+git clone https://github.com/PombertLab/SSRG.git
+cd SSRG/
 export PATH=$PATH:$(pwd)
 export PATH=$PATH:$(pwd)/Tools/MASH
 export PATH=$PATH:$(pwd)/Tools/NCBI
