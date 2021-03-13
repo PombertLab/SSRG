@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2020
-my $version = '2.0 alpha RC';
+my $version = '2.0 alpha RC2';
 my $name = 'get_SNPs.pl';
 my $updated = '13/03/2021; Code minification + readability';
 
@@ -37,7 +37,7 @@ OPTIONS:
 -fq (--fastq)			Fastq reads (single ends) to be mapped against reference(s)
 -pe1				Fastq reads #1 (paired ends) to be mapped against reference(s)
 -pe2				Fastq reads #2 (paired ends) to be mapped against reference(s)
--mapper				Read mapping tool: bwa, bowtie2, minimap2, ngmlr or hisat2 [default: minimap2]
+-mapper				Read mapping tool: bowtie2, minimap2, ngmlr or hisat2 [default: minimap2]
 -threads			Number of processing threads [default: 16]
 -mem				Max total memory for samtools (in Gb) [default: 16] ## mem/threads = memory per thread
 -bam				Keeps BAM files generated
@@ -48,7 +48,6 @@ OPTIONS:
 ### Mapper-specific options ###
 -X				BOWTIE2 - Maximum paired ends insert size [default: 750]
 -preset				MINIMAP2 - Preset: sr, map-ont, map-pb or asm20 [default: sr]
--algo				BWA - Mapping algorithm:  bwasw, mem, samse [default: mem]
 
 ### Variant calling options ###
 -caller				[default: varscan2]	## Variant caller: varscan2, bcftools or freebayes
@@ -65,7 +64,7 @@ OPTIONS:
 -pv (--p-value)			[default: 1e-02]	## P-value threshold for calling variants 
 -sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
 END_OPTIONS
-my @command = @ARGV; ## Keeping track of command lines for logs later on...
+my @command = @ARGV;
 
 my $help ='';
 my $vn;
@@ -75,16 +74,18 @@ my $outdir = './';
 my $mapper = 'minimap2';
 my $threads = 16;
 my $mem = 16;
-my $sam = ''; my $bam = '';
-my @fasta; my @fastq;
-my @pe1; my @pe2;
+my $sam = '';
+my $bam = '';
+my @fasta;
+my @fastq;
+my @pe1;
+my @pe2;
 my $rmo;
 my $nostat;
 
 ## Mapper-specific
 my $maxins = '750';
 my $preset = 'sr';
-my $algo = 'mem';
 
 ## Variant calling
 my $caller = 'varscan2';
@@ -122,7 +123,6 @@ GetOptions(
 	## Mapper-specific
 	'X=i' => \$maxins,
 	'preset=s' => \$preset,
-	'algo=s' => \$algo,	
 	
 	## Variant calling
 	'caller=s' => \$caller,
@@ -145,8 +145,8 @@ if ($vn){die "\nversion $version\n\n";}
 
 ### Program checks for samtools, read mappers and variant callers
 chkinstall('samtools');
-if ($mapper =~ /bowtie2|hisat2|bwa|minimap2|ngmlr/){ chkinstall($mapper);}
-else {die "\nMapper option $mapper is unrecognized. Please use bowtie2, hisat2, bwa, minimap2 or ngmlr...\n\n";}
+if ($mapper =~ /bowtie2|hisat2|minimap2|ngmlr/){ chkinstall($mapper);}
+else {die "\nMapper option $mapper is unrecognized. Please use bowtie2, hisat2, minimap2 or ngmlr...\n\n";}
 unless ($rmo){
 	if ($caller =~ /freebayes|bcftools/){ chkinstall($caller);}
 	elsif ($caller eq 'varscan2'){ unless (-f $varjar){ die "Cannot find varscan jar file: $varjar\n";} }
@@ -189,8 +189,7 @@ my $fasta; my $fastq; my $file; my $fa; my $dir; my $qdir; my $flagstat;
 foreach (@fasta){
 	$fasta = $_; ($fa, $dir) = fileparse($fasta);
 	unless (-f $fasta) { die "\nFASTA file named $fasta not found. Please check your command line...\n\n"; }
-	if ($mapper eq 'bwa'){system "bwa index -a is $_";}
-	elsif ($mapper eq 'bowtie2'){system "bowtie2-build --threads $threads $_ $fa.bt2";}
+	if ($mapper eq 'bowtie2'){system "bowtie2-build --threads $threads $_ $fa.bt2";}
 	elsif ($mapper eq 'hisat2'){system "hisat2-build $_ $fa.ht";}
 }
 my $index_time = time - $tstart;
@@ -217,19 +216,7 @@ if (@fastq){
 			print "Mapping $fastq on $fasta with $mapper...\n";
 			
 			## Read-mapping
-			if ($mapper eq 'bwa'){
-				## If algo = mem, use the -R option to add the read-group (@RG) to SAM/BAM headers
-				my $rg = ''; if ($algo eq 'mem'){$rg = '-R \@RG\\\\tID:'."$fastq".'\\\\tSM:'."$fasta";}
-				system "bwa \\
-				  $algo \\
-				  -t $threads \\
-				  $rg \\
-				  $fasta \\
-				  $fastq \\
-				  1> ${outdir}/$file.$fa.$mapper.sam \\
-				  2>> ${outdir}/mapping.$mapper.log";
-			}
-			elsif ($mapper eq 'bowtie2'){
+			if ($mapper eq 'bowtie2'){
 				system "bowtie2 \\
 				  --rg-id $fastq \\
 				  --rg SM:$fasta \\
@@ -310,20 +297,7 @@ if (@pe1 && @pe2){
 			print "Mapping $pe1 and $pe2 on $fasta with $mapper...\n";
 
 			## Read mapping
-			if ($mapper eq 'bwa'){
-				## If algo = mem, use the -R option to add the read-group (@RG) to SAM/BAM headers
-				my $rg = ''; if ($algo eq 'mem'){$rg = '-R \@RG\\\\tID:'."$pe1".'\\\\tSM:'."$fasta";}
-				system "bwa \\
-				  $algo \\
-				  -t $threads \\
-				  $rg \\
-				  $fasta \\
-				  $pe1 \\
-				  $pe2 \\
-				  1> ${outdir}/$file.$fa.$mapper.sam \\
-				  2>> ${outdir}/mapping.$mapper.log";
-			}
-			elsif ($mapper eq 'bowtie2'){
+			if ($mapper eq 'bowtie2'){
 				  system "bowtie2 \\
 				  --rg-id $pe1 \\
 				  --rg SM:$fasta \\
@@ -373,14 +347,10 @@ if (@pe1 && @pe2){
 }
 
 ## Cleaning up
-if ($mapper =~ /bwa|bowtie2|hisat2|ngmlr/){
+if ($mapper =~ /bowtie2|hisat2|ngmlr/){
 	mkdir ("${outdir}/$mapper.indexes",0755);
 }
-if ($mapper eq 'bwa'){ 
-	system "mv ${outdir}/${dir}*.amb ${outdir}/${dir}*.ann ${outdir}/${dir}*.bwt \\
-	${outdir}/${dir}*.fai ${outdir}/${dir}*.pac ${outdir}/${dir}*.sa ${outdir}/$mapper.indexes/";
-}
-elsif ($mapper eq 'bowtie2'){
+if ($mapper eq 'bowtie2'){
 	system "mv ${outdir}/*.bt2 ${outdir}/${dir}*.fai ${outdir}/$mapper.indexes/";
 }
 elsif ($mapper eq 'hisat2'){
@@ -639,7 +609,6 @@ sub print_options{
 	print MAP "get_SNP.pl version: $version\n";
 	print MAP "Number of threads: $threads\n";
 	print MAP "Read mapper: $mapper\n";
-	if ($mapper eq 'bwa'){print MAP "BWA alogrithm: $algo\n";}
 	if ($mapper eq 'bowtie'){print MAP "Max insert size for bowtie: $maxins nt\n";}
 	if ($rmo){print MAP "Read-mapping only requested, skipping variant calling.\n";}
 	if ($bam){print MAP "Keeping BAM files are requested.\n";}
