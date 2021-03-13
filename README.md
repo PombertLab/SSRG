@@ -10,9 +10,12 @@ People interested in ***genetic distances*** should use the genetic distance est
 
 ## Getting Started
 ```bash
-git clone --recursive https://github.com/PombertLab/SNPs.git
-chmod a+x `find ./SNPs/ -name *.pl`
-
+git clone https://github.com/PombertLab/SNPs.git
+cd SNPs/
+export PATH=$PATH:$(pwd)/MASH/
+export PATH=$PATH:$(pwd)/SSRG/
+export PATH=$PATH:$(pwd)/Tools/NCBI
+```
 ## Point mutations (using minimap2 + VarScan2)
 SSRG.pl -f *.fasta -r 250 ## Only for haploid genomes
 get_SNPs.pl -fa *.fasta -pe1 *R1.fastq -pe2 *R2.fastq
