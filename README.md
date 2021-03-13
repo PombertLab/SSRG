@@ -9,7 +9,7 @@ People interested in ***point mutations*** should use the read-mapping/variant c
 People interested in ***genetic distances*** should use the genetic distance estimation workflow. This workflow is based on [Mash](https://github.com/marbl/Mash), an excellent tool developed by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/). Genetic distances can be plotted as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
 ## Getting Started
-```bash
+```Bash
 git clone https://github.com/PombertLab/SNPs.git
 cd SNPs/
 export PATH=$PATH:$(pwd)/MASH/
@@ -17,11 +17,14 @@ export PATH=$PATH:$(pwd)/SSRG/
 export PATH=$PATH:$(pwd)/Tools/NCBI
 ```
 ## Point mutations (using minimap2 + VarScan2)
+```Bash
 SSRG.pl -f *.fasta -r 250 ## Only for haploid genomes
 get_SNPs.pl -fa *.fasta -pe1 *R1.fastq -pe2 *R2.fastq
 synonymy.pl -gcode 11 -fa reference.fasta -ref reference.gbk -format gb -vcf *.vcf -o synonymy
-	
+```
+
 ## Genetic distances (using Mash + R)
+```Bash
 run_Mash.pl -f *.fasta -o output.mash
 MashToDistanceMatrix.pl -i output.mash -o matrix -f tsv
 MashR_plotter.pl -i matrix.tsv -if tsv -t tree -f pdf -o tree 		## NJ tree
@@ -83,18 +86,14 @@ Assessing the genetic diversity between genomes often involves the calculation o
 
 ### Downloading from GitHub
 ```bash
-git clone --recursive https://github.com/PombertLab/SNPs.git
-chmod a+x `find ./SNPs/ -name *.pl`
+git clone https://github.com/PombertLab/SNPs.git
 ```
-For ease of use, the SSRG folders should be added to the $PATH variable. Bash users on Fedora/RedHat can type the following commands to add the SNPs folder and its subdirectories to their own .bash_profile:
+For ease of use, the SSRG folders should be added to the $PATH variable. To set the $PATH variable for the current session, type:
 ```bash
-cd ./SNPs; PWD=`pwd`;
-echo 'PATH="$PATH:'"$PWD\"" >> ~/.bash_profile
-echo 'PATH="$PATH:'"$PWD/SSRG\"" >> ~/.bash_profile
-echo 'PATH="$PATH:'"$PWD/MASH\"" >> ~/.bash_profile
-echo 'PATH="$PATH:'"$PWD/Tools/NCBI\"" >> ~/.bash_profile
-echo 'export PATH' >> ~/.bash_profile
-source ~/.bash_profile
+cd SNPs/
+export PATH=$PATH:$(pwd)/MASH/
+export PATH=$PATH:$(pwd)/SSRG/
+export PATH=$PATH:$(pwd)/Tools/NCBI
 ```
 
 ### Installing dependencies
