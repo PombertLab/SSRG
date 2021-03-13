@@ -73,7 +73,6 @@ Assessing the genetic diversity between genomes often involves the calculation o
 - [Mash](https://github.com/marbl/Mash) (for genetic distance estimations)
 
 ##### Compatible read aligners
-- [BWA](http://bio-bwa.sourceforge.net/) 0.7.12+
 - [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) 2.2.9+
 - [HISAT2](https://ccb.jhu.edu/software/hisat2/index.shtml) 2.0+
 - [Minimap2](https://github.com/lh3/minimap2) 2.14+ (recommended)
@@ -146,10 +145,7 @@ Read mapping/variant calling with [get_SNPs.pl](https://github.com/PombertLab/SS
 - [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)
 - [NGMLR](https://github.com/philres/ngmlr)
 - [HISAT2](https://ccb.jhu.edu/software/hisat2/index.shtml)
-- [BWA](http://bio-bwa.sourceforge.net/). ## On Fedora, BWA can be installed from the DNF package manager:
-```Bash
-sudo dnf install bwa
-```
+
 *Variant callers are available here:*
 - [BCFtools](http://samtools.github.io/bcftools/)
 - [FreeBayes](https://github.com/ekg/freebayes)
