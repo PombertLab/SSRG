@@ -1,17 +1,24 @@
 #!/usr/bin/perl
 ## Pombert Lab, IIT, 2019
 my $name = 'bam2fastq.pl';
-my $version = '0.2';
+my $version = '0.2a';
+my $updated = '13/03/2021';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions);
 
 my $usage = <<"OPTIONS";
-NAME		$name
-VERSION		$version
+NAME		${name}
+VERSION		${version}
+UPDATED		${updated}
 SYNOPSIS	Extract sequencing reads in FASTQ format from BAM alignment files
 REQUIREMENTS	Samtools 1.3.1+
 
-USAGE		bam2fastq.pl -b file.bam -t pe -e map -p reads -s fastq
+USAGE		${name} \\
+		  -b file.bam \\
+		  -t pe \\
+		  -e map \\
+		  -p reads \\
+		  -s fastq
 
 OPTIONS:
 -b (--bam)	BAM alignment file
@@ -20,7 +27,7 @@ OPTIONS:
 -p (--prefix)	Output file(s) prefix [Default: reads]
 -s (--suffix)	Output file(s) suffix [Default: fastq]
 OPTIONS
-die "$usage\n" unless @ARGV;
+die "\n$usage\n" unless @ARGV;
 
 my $bam;
 my $type = 'pe';
@@ -36,8 +43,14 @@ GetOptions(
 );
 
 ## Program + option check
-my $samtools = `command -v samtools`; chomp $samtools; if ($samtools eq ''){print "\nERROR: Cannot find Samtools. Please install Samtools in your path\n\n"; exit;}
-unless (($type eq 'pe') || ($type eq 'se')) {die "\nUnrecognized type $type. Please use 'pe' for paired-ends or 'se' for single ends\n";}
+my $samtools = `command -v samtools`;
+chomp $samtools;
+if ($samtools eq ''){
+	die "\nERROR: Cannot find Samtools. Please install Samtools in your path\n\n";
+}
+unless (($type eq 'pe') || ($type eq 'se')) {
+	die "\nUnrecognized type $type. Please use 'pe' for paired-ends or 'se' for single ends\n";
+}
 unless (($extract eq 'map') || ($extract eq 'unmap')) {
 	die "\nUnrecognized reads to extact: $extract. Please enter 'map' or 'unmap' to extract reads that map or do not map to the reference(s), respectively\n";
 }
