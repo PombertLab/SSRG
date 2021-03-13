@@ -165,7 +165,7 @@ To perform genetic distance estimations, [Mash](https://github.com/marbl/Mash) b
 ###### Case example with Minimap2, VarScan2 and 3 *Streptococcus pneumoniae* genomes
 1. Download a small CSV list of 3 *Streptococcus pneumoniae* genomes. ## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
 ```bash
-wget https://raw.githubusercontent.com/PombertLab/SSRG/master/Misc/S_pneumoniae_3.csv
+wget https://raw.githubusercontent.com/PombertLab/SSRG/master/Examples/S_pneumoniae_3.csv
 ```
 2. Download the corresponding FASTA and GenBank files from NCBI with [queryNCBI.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/NCBI/queryNCBI.pl).
 ```bash
@@ -222,7 +222,7 @@ synonymy.pl \
 ###### Case example with Mash, R and 75 *Streptococcus pneumoniae* genomes
 1. Download a CSV list of 75 *Streptococcus pneumoniae* genomes. ## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
 ```bash
-wget https://raw.githubusercontent.com/PombertLab/SSRG/master/Misc/S_pneumoniae_75.csv
+wget https://raw.githubusercontent.com/PombertLab/SSRG/master/Examples/S_pneumoniae_75.csv
 ```
 
 2. Download the FASTA files automatically with [queryNCBI.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/NCBI/queryNCBI.pl), then run Mash with [run_Mash.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/run_Mash.pl).
@@ -239,7 +239,7 @@ MashToDistanceMatrix.pl  \
 	-o S_pneumoniae_75 \
 	-f tsv
 ```
-4. Generate a quick neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar to [S_pneumoniae_75_NJ_tree.pdf](https://github.com/PombertLab/SSRG/blob/master/Misc/S_pneumoniae_75_NJ_tree.pdf) from the Misc subdirectory.
+4. Generate a quick neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar to [S_pneumoniae_75_NJ_tree.pdf](https://github.com/PombertLab/SSRG/blob/master/Examples/S_pneumoniae_75_NJ_tree.pdf) from the Misc subdirectory.
 ```bash
 MashR_plotter.pl \
 	-i S_pneumoniae_75.tsv \
@@ -250,7 +250,7 @@ MashR_plotter.pl \
 	-o S_pneumoniae_75_NJ_tree \
 	-he 20
 ```
-5. Generate a quick heatmap with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar to [S_pneumoniae_75_heatmap.pdf](https://github.com/PombertLab/SSRG/blob/master/Misc/S_pneumoniae_75_heatmap.pdf) from the Misc subdirectory.
+5. Generate a quick heatmap with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar to [S_pneumoniae_75_heatmap.pdf](https://github.com/PombertLab/SSRG/blob/master/Examples/S_pneumoniae_75_heatmap.pdf) from the Misc subdirectory.
 ```bash
 MashR_plotter.pl \
 	-i S_pneumoniae_75.tsv \
@@ -262,7 +262,7 @@ MashR_plotter.pl \
 	-he 20 \
 	-wd 20
 ```
-6. Generate a quick t-SNE multidimensional reduction plot with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar, ***but not identical***, to [S_pneumoniae_75_tSNE.pdf](https://github.com/PombertLab/SSRG/blob/master/Misc/S_pneumoniae_75_tSNE.pdf) from the Misc subdirectory. ## t-SNE graphs are generated using random seeds, which affect how the distances are represented in 2D.
+6. Generate a quick t-SNE multidimensional reduction plot with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar, ***but not identical***, to [S_pneumoniae_75_tSNE.pdf](https://github.com/PombertLab/SSRG/blob/master/Examples/S_pneumoniae_75_tSNE.pdf) from the Misc subdirectory. ## t-SNE graphs are generated using random seeds, which affect how the distances are represented in 2D.
 ```bash
 MashR_plotter.pl \
 	-i S_pneumoniae_75.tsv \
