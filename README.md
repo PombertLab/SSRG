@@ -1,10 +1,10 @@
-<p align="center"><img src="https://github.com/PombertLab/SNPs/blob/master/logo.png" alt="SSRG - A simple pipeline to assess genetic diversity" width="900"></p>
+<p align="center"><img src="https://github.com/PombertLab/SSRG/blob/master/logo.png" alt="SSRG - A simple pipeline to assess genetic diversity" width="900"></p>
 
-The [SSRG pipeline](https://github.com/PombertLab/SNPs) was created as a simple and focused tool to investigate genetic diversity between genomes. The pipeline features two independent workflows:
+The [SSRG pipeline](https://github.com/PombertLab/SSRG) was created as a simple and focused tool to investigate genetic diversity between genomes. The pipeline features two independent workflows:
 1.	Read-mapping/variant calling
 2.	Genetic distance estimation
 
-People interested in ***point mutations*** should use the read-mapping/variant calling workflow. The unique feature of the SSRG pipeline resides in the creation with [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl) of synthetic short reads  from complete or draft genomes, which can then be fed to the read mapping/variant calling tools. Note that this approach works only for haploid genomes. Alternatively, users can select any FASTQ dataset to use with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl).
+People interested in ***point mutations*** should use the read-mapping/variant calling workflow. The unique feature of the SSRG pipeline resides in the creation with [SSRG.pl](https://github.com/PombertLab/SSRG/blob/master/SSRG.pl) of synthetic short reads  from complete or draft genomes, which can then be fed to the read mapping/variant calling tools. Note that this approach works only for haploid genomes. Alternatively, users can select any FASTQ dataset to use with [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl).
 
 People interested in ***genetic distances*** should use the genetic distance estimation workflow. This workflow is based on [Mash](https://github.com/marbl/Mash), an excellent tool developed by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/). Genetic distances can be plotted as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
@@ -12,8 +12,8 @@ People interested in ***genetic distances*** should use the genetic distance est
 ```Bash
 git clone https://github.com/PombertLab/SNPs.git
 cd SNPs/
-export PATH=$PATH:$(pwd)/MASH/
-export PATH=$PATH:$(pwd)/SSRG/
+export PATH=$PATH:$(pwd)
+export PATH=$PATH:$(pwd)/Tools/MASH
 export PATH=$PATH:$(pwd)/Tools/NCBI
 ```
 ## Point mutations (using minimap2 + VarScan2)
@@ -53,7 +53,7 @@ MashR_plotter.pl -i matrix.tsv -if tsv -t heatmap -f pdf -o heatmap 	## Heatmap
 
 ## Introduction
 ##### Why another read mapping pipeline?
-Assessing the genetic diversity between genomes often involves the calculation of ***[single nucleotide polymorphisms](https://ghr.nlm.nih.gov/primer/genomicresearch/snp) (SNPs)*** and ***[insertions/deletions](https://ghr.nlm.nih.gov/primer/mutationsanddisorders/possiblemutations) (indels)***. This is usually done by mapping short accurate sequencing reads from one or more species against a reference genome, from which variants are called. This approach works well when short read data from published genomes are available in public repositories such as [NCBI's SRA](https://www.ncbi.nlm.nih.gov/sra) but that is not always the case, especially now that genome sequencing is shifting towards the use of long read technologies. While genomes and/or long reads can be aligned against each other, the results are often suboptimal when the investigated chromosomes are highly reorganized, which can cause the mapping to fail. A simple solution to this problem is to deconstruct the genomes or long reads randomly into shorter fragments —much like DNA fragmentation protocols used in ***[whole genome sequencing](https://ghr.nlm.nih.gov/primer/testing/sequencing) (WGS)***— and to use these smaller synthetic reads as input for mapping. We have implemented this approach in [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl). Note that this approach is only valid for haploid genomes and should not be used in presence of heterozygosity.
+Assessing the genetic diversity between genomes often involves the calculation of ***[single nucleotide polymorphisms](https://ghr.nlm.nih.gov/primer/genomicresearch/snp) (SNPs)*** and ***[insertions/deletions](https://ghr.nlm.nih.gov/primer/mutationsanddisorders/possiblemutations) (indels)***. This is usually done by mapping short accurate sequencing reads from one or more species against a reference genome, from which variants are called. This approach works well when short read data from published genomes are available in public repositories such as [NCBI's SRA](https://www.ncbi.nlm.nih.gov/sra) but that is not always the case, especially now that genome sequencing is shifting towards the use of long read technologies. While genomes and/or long reads can be aligned against each other, the results are often suboptimal when the investigated chromosomes are highly reorganized, which can cause the mapping to fail. A simple solution to this problem is to deconstruct the genomes or long reads randomly into shorter fragments —much like DNA fragmentation protocols used in ***[whole genome sequencing](https://ghr.nlm.nih.gov/primer/testing/sequencing) (WGS)***— and to use these smaller synthetic reads as input for mapping. We have implemented this approach in [SSRG.pl](https://github.com/PombertLab/SSRG/blob/master/SSRG.pl). Note that this approach is only valid for haploid genomes and should not be used in presence of heterozygosity.
 
 ##### Deconstructing genomes into synthetic reads has the following advantages:
 -	It enables comparisons between genomes for which sequencing datasets are not available in public repositories.
@@ -86,13 +86,13 @@ Assessing the genetic diversity between genomes often involves the calculation o
 
 ### Downloading from GitHub
 ```bash
-git clone https://github.com/PombertLab/SNPs.git
+git clone https://github.com/PombertLab/SSRG.git
 ```
 For ease of use, the SSRG folders should be added to the $PATH variable. To set the $PATH variable for the current session, type:
 ```bash
 cd SNPs/
-export PATH=$PATH:$(pwd)/MASH/
-export PATH=$PATH:$(pwd)/SSRG/
+export PATH=$PATH:$(pwd)/
+export PATH=$PATH:$(pwd)/Tools/MASH
 export PATH=$PATH:$(pwd)/Tools/NCBI
 ```
 
@@ -138,7 +138,7 @@ quit()
 
 ##### ***Installing read mappers, variants callers and Mash***
 
-Read mapping/variant calling with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) require [Samtools](http://www.htslib.org/) 1.3.1+. Read mappers and variant callers to be used with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) can be installed on a need-to basis. [Minimap2](https://github.com/lh3/minimap2) and [VarScan2](http://dkoboldt.github.io/varscan/) are recommended.
+Read mapping/variant calling with [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) require [Samtools](http://www.htslib.org/) 1.3.1+. Read mappers and variant callers to be used with [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) can be installed on a need-to basis. [Minimap2](https://github.com/lh3/minimap2) and [VarScan2](http://dkoboldt.github.io/varscan/) are recommended.
 
 *Read mappers are available here:*
 
@@ -153,7 +153,7 @@ sudo dnf install bwa
 *Variant callers are available here:*
 - [BCFtools](http://samtools.github.io/bcftools/)
 - [FreeBayes](https://github.com/ekg/freebayes)
-- [VarScan2](http://dkoboldt.github.io/varscan/). ## The default location of the VarScan2 jar file can be updated in [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) by modifying the following line:
+- [VarScan2](http://dkoboldt.github.io/varscan/). ## The default location of the VarScan2 jar file can be updated in [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) by modifying the following line:
 ```perl
 my $varjar = '/opt/varscan/VarScan.v2.4.4.jar';
 ```
@@ -165,19 +165,19 @@ To perform genetic distance estimations, [Mash](https://github.com/marbl/Mash) b
 ###### Case example with Minimap2, VarScan2 and 3 *Streptococcus pneumoniae* genomes
 1. Download a small CSV list of 3 *Streptococcus pneumoniae* genomes. ## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
 ```bash
-wget https://raw.githubusercontent.com/PombertLab/SNPs/master/Misc/S_pneumoniae_3.csv
+wget https://raw.githubusercontent.com/PombertLab/SSRG/master/Misc/S_pneumoniae_3.csv
 ```
-2. Download the corresponding FASTA and GenBank files from NCBI with [queryNCBI.pl](https://github.com/PombertLab/SNPs/blob/master/Tools/NCBI/queryNCBI.pl).
+2. Download the corresponding FASTA and GenBank files from NCBI with [queryNCBI.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/NCBI/queryNCBI.pl).
 ```bash
 queryNCBI.pl -l S_pneumoniae_3.csv -fa -gb
 ```
 
-3. Generate FASTQ datasets from the downloaded genomes with [SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl).
+3. Generate FASTQ datasets from the downloaded genomes with [SSRG.pl](https://github.com/PombertLab/SSRG/blob/master/SSRG.pl).
 ```bash
 SSRG.pl -f *.fasta -r 250
 ```
 
-4a. To test the read-mapping step with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) but skip variant calling, type:
+4a. To test the read-mapping step with [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) but skip variant calling, type:
 ```bash
 ## Running get_SNPs.pl with 8 threads, 16 Gb RAM (change according to your settings)
 get_SNPs.pl \
@@ -191,7 +191,7 @@ get_SNPs.pl \
 	-rmo \
 	-bam
 ```
-4b. To test the read-mapping and variant calling steps with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl), type:
+4b. To test the read-mapping and variant calling steps with [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl), type:
 ```bash
 ## Running get_SNPs.pl with 8 threads, 16 Gb RAM (change according to your settings)
 get_SNPs.pl \
@@ -222,24 +222,24 @@ synonymy.pl \
 ###### Case example with Mash, R and 75 *Streptococcus pneumoniae* genomes
 1. Download a CSV list of 75 *Streptococcus pneumoniae* genomes. ## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
 ```bash
-wget https://raw.githubusercontent.com/PombertLab/SNPs/master/Misc/S_pneumoniae_75.csv
+wget https://raw.githubusercontent.com/PombertLab/SSRG/master/Misc/S_pneumoniae_75.csv
 ```
 
-2. Download the FASTA files automatically with [queryNCBI.pl](https://github.com/PombertLab/SNPs/blob/master/Tools/NCBI/queryNCBI.pl), then run Mash with [run_Mash.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/run_Mash.pl).
+2. Download the FASTA files automatically with [queryNCBI.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/NCBI/queryNCBI.pl), then run Mash with [run_Mash.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/run_Mash.pl).
 ```bash
 mkdir FASTA; cd FASTA/;
 queryNCBI.pl -l ../S_pneumoniae_75.csv -fa
 run_Mash.pl -f *.fasta -o ../S_pneumoniae_75.mash
 cd ../
 ```
-3. Convert the Mash output to a distance matrix with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashToDistanceMatrix.pl).
+3. Convert the Mash output to a distance matrix with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashToDistanceMatrix.pl).
 ```bash
 MashToDistanceMatrix.pl  \
 	-i S_pneumoniae_75.mash \
 	-o S_pneumoniae_75 \
 	-f tsv
 ```
-4. Generate a quick neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashR_plotter.pl). The PDF generated should be similar to [S_pneumoniae_75_NJ_tree.pdf](https://github.com/PombertLab/SNPs/blob/master/Misc/S_pneumoniae_75_NJ_tree.pdf) from the Misc subdirectory.
+4. Generate a quick neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar to [S_pneumoniae_75_NJ_tree.pdf](https://github.com/PombertLab/SSRG/blob/master/Misc/S_pneumoniae_75_NJ_tree.pdf) from the Misc subdirectory.
 ```bash
 MashR_plotter.pl \
 	-i S_pneumoniae_75.tsv \
@@ -250,7 +250,7 @@ MashR_plotter.pl \
 	-o S_pneumoniae_75_NJ_tree \
 	-he 20
 ```
-5. Generate a quick heatmap with [MashR_plotter.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashR_plotter.pl). The PDF generated should be similar to [S_pneumoniae_75_heatmap.pdf](https://github.com/PombertLab/SNPs/blob/master/Misc/S_pneumoniae_75_heatmap.pdf) from the Misc subdirectory.
+5. Generate a quick heatmap with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar to [S_pneumoniae_75_heatmap.pdf](https://github.com/PombertLab/SSRG/blob/master/Misc/S_pneumoniae_75_heatmap.pdf) from the Misc subdirectory.
 ```bash
 MashR_plotter.pl \
 	-i S_pneumoniae_75.tsv \
@@ -262,7 +262,7 @@ MashR_plotter.pl \
 	-he 20 \
 	-wd 20
 ```
-6. Generate a quick t-SNE multidimensional reduction plot with [MashR_plotter.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashR_plotter.pl). The PDF generated should be similar, ***but not identical***, to [S_pneumoniae_75_tSNE.pdf](https://github.com/PombertLab/SNPs/blob/master/Misc/S_pneumoniae_75_tSNE.pdf) from the Misc subdirectory. ## t-SNE graphs are generated using random seeds, which affect how the distances are represented in 2D.
+6. Generate a quick t-SNE multidimensional reduction plot with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar, ***but not identical***, to [S_pneumoniae_75_tSNE.pdf](https://github.com/PombertLab/SSRG/blob/master/Misc/S_pneumoniae_75_tSNE.pdf) from the Misc subdirectory. ## t-SNE graphs are generated using random seeds, which affect how the distances are represented in 2D.
 ```bash
 MashR_plotter.pl \
 	-i S_pneumoniae_75.tsv \
@@ -282,7 +282,7 @@ MashR_plotter.pl \
 ## Detailed options
 #### Read mapping and variant calling
 ##### Synthetic reads
-[SSRG.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/SSRG.pl) can be used to generate FASTQ datasets from complete or draft genomes (ploidy = 1). For example, to generate FASTQ datasets (paired ends; 250 bp; 50x sequencing depth) from one or more genomes:
+[SSRG.pl](https://github.com/PombertLab/SSRG/blob/master/SSRG.pl) can be used to generate FASTQ datasets from complete or draft genomes (ploidy = 1). For example, to generate FASTQ datasets (paired ends; 250 bp; 50x sequencing depth) from one or more genomes:
 ```Bash
 SSRG.pl -f *.fasta -r 250 
 ```
@@ -301,12 +301,12 @@ Options for SSRG.pl are:
 
 
 ##### Read mapping
-[get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) is the main script that handles read mapping and variant calling. The default read mapper in get_SNPs.pl is [Minimap2](https://github.com/lh3/minimap2), and can be changed by invoking the **--mapper** switch from the command line. Users can also change the default read mapper settings by modifying the following line in [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl):
+[get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) is the main script that handles read mapping and variant calling. The default read mapper in get_SNPs.pl is [Minimap2](https://github.com/lh3/minimap2), and can be changed by invoking the **--mapper** switch from the command line. Users can also change the default read mapper settings by modifying the following line in [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl):
 ```perl
 my $mapper = 'minimap2';
 ```
 
-[get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) can be used with single or paired ends datasets. BAM files generated during the alignments can be kept with the **--bam** command line switch (BAM files are discarded by default to save on disk space). The **--rmo** option (read mapping only) skips the variant calling process. When combined, the **--rmo** and **--bam** options generate BAM alignment files using the selected read mapper.
+[get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) can be used with single or paired ends datasets. BAM files generated during the alignments can be kept with the **--bam** command line switch (BAM files are discarded by default to save on disk space). The **--rmo** option (read mapping only) skips the variant calling process. When combined, the **--rmo** and **--bam** options generate BAM alignment files using the selected read mapper.
 
 To generate BAM alignments with ***single end*** FASTQ datasets using the default read mapper, [Minimap2](https://github.com/lh3/minimap2), with its default sr (short reads) preset:
 ```bash
@@ -340,7 +340,7 @@ General and read mapping options for get_SNPs.pl are:
 ```
 
 ##### Variant calling
-The default variant caller in get_SNPs.pl is [VarScan2](http://dkoboldt.github.io/varscan/). Other variant callers are implemented only partially. To perform variant calling with [get_SNPs.pl](https://github.com/PombertLab/SNPs/blob/master/SSRG/get_SNPs.pl) using default settings ([Minimap2](https://github.com/lh3/minimap2) + [VarScan2](http://dkoboldt.github.io/varscan/)) and single end datasets, simply type:
+The default variant caller in get_SNPs.pl is [VarScan2](http://dkoboldt.github.io/varscan/). Other variant callers are implemented only partially. To perform variant calling with [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) using default settings ([Minimap2](https://github.com/lh3/minimap2) + [VarScan2](http://dkoboldt.github.io/varscan/)) and single end datasets, simply type:
 ```bash
 get_SNPs.pl -fa *.fasta -fq *.fastq
 ```
@@ -366,7 +366,7 @@ Variant calling options for get_SNPs.pl are:
 -ploidy				[default: 1]		## FreeBayes/BCFtools option; change ploidy (if needed)
 
 ### VarScan2 parameters ### see http://dkoboldt.github.io/varscan/using-varscan.html
--var				[default: /opt/varscan/VarScan.v2.4.3.jar]	## Which varscan jar file to use
+-var				[default: /opt/varscan/VarScan.v2.4.4.jar]	## Which varscan jar file to use
 -mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
 -mr (--min-reads2)		[default: 15]		## Minimum supporting reads at a position to call variants
 -maq (--min-avg-qual)		[default: 28]		## Minimum base quality at a position to count a read
@@ -377,12 +377,12 @@ Variant calling options for get_SNPs.pl are:
 ```
 
 #### Genetic distance estimation with Mash
-Runnning Mash with [run_Mash.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/run_Mash.pl) and converting output to distance matrices with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashToDistanceMatrix.pl)
+Runnning Mash with [run_Mash.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/run_Mash.pl) and converting output to distance matrices with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashToDistanceMatrix.pl)
 ```
 run_Mash.pl -f *.fasta -o Mash.txt
 MashToDistanceMatrix.pl  -i Mash.txt -o Mash -f tsv
 ```
-Plotting a quick Neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SNPs/blob/master/MASH/MashR_plotter.pl)
+Plotting a quick Neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl)
 ```
 MashR_plotter.pl -i Mash.tsv -if tsv -t tree -newick Mash.txt.tre
 ```
