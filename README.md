@@ -169,12 +169,12 @@ wget https://raw.githubusercontent.com/PombertLab/SSRG/master/Examples/S_pneumon
 ```
 2. Download the corresponding FASTA and GenBank files from NCBI with [queryNCBI.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/NCBI/queryNCBI.pl).
 ```bash
-queryNCBI.pl -l S_pneumoniae_3.csv -fa -gb
+queryNCBI.pl -l Examples/S_pneumoniae_3.csv -o DATASETS -fa -gb
 ```
 
 3. Generate FASTQ datasets from the downloaded genomes with [SSRG.pl](https://github.com/PombertLab/SSRG/blob/master/SSRG.pl).
 ```bash
-SSRG.pl -f *.fasta -r 250
+SSRG.pl -f DATASETS/*.fasta -o FASTQ -r 250
 ```
 
 4a. To test the read-mapping step with [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) but skip variant calling, type:

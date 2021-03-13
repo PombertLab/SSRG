@@ -1,20 +1,30 @@
 #!/usr/bin/perl
 ## Pombert Lab, Illinois Tech (2015-2020)
-my $version = '1.7';
+my $version = '1.8';
 my $name = 'SSRG.pl';
+my $updated = '13/03/2021';
 
-use strict; use warnings; use Getopt::Long qw(GetOptions);
+use strict; use warnings; use Getopt::Long qw(GetOptions); use File::Basename;
 
 my $options = <<"END_OPTIONS";
-NAME		$name
-VERSION		$version
-SYNOPSIS	SSRG: Synthetic Short Read Generator: 
-		Generates short reads in FASTQ (Q33) format from multifasta files
+NAME		${name}
+VERSION		${version}
+UPDATED		${updated}
+SYNOPSIS	SSRG (Synthetic Short Read Generator) generates short reads in FASTQ
+		format (Q33) from multifasta files
 
-COMMAND		$name -f *.fasta -r 250 -i 350 -s 20 -c 25 -t PE
+COMMAND		${name} \\
+		  -f *.fasta \\
+		  -o FASTQ \\
+		  -r 250 \\
+		  -i 350 \\
+		  -s 20 \\
+		  -c 25 \\
+		  -t PE
 
 OPTIONS:
  -f (--fasta)		Fasta/multifasta file(s)
+ -o (--outdir)		Output directory [Default: ./]
  -l (--list)		List of fasta file(s), one per line
  -r (--readsize)	Desired read size [default: 150]
  -t (--type)		Read type: single (SE) or paired ends (PE) [default: PE]
@@ -25,11 +35,11 @@ OPTIONS:
  -q64          		Use the old Illumina Q64 FastQ format instead of the default Q33 Sanger/Illumina 1.8+ encoding
 END_OPTIONS
 die "\n$options\n" unless(scalar@ARGV>=1);
-
-my $start = localtime(); my $tstart = time;
+my @commands = @ARGV;
 
 ## Declare options
 my @fasta;
+my $outdir = './';
 my $list;
 my $readsize = 150;
 my $type = 'pe';
@@ -39,12 +49,9 @@ my $slide;
 my $cov = '50';
 my $qscore = 30;
 my $q64 = '';		## Default is false so that Q33 format is used
-my $date = `date`;
-open LOG, ">>SSRG.log"; ## Keep track of read mapper STDERR messages
-print LOG "\# $date";
-print LOG "COMMAND LINE: $name @ARGV\n\n";
 GetOptions(
 	'f|fasta=s@{1,}' => \@fasta,
+	'o|outdir=s' => \$outdir, 
 	'l|list=s' =>	\$list,
 	'r|readsize=i' => \$readsize,
 	'i|insert=i' => \$insert,
@@ -55,16 +62,32 @@ GetOptions(
 	'c|coverage=s' => \$cov
 );
 
-my $warning1 = "\nFatal Error: Read size must be an integer\n"; die $warning1 unless(int($readsize) == $readsize);
-my $warning2 = "\nFatal Error: Insert size \($insert\) is smaller than read size \($readsize\). Please use a larger insert size.\n\n"; if ($type eq 'pe'){die $warning2 if ($insert < $readsize);}
-my %ASCII = ASCII(); my $offset; my $score; qscore(); ## ASCII offset for quality score
+my $warning1 = "\nFatal Error: Read size must be an integer\n";
+my $warning2 = "\nFatal Error: Insert size \($insert\) is smaller than read size \($readsize\). Please use a larger insert size.\n\n";
+die $warning1 unless(int($readsize) == $readsize);
+if ($type eq 'pe'){ die $warning2 if ($insert < $readsize); }
+
+### Creating log
+my $start = localtime(); my $tstart = time;
+my $date = `date`;
+open LOG, ">>", "SSRG.log" or die "Can't create file SSRG.log: $!\n";
+print LOG "\# $date";
+print LOG "COMMAND LINE: $name @commands\n\n";
+
+## ASCII offset for quality score
+my %ASCII = ASCII(); my $offset; my $score; qscore();
+
+## Creating output folder
+unless (-d $outdir){
+	mkdir ($outdir,0755) or die "Can't create folder $outdir: $!\n";
+}
 
 ## Working on files
 my $fasta;		## Init fasta file
 my $count = 0;	## Read number counter to be auto-incremented
 my $read; my $rev_read; my $pe1; my $pe2; my $rev1; my $rev2; ## Init read variables
 if ($list){
-	open LIST, "<", "$list" or die "cannot open $list";
+	open LIST, "<", "$list" or die "Can't open $list: $!\n";
 	print "\nSequences listed in $list:\n";
 	while (my $line = <LIST>){
 		chomp $line;
@@ -75,11 +98,17 @@ if ($list){
 }
 
 while ($fasta = shift @fasta) {
-	open IN, "<", "$fasta" or die "cannot open $fasta";
-	$fasta =~ s/\.fasta$//; $fasta =~ s/\.fsa$//; $fasta =~ s/\.fa$//; $fasta =~ s/\.fna$//; ## Removing file extensions
+	open IN, "<", "$fasta" or die "Can't open $fasta: $!\n";
+	$fasta =~ s/\.\w+$//; ## Removing file extensions
 	$type = lc($type);
-	if($type eq 'se'){open SE, ">$fasta.$readsize.SE.fastq";}
-	elsif($type eq 'pe'){open R1, ">$fasta.$readsize.R1.fastq"; open R2, ">$fasta.$readsize.R2.fastq";}
+	my $basename = fileparse($fasta);
+	if($type eq 'se'){
+		open SE, ">", "${outdir}/$basename.$readsize.SE.fastq" or die "Can't create file ${outdir}/$basename.$readsize.SE.fastq: $!\n";
+	}
+	elsif($type eq 'pe'){
+		open R1, ">", "${outdir}/$basename.$readsize.R1.fastq" or die "Can't create file ${outdir}/$basename.$readsize.R1.fastq: $!\n";
+		open R2, ">", "${outdir}/$basename.$readsize.R2.fastq" or die "Can't create file ${outdir}/$basename.$readsize.R2.fastq: $!\n";
+	}
 	stats();
 
 	my @contigs = ();	## Initializing list of contigs per fasta file
