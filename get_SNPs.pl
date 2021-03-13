@@ -18,7 +18,7 @@ SYNOPSIS	Automates read-mapping of FASTQ datasets against reference sequence(s) 
 USAGE		${name} [options]
 
 EXAMPLES:
-simple			${name} -fa *.fasta -fq *.fastq
+simple			${name} -fa *.fasta -fq *.fastq -o RESULTS
 advanced		${name} --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar --threads 16
 paired ends		${name} --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --caller freebayes --threads 16
 read-mapping only	${name} --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --rmo --bam --threads 16
@@ -30,6 +30,7 @@ my $options = <<'END_OPTIONS';
 OPTIONS:
 -h (--help)	Display this list of options
 -v (--version)	Display script version
+-o (--outdir)	Output directory [Default: ./]
 
 ### Mapping options ###
 -fa (--fasta)			Reference genome(s) in fasta file
@@ -66,9 +67,11 @@ OPTIONS:
 END_OPTIONS
 my @command = @ARGV; ## Keeping track of command lines for logs later on...
 
-my $help =''; my $vn;
-## Mapping
+my $help ='';
+my $vn;
+my $outdir = './';
 
+## Mapping
 my $mapper = 'minimap2';
 my $threads = 16;
 my $mem = 16;
@@ -156,6 +159,11 @@ if ((scalar@fastq == 0) && (scalar@pe1 == 0)) { die "\nPlease enter at least one
 ## keep the default variant caller for file names if -rmo is enabled...)
 if ($rmo){$caller = 'rmo';} 
 
+## Creating output directory
+unless (-d $outdir){
+	mkdir ($outdir,0755) or die "Can't create output directory $outdir: $!\n";
+}
+
 ## Timestamps and logs
 my $start = localtime();
 my $tstart = time;
@@ -163,8 +171,8 @@ my $todo = 0;
 if (@fastq){$todo += scalar(@fastq)*scalar(@fasta);}
 if (@pe1 && @pe2){$todo += scalar(@pe1)*scalar(@fasta);}
 
-open MAP, ">>", "mapping.$mapper.log" or die "Can't create file mapping.$mapper.log: $!\n";
-open LOG, ">", "time.$mapper.$caller.log" or die "Can't create file time.$mapper.$caller.log: $!\n";
+open MAP, ">>", "${outdir}/mapping.$mapper.log" or die "Can't create file ${outdir}/mapping.$mapper.log: $!\n";
+open LOG, ">", "${outdir}/time.$mapper.$caller.log" or die "Can't create file ${outdir}/time.$mapper.$caller.log: $!\n";
 
 print MAP "COMMAND LINE:\n${name} @command\n";
 print LOG "Mapping/SNP calling started on: $start\n";
@@ -216,8 +224,8 @@ if (@fastq){
 				  $rg \\
 				  $fasta \\
 				  $fastq \\
-				  1> $file.$fa.$mapper.sam \\
-				  2>> mapping.$mapper.log";
+				  1> ${outdir}/$file.$fa.$mapper.sam \\
+				  2>> ${outdir}/mapping.$mapper.log";
 			}
 			elsif ($mapper eq 'bowtie2'){
 				system "bowtie2 \\
@@ -226,8 +234,8 @@ if (@fastq){
 				  -p $threads \\
 				  -x $fa.bt2 \\
 				  -U $fastq \\
-				  -S $file.$fa.$mapper.sam \\
-				  2>> mapping.$mapper.log";
+				  -S ${outdir}/$file.$fa.$mapper.sam \\
+				  2>> ${outdir}/mapping.$mapper.log";
 			} 
 			elsif ($mapper eq 'minimap2'){ #-R \@RG\\\\tID:$fastq\\\\tSM:$fasta
 				system "minimap2 \\
@@ -238,8 +246,8 @@ if (@fastq){
 				-ax $preset \\
 				$fasta \\
 				$fastq \\
-				1> $file.$fa.$mapper.sam \\
-				2>> mapping.$mapper.log";
+				1> ${outdir}/$file.$fa.$mapper.sam \\
+				2>> ${outdir}/mapping.$mapper.log";
 			}
 			elsif ($mapper eq 'ngmlr'){
 				system "ngmlr \\
@@ -248,8 +256,8 @@ if (@fastq){
 				  --rg-sm $fasta \\
 				  -r $fasta \\
 				  -q $fastq \\
-				  -o $file.$fa.$mapper.sam \\
-				  2>&1 | tee mapping.$mapper.log";
+				  -o ${outdir}/$file.$fa.$mapper.sam \\
+				  2>&1 | tee ${outdir}/mapping.$mapper.log";
 			}
 			elsif ($mapper eq 'hisat2'){
 				system "hisat2 \\
@@ -260,8 +268,8 @@ if (@fastq){
 				-x $fa.ht \\
 				-U $fastq \\
 				--no-spliced-alignment \\
-				-S $file.$fa.$mapper.sam \\
-				2>> mapping.$mapper.log";
+				-S ${outdir}/$file.$fa.$mapper.sam \\
+				2>> ${outdir}/mapping.$mapper.log";
 			}
 
 			samtools(); ## Converting to BAM
@@ -270,8 +278,8 @@ if (@fastq){
 			logs();
 
 			## Cleaning SAM/BAM files
-			unless ($bam) {system "rm $file.$fa.$mapper.bam $file.$fa.$mapper.bam.csi";}
-			unless ($sam) {system "rm $file.$fa.$mapper.sam";}
+			unless ($bam) {system "rm ${outdir}/$file.$fa.$mapper.bam ${outdir}/$file.$fa.$mapper.bam.csi";}
+			unless ($sam) {system "rm ${outdir}/$file.$fa.$mapper.sam";}
 		}
 	}
 }
@@ -310,8 +318,8 @@ if (@pe1 && @pe2){
 				  $fasta \\
 				  $pe1 \\
 				  $pe2 \\
-				  1> $file.$fa.$mapper.sam \\
-				  2>> mapping.$mapper.log";
+				  1> ${outdir}/$file.$fa.$mapper.sam \\
+				  2>> ${outdir}/mapping.$mapper.log";
 			}
 			elsif ($mapper eq 'bowtie2'){
 				  system "bowtie2 \\
@@ -322,8 +330,8 @@ if (@pe1 && @pe2){
 				  -X $maxins \\
 				  -1 $pe1 \\
 				  -2 $pe2 \\
-				  -S $file.$fa.$mapper.sam \\
-				  2>> mapping.$mapper.log";
+				  -S ${outdir}/$file.$fa.$mapper.sam \\
+				  2>> ${outdir}/mapping.$mapper.log";
 			}
 			elsif ($mapper eq 'hisat2'){
 				system "hisat2 \\
@@ -335,8 +343,8 @@ if (@pe1 && @pe2){
 				  -1 $pe1 \\
 				  -2 $pe2 \\
 				  --no-spliced-alignment \\
-				  -S $file.$fa.$mapper.sam \\
-				  2>> mapping.$mapper.log";
+				  -S ${outdir}/$file.$fa.$mapper.sam \\
+				  2>> ${outdir}/mapping.$mapper.log";
 			}
 			elsif ($mapper eq 'minimap2'){
 				system "minimap2 \\
@@ -346,8 +354,8 @@ if (@pe1 && @pe2){
 				  $fasta \\
 				  $pe1 \\
 				  $pe2 \\
-				  1> $file.$fa.$mapper.sam \\
-				  2>> mapping.$mapper.log";
+				  1> ${outdir}/$file.$fa.$mapper.sam \\
+				  2>> ${outdir}/mapping.$mapper.log";
 			}
 
 			samtools(); ## Converting to BAM 
@@ -356,37 +364,37 @@ if (@pe1 && @pe2){
 			logs();
 			
 			## Cleaning SAM/BAM files
-			unless ($bam) {system "rm $file.$fa.$mapper.bam $file.$fa.$mapper.bam.csi";}
-			unless ($sam) {system "rm $file.$fa.$mapper.sam";}
+			unless ($bam) {system "rm ${outdir}/$file.$fa.$mapper.bam ${outdir}/$file.$fa.$mapper.bam.csi";}
+			unless ($sam) {system "rm ${outdir}/$file.$fa.$mapper.sam";}
 		}
 	}
 }
 
 ## Cleaning up
 if ($mapper =~ /bwa|bowtie2|hisat2|ngmlr/){ mkdir ("$mapper.indexes",0755); }
-if ($mapper eq 'bwa'){system "mv ${dir}*.amb ${dir}*.ann ${dir}*.bwt ${dir}*.fai ${dir}*.pac ${dir}*.sa $mapper.indexes/";}
-elsif ($mapper eq 'bowtie2'){system "mv *.bt2 ${dir}*.fai $mapper.indexes/";}
-elsif ($mapper eq 'hisat2'){system "mv *.ht2 ${dir}*.fai $mapper.indexes/";}
-elsif ($mapper eq 'ngmlr'){system "mv *.ngm $mapper.indexes/";}
+if ($mapper eq 'bwa'){system "mv ${dir}*.amb ${dir}*.ann ${dir}*.bwt ${dir}*.fai ${dir}*.pac ${dir}*.sa ${outdir}/$mapper.indexes/";}
+elsif ($mapper eq 'bowtie2'){system "mv *.bt2 ${dir}*.fai ${outdir}/$mapper.indexes/";}
+elsif ($mapper eq 'hisat2'){system "mv *.ht2 ${dir}*.fai ${outdir}/$mapper.indexes/";}
+elsif ($mapper eq 'ngmlr'){system "mv *.ngm ${outdir}/$mapper.indexes/";}
 if ($bam){
-	mkdir ("$mapper.BAM",0755);
-	system "mv *.bam $mapper.BAM/; mv *.csi $mapper.BAM/";
+	mkdir ("${outdir}/$mapper.BAM",0755);
+	system "mv *.bam ${outdir}/$mapper.BAM/; mv *.csi ${outdir}/$mapper.BAM/";
 }
 if ($sam){
-	mkdir ("$mapper.SAM",0755);
-	system "mv *.sam $mapper.SAM/";
+	mkdir ("${outdir}/$mapper.SAM",0755);
+	system "mv *.sam ${outdir}/$mapper.SAM/";
 }
 unless ($rmo) {
-	mkdir ("$mapper.$caller.VCFs",0755);
-	system "mv *.vcf $mapper.$caller.VCFs/";}
+	mkdir ("${outdir}/$mapper.$caller.VCFs",0755);
+	system "mv *.vcf ${outdir}/$mapper.$caller.VCFs/";}
 unless ($nostat){
-	mkdir ("$mapper.$caller.depth",0755);
-	mkdir ("$mapper.$caller.stats",0755);
-	system "mv *.$mapper.depth $mapper.$caller.depth/";
-	system "mv *.$mapper.$type.stats $mapper.$caller.stats/";
+	mkdir ("${outdir}/$mapper.$caller.depth",0755);
+	mkdir ("${outdir}/$mapper.$caller.stats",0755);
+	system "mv *.$mapper.depth ${outdir}/$mapper.$caller.depth/";
+	system "mv *.$mapper.$type.stats ${outdir}/$mapper.$caller.stats/";
 }
-mkdir ("$mapper.$caller.coverage",0755);
-system "mv *.$mapper.coverage $mapper.$caller.coverage/";
+mkdir ("${outdir}/$mapper.$caller.coverage",0755);
+system "mv *.$mapper.coverage ${outdir}/$mapper.$caller.coverage/";
 
 ## Printing timestamps and logs
 my $end = localtime();
@@ -413,14 +421,14 @@ sub chkinstall{
 # sub to run convert SAM files to binary (BAM) format with samtools
 sub samtools{
 	my $sammem = int(($mem/$threads)*1024);
-	print "Running samtools on $file.$fa.$mapper.sam...\n";
+	print "Running samtools on ${outdir}/$file.$fa.$mapper.sam...\n";
 	print "Using $sammem Mb per thread for samtools\n";
-	system "samtools view -@ $threads -bS $file.$fa.$mapper.sam -o $file.$fa.bam";
-	system "samtools sort -@ $threads -m ${sammem}M -o $file.$fa.$mapper.bam $file.$fa.bam";
-	system "samtools index -@ $threads -m ${sammem}M $file.$fa.$mapper.bam";
-	system "samtools depth -aa $file.$fa.$mapper.bam > $file.$fa.$mapper.coverage"; ## Printing per base coverage information
-	system "rm $file.$fa.bam"; ## Discarding unsorted BAM file
-	$flagstat = `samtools flagstat $file.$fa.$mapper.bam`;
+	system "samtools view -@ $threads -bS ${outdir}/$file.$fa.$mapper.sam -o ${outdir}/$file.$fa.bam";
+	system "samtools sort -@ $threads -m ${sammem}M -o ${outdir}/$file.$fa.$mapper.bam ${outdir}/$file.$fa.bam";
+	system "samtools index -@ $threads -m ${sammem}M ${outdir}/$file.$fa.$mapper.bam";
+	system "samtools depth -aa ${outdir}/$file.$fa.$mapper.bam > ${outdir}/$file.$fa.$mapper.coverage"; ## Printing per base coverage information
+	system "rm ${outdir}/$file.$fa.bam"; ## Discarding unsorted BAM file
+	$flagstat = `samtools flagstat ${outdir}/$file.$fa.$mapper.bam`;
 }
 
 # sub to run the variant calling process
@@ -431,7 +439,7 @@ sub variant{
 	## Checking if BAM file is empty
 	if ($passQC == 0){
 		print "No QC-passed reads mapped to the genome; skipping variants calling\n\n";
-		open VCF, ">", "$file.$fa.$mapper.$type.vcf" or die "Can't create file $file.$fa.$mapper.$type.vcf: $!\n";
+		open VCF, ">", "${outdir}/$file.$fa.$mapper.$type.vcf" or die "Can't create file ${outdir}/$file.$fa.$mapper.$type.vcf: $!\n";
 		print VCF '## No QC-passed reads mapped to the genome'."\n";
 		close VCF;
 	}
@@ -445,7 +453,7 @@ sub variant{
 				system "samtools \\
 				  mpileup \\
 				  -f $fasta \\
-				  $file.$fa.$mapper.bam \\
+				  ${outdir}/$file.$fa.$mapper.bam \\
 				  | \\
 				  java -jar $varjar \\
 				  mpileup2$type \\
@@ -457,13 +465,13 @@ sub variant{
 				  --p-value $pv \\
 				  --strand-filter $sf \\
 				  --output-vcf \\
-				  > $file.$fa.$mapper.$type.vcf";
+				  > ${outdir}/$file.$fa.$mapper.$type.vcf";
 			}
 			elsif ($type eq 'both'){
 				system "samtools \\
 				  mpileup \\
 				  -f $fasta \\
-				  $file.$fa.$mapper.bam \\
+				  ${outdir}/$file.$fa.$mapper.bam \\
 				  | \\
 				  java -jar $varjar \\
 				  mpileup2cns \\
@@ -476,7 +484,7 @@ sub variant{
 				  --strand-filter $sf \\
 				  --variants \\
 				  --output-vcf \\
-				  > $file.$fa.$mapper.$type.vcf";
+				  > ${outdir}/$file.$fa.$mapper.$type.vcf";
 			}
 			else {die "\nERROR: Unrecognized variant type. Please use: snp, indel, or both\n\n";}
 		}
@@ -488,19 +496,19 @@ sub variant{
 			system "bcftools \\
 				mpileup \\
 				-f $fasta \\
-				$file.$fa.$mapper.bam \\
+				${outdir}/$file.$fa.$mapper.bam \\
 				| \\
 				bcftools \\
 				call \\
 				-vmO v \\
 				$varV \\
 				--ploidy $ploidy \\
-				--output $file.$fa.$mapper.$type.vcf";
+				--output ${outdir}/$file.$fa.$mapper.$type.vcf";
 		}
 		elsif ($caller eq 'freebayes'){ ## single thread only, parallel version behaving wonky
-			system "samtools index $file.$fa.$mapper.bam";
-			system "freebayes -f $fasta -p $ploidy $file.$fa.$mapper.bam > $file.$fa.$mapper.$type.vcf";
-			system "rm $file.$fa.$mapper.bam.bai";
+			system "samtools index ${outdir}/$file.$fa.$mapper.bam";
+			system "freebayes -f $fasta -p $ploidy ${outdir}/$file.$fa.$mapper.bam > ${outdir}/$file.$fa.$mapper.$type.vcf";
+			system "rm ${outdir}/$file.$fa.$mapper.bam.bai";
 		}
 	}
 }
@@ -509,10 +517,10 @@ sub variant{
 sub stats{
 	my $run_time = time - $tstart; my $mend = localtime();
 	print "\nCalculating stats...\n";
-	open COV, "<", "$file.$fa.$mapper.coverage" or die "Can't read file $file.$fa.$mapper.coverage: $!\n";
-	unless ($rmo){open SN, "<", "$file.$fa.$mapper.$type.vcf" or die "Can't read file $file.$fa.$mapper.$type.vcf: $!\n";}
-	open STATS, ">", "$file.$fa.$mapper.$type.stats" or die "Can't create file $file.$fa.$mapper.$type.stats: $!\n";
-	open DEPTH, ">", "$file.$fa.$mapper.depth" or die "Can't create file $file.$fa.$mapper.$type.depth: $!\n";
+	open COV, "<", "${outdir}/$file.$fa.$mapper.coverage" or die "Can't read file ${outdir}/$file.$fa.$mapper.coverage: $!\n";
+	unless ($rmo){open SN, "<", "${outdir}/$file.$fa.$mapper.$type.vcf" or die "Can't read file ${outdir}/$file.$fa.$mapper.$type.vcf: $!\n";}
+	open STATS, ">", "${outdir}/$file.$fa.$mapper.$type.stats" or die "Can't create file ${outdir}/$file.$fa.$mapper.$type.stats: $!\n";
+	open DEPTH, ">", "${outdir}/$file.$fa.$mapper.depth" or die "Can't create file ${outdir}/$file.$fa.$mapper.$type.depth: $!\n";
 	print DEPTH "Contig\tAverage depth\tAverage (all contigs)\tDifference\tRatio Contig\/Average\n";
 	my $total = 0; my $covered = 0; my $nocov = 0; my $max = 0; my $sumcov; my $sn =0;
 	
@@ -580,7 +588,7 @@ sub stats{
 	}
 	else{
 		print STATS "\nNo read was found to map to the reference: ";
-		print STATS "the output of samtools depth -aa ($file.$fa.$mapper.coverage) is blank.\n";
+		print STATS "the output of samtools depth -aa (${outdir}/$file.$fa.$mapper.coverage) is blank.\n";
 	}
 	
 	## Execute only if variant calling has been performed
