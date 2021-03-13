@@ -182,6 +182,7 @@ get_SNPs.pl \
 	-fa DATASETS/*.fasta \
 	-pe1 FASTQ/*R1.fastq \
 	-pe2 FASTQ/*R2.fastq \
+	-o RESULTS \
 	-mapper minimap2 \
 	-preset sr \
 	-rmo \
@@ -196,6 +197,7 @@ get_SNPs.pl \
 	-fa DATASETS/*.fasta \
 	-pe1 FASTQ/*R1.fastq \
 	-pe2 FASTQ/*R2.fastq \
+	-o RESULTS \
 	-mapper minimap2 \
 	-preset sr \
 	-bam \
@@ -210,7 +212,7 @@ synonymy.pl \
 	-fa DATASETS/Streptococcus_pneumoniae_R6.fasta \
 	-ref DATASETS/Streptococcus_pneumoniae_R6.gbk \
 	-format gb \
-	-vcf minimap2.varscan2.VCFs/*.vcf \
+	-vcf RESULTS/minimap2.varscan2.VCFs/*.vcf \
 	-o synonymy
 ```
 

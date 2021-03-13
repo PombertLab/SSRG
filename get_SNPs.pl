@@ -102,7 +102,9 @@ my $pv = '1e-02';
 my $sf = 0;
 
 GetOptions(
-	'h|help' => \$help, 'v|version', => \$vn,
+	'h|help' => \$help,
+	'v|version', => \$vn,
+	'o|outdir=s' => \$outdir,
 	
 	## Mapping
 	'mapper=s' => \$mapper,
