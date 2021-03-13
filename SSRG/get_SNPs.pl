@@ -142,8 +142,12 @@ if ($vn){die "\nversion $version\n\n";}
 chkinstall('samtools');
 if ($mapper =~ /bowtie2|hisat2|bwa|minimap2|ngmlr/){ chkinstall($mapper);}
 else {die "\nMapper option $mapper is unrecognized. Please use bowtie2, hisat2, bwa, minimap2 or ngmlr...\n\n";}
-if ($caller =~ /varscan2|freebayes|bcftools/){ chkinstall($caller);}
+if ($caller =~ /freebayes|bcftools/){ chkinstall($caller);}
+elsif ($caller eq 'varscan2'){
+	unless (-f $caller){ die "Cannot find varscan jar file: $varjar\n";}
+}
 else {die "\nVariant caller option $caller is unrecognized. Please use varscan2, bcftools, freebayes...\n\n";}
+
 
 ## Option checks
 if (scalar@fasta == 0) { die "\nPlease enter at least one FASTA reference before proceeding...\n\n"; }
