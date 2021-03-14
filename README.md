@@ -323,7 +323,7 @@ Options for [MashToDistanceMatrix.pl](https://github.com/PombertLab/SSRG/blob/ma
 -f (--format)	Output format; csv or tsv [Default: csv]
 ```
 
-4. To generate a quick neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl), tyoe:
+4. To generate a quick neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl), type:
 ```bash
 MashR_plotter.pl \
 	-i MASH/S_pneumoniae_75.tsv \
@@ -340,7 +340,7 @@ The PDF generated should be similar to [S_pneumoniae_75_NJ_tree.pdf](https://git
 5. To generate a quick heatmap with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl), type:
 ```bash
 MashR_plotter.pl \
-	-i S_pneumoniae_75.tsv \
+	-i MASH/S_pneumoniae_75.tsv \
 	-if tsv \
 	-t heatmap \
 	-f pdf \
@@ -355,7 +355,7 @@ The PDF generated should be similar to [S_pneumoniae_75_heatmap.pdf](https://git
 6. To generate a quick t-SNE multidimensional reduction plot with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl), type:
 ```bash
 MashR_plotter.pl \
-	-i S_pneumoniae_75.tsv \
+	-i MASH/S_pneumoniae_75.tsv \
 	-if tsv \
 	-t cluster \
 	-m tsne \
