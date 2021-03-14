@@ -248,25 +248,27 @@ synonymy.pl \
 	-ref DATASETS/Streptococcus_pneumoniae_R6.gbk \
 	-format gb \
 	-vcf RESULTS/minimap2.varscan2.VCFs/*.vcf \
-	-o synonymy
+	-o SYNONYMY \
+	-p synonymy \
+	-v
 ```
 
 Options for [synonymy.pl](https://github.com/PombertLab/SSRG/blob/master/synonymy.pl) are:
 ```
--h (--help)	Display this list of options
--v (--version)	Display script version
 -fa (--fasta)	Reference genome in fasta format
 -r (--ref)	Reference genome annotation in GBK or GFF format
 -f (--format)	Reference file format; gb or gff [default: gff]
 -vcf (--vcf)	SNPs in Variant Calling Format (VCF)
--o (--output)	Table prefix [Default: synonymy] The .features/.intergenic suffixes and .tsv file extension will be added automatically.
--gc (--gcode)	NCBI genetic code; e.g.:
+-o (--outdir)	Output directory [Default: ./]
+-p (--prefix)	Table prefix [Default: synonymy]
+-gc (--gcode)	NCBI genetic code [Default: 1]
 		1  - The Standard Code
 		2  - The Vertebrate Mitochondrial Code
 		3  - The Yeast Mitochondrial Code
 		4  - The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
 		11 - The Bacterial, Archaeal and Plant Plastid Code
-		NOTE - For complete list; see https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
+		# For complete list, see https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
+-v (--verbose)	Adds verbosity
 ```
 
 #### Mash workflow
