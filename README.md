@@ -301,15 +301,16 @@ run_Mash.pl \
 3. To convert the Mash output to a distance matrix with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashToDistanceMatrix.pl), type:
 ```bash
 MashToDistanceMatrix.pl  \
-	-i S_pneumoniae_75.mash \
-	-o S_pneumoniae_75 \
+	-i MASH/S_pneumoniae_75.mash \
+	-o MASH/ \
+	-p S_pneumoniae_75 \
 	-f tsv
 ```
 
 4. To generate a quick neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl), tyoe:
 ```bash
 MashR_plotter.pl \
-	-i S_pneumoniae_75.tsv \
+	-i MASH/S_pneumoniae_75.tsv \
 	-if tsv \
 	-t tree \
 	-newick S_pneumoniae_75.tre \
