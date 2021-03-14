@@ -1,31 +1,40 @@
 #!/usr/bin/perl
 ## Pombert lab, 2019
-my $version = '1.1d';
+my $version = '1.2';
 my $name = 'MashToDistanceMatrix.pl';
+my $updated = '14/03/2021';
 
-use strict; use warnings; use Getopt::Long qw(GetOptions);
+use strict; use warnings; use Getopt::Long qw(GetOptions); use File::Basename;
 
 ## Defining options
-my $options = <<"OPTIONS";
-
-NAME		$name
-VERSION		$version
+my $usage = <<"OPTIONS";
+NAME		${name}
+VERSION		${version}
+UPDATED		${updated}
 SYNOPSIS	Converts the Mash output to a CSV or TSV matrix for easy plotting with R
-USAGE		MashToDistanceMatrix.pl -i Mash.txt -o Mash -f csv
+
+USAGE		${name} \\
+		  -i MASH/S_pneumoniae_75.mash \\
+		  -o MASH \\
+		  -p S_pneumoniae_75 \\
+		  -f csv
 
 OPTIONS:
--i (--input)		Mash output file [Default: Mash.txt]
--o (--out)		Output file prefix [Default: Mash]
+-i (--input)		Mash output file
+-o (--outdir)	Output folder [Default: ./]
+-p (--prefix)	Output file prefix [Default: Mash]
 -f (--format)	Output format; csv or tsv [Default: csv]
 OPTIONS
-die "$options\n" unless @ARGV;
+die "$usage\n" unless @ARGV;
 
-my $mash = 'Mash.txt';
-my $out = 'Mash';
+my $mash;
+my $outdir = './';
+my $prefix = 'Mash';
 my $format = 'csv';
 GetOptions(
 	'i|input=s' => \$mash,
-	'o|out=s' => \$out,
+	'o|outdir=s' => \$outdir,
+	'p|prefix=s' => \$prefix,
 	'f|format=s' => \$format
 );
 
@@ -35,15 +44,21 @@ my $sep;
 if ($format eq 'csv'){$sep = ",";}
 elsif ($format eq 'tsv'){$sep = "\t";}
 else {die "Format $format in not recognized. Please specify csv or tsv...\n";}
-open IN, "<$mash";
-open MASH, ">$out.$format"; open CORR, ">$out.alternatedist.$format";
-print MASH "OTU"; print CORR "OTU";
+
+open IN, "<", "$mash" or die "Can't read file $mash: $!\n";
+my $outfile = "${outdir}/$prefix.$format";
+my $alternate = "${outdir}/$prefix.alternatedist.$format";
+open MASH, ">", "$outfile" or die "Can't create file $outfile: $!\n";
+open CORR, ">", "$alternate" or die "Can't create file $outfile: $!\n";
+print MASH "OTU";
+print CORR "OTU";
+
 my %hash = (); my %dist = (); my @OTU = ();
 while (my $line = <IN>){
 	chomp $line;
 	my @columns = split ("\t", $line); ## https://github.com/marbl/Mash/blob/master/doc/sphinx/tutorials.rst
-	my $reference = $columns[0];
-	my $query = $columns[1];
+	my $reference = fileparse($columns[0]);
+	my $query = fileparse($columns[1]);
 	my $mashdist = $columns[2];
 	my $pval = $columns[3];
 	my ($numerator, $denominator) = $columns[4] =~ /(\d+)\/(\d+)/;

@@ -293,7 +293,8 @@ Options for [queryNCBI.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/
 2. To run Mash on the downloaded FASTA files with [run_Mash.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/run_Mash.pl), type:
 ```bash
 run_Mash.pl \
-   -f *.fasta \
+   -f DATASETS/*.fasta \
+   -d MASH \
    -o S_pneumoniae_75.mash
 ```
 
