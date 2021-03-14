@@ -41,19 +41,20 @@ Assessing the genetic diversity between genomes often involves the calculation o
 3)	Run [Mash](https://github.com/marbl/Mash) and plot the estimated genetic distances as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
 ## Requirements
-- Unix/Linux, MacOS X, or WSL2
-- [Perl 5](https://www.perl.org/), [R](https://www.r-project.org/), and [Java](https://www.java.com/) (for VarScan2)
+- [Perl 5](https://www.perl.org/)
+###### For read mapping
 - [Samtools](http://www.htslib.org/) 1.3.1+
-- [Mash](https://github.com/marbl/Mash) (for genetic distance estimations)
+- [Minimap2](https://github.com/lh3/minimap2) 2.14+
+- [VarScan2](http://dkoboldt.github.io/varscan/) 2.4.2+
+- [Java](https://www.java.com/) (for VarScan2)
+###### For genetic distance estimations with Mash
+- [Mash](https://github.com/marbl/Mash)
+- [R](https://www.r-project.org/)
 
-## Compatible read mapper and variant callers
-##### Read mappers
+#### Optional
 - [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) 2.2.9+
 - [HISAT2](https://ccb.jhu.edu/software/hisat2/index.shtml) 2.0+
-- [Minimap2](https://github.com/lh3/minimap2) 2.14+ (recommended)
 - [NGMLR](https://github.com/philres/ngmlr) 0.2.7+ (partial support)
-##### Variant callers
-- [VarScan2](http://dkoboldt.github.io/varscan/) 2.4.2+
 - [BCFtools](http://samtools.github.io/bcftools/) 1.3.1+
 - [FreeBayes](https://github.com/ekg/freebayes)
 
