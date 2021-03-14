@@ -331,7 +331,8 @@ MashR_plotter.pl \
 	-t tree \
 	-newick S_pneumoniae_75.tre \
 	-f pdf \
-	-o S_pneumoniae_75_NJ_tree \
+	-o PLOTS \
+	-n S_pneumoniae_75_NJ_tree \
 	-he 20
 ```
 The PDF generated should be similar to [S_pneumoniae_75_NJ_tree.pdf](https://github.com/PombertLab/SSRG/blob/master/Images/S_pneumoniae_75_NJ_tree.pdf) from the [Images/](https://github.com/PombertLab/SSRG/tree/master/Images) directory.
@@ -343,7 +344,8 @@ MashR_plotter.pl \
 	-if tsv \
 	-t heatmap \
 	-f pdf \
-	-o S_pneumoniae_75_heatmap \
+	-o PLOTS \
+	-n S_pneumoniae_75_heatmap \
 	-colors white cyan magenta \
 	-he 20 \
 	-wd 20
@@ -360,7 +362,8 @@ MashR_plotter.pl \
 	-pe 15 \
 	-cmode terrain \
 	-f pdf \
-	-o S_pneumoniae_75_tSNE \
+	-o PLOTS \
+	-n S_pneumoniae_75_tSNE \
 	-he 20 \
 	-wd 20 \
 	-lb \
