@@ -58,13 +58,17 @@ Assessing the genetic diversity between genomes often involves the calculation o
 - [BCFtools](http://samtools.github.io/bcftools/) 1.3.1+
 - [FreeBayes](https://github.com/ekg/freebayes)
 
-### Downloading from GitHub
+#### Downloading from GitHub
 ```bash
 git clone https://github.com/PombertLab/SSRG.git
 cd SSRG/
 export PATH=$PATH:$(pwd)/
 export PATH=$PATH:$(pwd)/Tools/MASH
 export PATH=$PATH:$(pwd)/Tools/NCBI
+```
+The default location of the VarScan2 jar file can be updated in [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) by modifying the following line:
+```perl
+my $varjar = '/opt/varscan/VarScan.v2.4.4.jar';
 ```
 
 ### Installing dependencies
@@ -107,24 +111,7 @@ install.packages("Rtsne")
 quit()
 ```
 
-##### ***Installing read mappers, variants callers and Mash***
 
-Read mapping/variant calling with [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) require [Samtools](http://www.htslib.org/) 1.3.1+. Read mappers and variant callers to be used with [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) can be installed on a need-to basis. [Minimap2](https://github.com/lh3/minimap2) and [VarScan2](http://dkoboldt.github.io/varscan/) are recommended.
-
-*Read mappers are available here:*
-
-- [Minimap2](https://github.com/lh3/minimap2)
-- [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)
-- [NGMLR](https://github.com/philres/ngmlr)
-- [HISAT2](https://ccb.jhu.edu/software/hisat2/index.shtml)
-
-*Variant callers are available here:*
-- [BCFtools](http://samtools.github.io/bcftools/)
-- [FreeBayes](https://github.com/ekg/freebayes)
-- [VarScan2](http://dkoboldt.github.io/varscan/). ## The default location of the VarScan2 jar file can be updated in [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) by modifying the following line:
-```perl
-my $varjar = '/opt/varscan/VarScan.v2.4.4.jar';
-```
 
 To perform genetic distance estimations, [Mash](https://github.com/marbl/Mash) by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/) is required. It is available [here](https://github.com/marbl/Mash/releases).
 
