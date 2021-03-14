@@ -29,12 +29,12 @@ die "\n$usage\n" unless@ARGV;
 
 my @fasta;
 my $outdir = './';
-my $name = 'Mash.mash';
+my $filename = 'Mash.mash';
 my $sort;
 GetOptions(
 	'f|fasta=s@{1,}' => \@fasta,
-	'd|dir=s' => \$outdir,
-	'n|name=s' => \$name,
+	'o|outdir=s' => \$outdir,
+	'n|name=s' => \$filename,
 	's|sort' => \$sort,
 );
 
@@ -52,9 +52,9 @@ unless (-d $outdir){
 
 ## Running Mash
 print "Running Mash genetic distance analysis...";
-system "mash sketch -o reference @fasta";
-system "mash dist reference.msh @fasta > ${outdir}/$name";
+system "mash sketch -o ${outdir}/reference @fasta";
+system "mash dist ${outdir}/reference.msh @fasta > ${outdir}/$filename";
 if ($sort){
-	print "Sorting out Mash results -- See ${outdir}/$name.sorted";
-	system "sort -gk3 ${outdir}/$name > ${outdir}/$name.sorted";
+	print "Sorting out Mash results -- See ${outdir}/$filename.sorted";
+	system "sort -gk3 ${outdir}/$filename > ${outdir}/$filename.sorted";
 }
