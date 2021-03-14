@@ -67,7 +67,9 @@ my $varjar = '/opt/varscan/VarScan.v2.4.4.jar';
 
 If an error message appears relating to a corrupted jar file, download varscan with curl rather than git clone. To download the latest varscan2 with curl, type:
 ```Bash
-curl -o VarScan.v2.4.4.jar -L https://github.com/dkoboldt/varscan/blob/master/VarScan.v2.4.4.jar?raw=true
+curl \
+   -o VarScan.v2.4.4.jar \
+   -L https://github.com/dkoboldt/varscan/blob/master/VarScan.v2.4.4.jar?raw=true
 ```
 
 #### Installing dependencies
