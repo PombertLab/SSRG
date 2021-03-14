@@ -1,79 +1,117 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2017-2018 Illinois Tech
-my $version = '0.4'; ## Now compatible with NCBI GenBank GBFF and GFF files
+my $version = '0.4a';
 my $name = 'synonymy.pl';
+my $updated = '14/03/2021';
 
-use strict; use warnings; use Getopt::Long qw(GetOptions);
+use strict; use warnings; use Getopt::Long qw(GetOptions); use File::Basename;
 
 ## Usage definition
-my $hint = "Type synonymy.pl -h (--help) for list of options\n";
 my $usage = <<"OPTIONS";
-
-NAME		$name
-VERSION		$version
+NAME		${name}
+VERSION		${version}
+UPDATED		${updated}
 SYNOPSIS	Sort SNPs per type (CDS, tRNA, rRNA or intergenic) and synonymous or non-synonymous, if applicable
-		## Does not work with introns yet
+NOTE		Does not work with introns yet
 		
-USAGE		synonymy.pl -gcode 1 -fa reference.fasta -ref reference.gff -format gb -vcf *.vcf -o table_name
-OPTIONS
-die "$usage\n$hint\n" unless@ARGV;
+USAGE		${name} \\
+		  -gcode 1 \\
+		  -fa reference.fasta \\
+		  -ref reference.gbk \\
+		  -format gb \\
+		  -vcf *.vcf \\
+		  -o SYNONYMY \\
+		  -p synonymy
 
-my $options = <<'END_OPTIONS';
 OPTIONS:
--h (--help)	Display this list of options
--v (--version)	Display script version
 -fa (--fasta)	Reference genome in fasta format
 -r (--ref)	Reference genome annotation in GBK or GFF format
 -f (--format)	Reference file format; gb or gff [default: gff]
 -vcf (--vcf)	SNPs in Variant Calling Format (VCF)
--o (--output)	Table prefix [Default: synonymy] The .features/.intergenic suffixes and .tsv file extension will be added automatically.
--gc (--gcode)	NCBI genetic code; e.g.:
+-o (--outdir)	Output directory [Default: ./]
+-p (--prefix)	Table prefix [Default: synonymy]
+-gc (--gcode)	NCBI genetic code [Default: 1]
 		1  - The Standard Code
 		2  - The Vertebrate Mitochondrial Code
 		3  - The Yeast Mitochondrial Code
 		4  - The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
 		11 - The Bacterial, Archaeal and Plant Plastid Code
-		NOTE - For complete list; see https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
-END_OPTIONS
+		# For complete list, see https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
+-v (--verbose)	Adds verbosity
+OPTIONS
+die "\n$usage\n" unless@ARGV;
 
 ## GetOptions
-my $help;
-my $vn;
 my $fasta;
 my $ref;
 my $format = 'gff';
 my @vcf;
-my $output = 'synonymy';
-my $gc = '01';
+my $outdir = './';
+my $prefix = 'synonymy';
+my $gc = '1';
+my $verbose;
 GetOptions(
-	'h|help' => \$help,
-	'v|version' => \$vn,
 	'fa|fasta=s' => \$fasta,
 	'r|ref=s' => \$ref,
 	'f|format=s' => \$format,
 	'vcf=s@{1,}' => \@vcf,
-	'o|output=s' => \$output,
-	'gc|gcode=i' => \$gc
+	'o|outdir=s' => \$outdir,
+	'p|prefix=s' => \$prefix,
+	'gc|gcode=i' => \$gc,
+	'v|verbose' => \$verbose
 );
-if ($help){die "$usage\n$options\n";} if ($vn){die "\nversion $version\n\n";}
 
 ## Building hash of sequences
-open FASTA, "<$fasta";
+open FASTA, "<", "$fasta" or die "Can't read FASTA file $fasta: $!\n";
 my %sequences; my $contig;
 while (my $line = <FASTA>){
 	chomp $line;
-	if ($line =~ /^>(\S+)/){$contig = $1;}
-	else{$sequences{$contig} .= $line;}
+	if ($line =~ /^>(\S+)/){ $contig = $1; }
+	else{ $sequences{$contig} .= $line; }
 }
 
-## Building hashes of features + Init tables
-open REF, "<$ref";
-open TABLE, ">$output.features.tsv";
-open INTER, ">$output.intergenic.tsv";
-print TABLE "Locus_tag\tReference Contig\tVCF file\tType\tStart\tEnd\tStrandedness\tProduct\tVariant Position\tReference\tVariant\tSynonymy\tGenetic Code\tRefCodon\tVarCodon\tFrequency\tE-value\n";
-print INTER "Reference Contig\tVCF file\tType\tVariant Position\tReference\tVariant\tFrequency\tE-value\n";
+## Creating output directory + output files
+unless (-d $outdir){ mkdir ($outdir,0755) or die "Can't create folder $outdir: $!\n"; }
+open FEAT, ">", "${outdir}/$prefix.features.tsv" or die "Can't create file ${outdir}/$prefix.features.tsv: $!\n";
+open INTER, ">", "${outdir}/$prefix.intergenic.tsv" or die "Can't create file ${outdir}/$prefix.intergenic.tsv: $!\n";
 
-## Must simplify the data structure to one hash of features. Will be easier to adapt for input files. Working multiline would do it.
+my @feat_headers = (
+	'Locus_tag',
+	'Reference Contig',
+	'VCF file',
+	'Type',
+	'Start',
+	'End',
+	'Strandedness',
+	'Product',
+	'Variant Position',
+	'Reference',
+	'Variant',
+	'Synonymy',
+	'Genetic Code',
+	'RefCodon',
+	'VarCodon',
+	'Frequency',
+	'E-value'
+);
+for (0..$#feat_headers-1){ print FEAT "$feat_headers[$_]\t"; }
+print FEAT "$feat_headers[-1]\n";
+
+my @inter_headers = (
+	'Reference Contig',
+	'VCF file',
+	'Type',
+	'Variant Position',
+	'Reference',
+	'Variant',
+	'Frequency',
+	'E-value'
+);
+for (0..$#inter_headers-1){ print INTER "$inter_headers[$_]\t"; }
+print INTER "$inter_headers[-1]\n";
+
+## Building hashes of features. Must simplify the data structure to one hash of features. Will be easier to adapt for input files. Working multiline would do it.
+open REF, "<", "$ref" or die "Can't read reference file $ref: $!\n";
 my %genes, my %features; my %hashes; ## hash of hashes for contigs and their feature locations
 my $type; my $start; my $end; my $strand; my $id; my $locus_tag; my $parent; my $product; my $key;
 if ($format eq 'gff'){
@@ -98,7 +136,7 @@ if ($format eq 'gff'){
 			$features{$id}[3] = $strand;
 			$features{$id}[4] = $parent;
 			$features{$id}[5] = $product;
-			print "$contig\t$type\t$strand\t$locus_tag\t$product\n";
+			if ($verbose){ print "$contig\t$type\t$strand\t$locus_tag\t$product\n"; }
 			for ($start..$end){
 				push (@{$hashes{$contig}{$_}}, $id);
 			}
@@ -109,13 +147,13 @@ elsif ($format eq 'gb'){
 	my $gbk; while (my $line = <REF>){$gbk .= $line;}
 	my @contigs = split ("\/\/\n", $gbk);
 	while (my $cg = shift @contigs){
-	my @data = split ("ORIGIN.*?\n", $cg); ## $data[0] => annotations, $data[1] => sequences
-	my $sequence = $data[1]; $sequence =~ s/[0-9\s\n]//g;
-	my $locus; ($locus) = ($data[0] =~ /LOCUS\s+(\S+)/);
-	my $contig; ($contig) = ($data[0] =~ /VERSION\s+(\S+)/);
-	print "Working on $locus version $contig\n";
-	my $feat;	($feat) = ($data[0] =~ /FEATURES(.*)/s);
-	my @features = split("     gene            ", $feat);
+		my @data = split ("ORIGIN.*?\n", $cg); ## $data[0] => annotations, $data[1] => sequences
+		my $sequence = $data[1]; $sequence =~ s/[0-9\s\n]//g;
+		my $locus; ($locus) = ($data[0] =~ /LOCUS\s+(\S+)/);
+		my $contig; ($contig) = ($data[0] =~ /VERSION\s+(\S+)/);
+		if ($verbose){ print "Working on $locus version $contig\n"; }
+		my $feat; ($feat) = ($data[0] =~ /FEATURES(.*)/s);
+		my @features = split("     gene            ", $feat);
 		while (my $line = shift@features){
 			if ($line =~ /\s+(CDS|rRNA|tRNA)\s+.*?(\d+)\.\.(\d+)/m){
 				$type = $1; $start = $2; $end = $3;
@@ -123,7 +161,7 @@ elsif ($format eq 'gb'){
 				else{$strand = '+';}
 				($locus_tag) = ($line =~ /\/locus_tag="(.*?)"/s); $locus_tag =~ s/\s{2,}/ /g; $locus_tag =~ s/\n//g; ## removing new lines, if any
 				($product) = ($line =~ /\/product="(.*?)"/s); $product =~ s/\s{2,}/ /g; $product =~ s/\n//g; ## removing new lines, if any
-				print "$contig\t$type\t$strand\t$locus_tag\t$product\n";
+				if ($verbose){ print "$contig\t$type\t$strand\t$locus_tag\t$product\n"; }
 				$genes{$locus_tag}[0] = $contig;
 				$genes{$locus_tag}[1] = $start; $features{$locus_tag}[1] = $start;
 				$genes{$locus_tag}[2] = $end; $features{$locus_tag}[2] = $end;
@@ -142,13 +180,21 @@ elsif ($format eq 'gb'){
 my $codon; my $snp; my $revcodon; my $revsnp; my $locus;
 my %gcodes; gcodes();
 while (my $vcf = shift@vcf){
-	open VCF, "<$vcf";
+	open VCF, "<", "$vcf" or die "Can't read VCF file $vcf: $!\n";
 	while (my $line = <VCF>){
 		chomp $line;
 		if ($line =~ /^#/){next;}
 		else{
-			my @vcf = split("\t", $line); my @params = split(":", $vcf[9]); my $freq = $params[6]; my $evalue = $params[7];
-			$contig = $vcf[0]; my $position = $vcf[1]; my $ref = $vcf[3]; my $alt = $vcf[4];
+			my @vcf = split("\t", $line);
+			$contig = $vcf[0];
+			my $position = $vcf[1];
+			my $ref = $vcf[3];
+			my $alt = $vcf[4];
+			
+			my @params = split(":", $vcf[9]);
+			my $freq = $params[6];
+			my $evalue = $params[7];
+			
 			if (exists $hashes{$contig}{$position}){
 				for (0..$#{$hashes{$contig}{$position}}){
 					$locus = $hashes{$contig}{$position}[$_];
@@ -158,9 +204,9 @@ while (my $vcf = shift@vcf){
 					$strand = $features{$hashes{$contig}{$position}[$_]}[3];
 					$parent = $features{$hashes{$contig}{$position}[$_]}[4];
 					$product = $features{$hashes{$contig}{$position}[$_]}[5];
-					print TABLE "$genes{$parent}[4]\t$contig\t$vcf\t$type\t$start\t$end\t$strand\t$product\t$position\t$ref\t$alt\t";
-					if ($type eq 'tRNA'){print TABLE "N\/A\tN\/A\tN\/A\tN\/A\t";}
-					elsif ($type eq 'rRNA'){print TABLE "N\/A\tN\/A\tN\/A\tN\/A\t";}
+					print FEAT "$genes{$parent}[4]\t$contig\t$vcf\t$type\t$start\t$end\t$strand\t$product\t$position\t$ref\t$alt\t";
+					if ($type eq 'tRNA'){print FEAT "N\/A\tN\/A\tN\/A\tN\/A\t";}
+					elsif ($type eq 'rRNA'){print FEAT "N\/A\tN\/A\tN\/A\tN\/A\t";}
 					elsif ($type eq 'CDS'){
 						if (($strand  eq '+') || ($strand  eq 'plus')){
 							if (($position - $start) == 0){
@@ -223,7 +269,7 @@ while (my $vcf = shift@vcf){
 							}
 						}
 					}
-					print TABLE "$freq\t$evalue\n";
+					print FEAT "$freq\t$evalue\n";
 				}
 			}
 			else {print INTER "$contig\t$vcf\tintergenic\t$position\t$ref\t$alt\t$freq\t$evalue\n"}
@@ -238,9 +284,9 @@ sub rev{
 }
 sub translation{
 	$codon = uc($codon); $snp = uc($snp);
-	if ($codon =~ /[^ATGCatgc]/){print TABLE "ambiguous bases\t$gc\t$codon\t$snp\t";}
-	elsif ($gcodes{$gc}{$codon} eq $gcodes{$gc}{$snp}){print TABLE "synonym\t$gc\t$codon\t$snp\t";}
-	elsif ($gcodes{$gc}{$codon} ne $gcodes{$gc}{$snp}){print TABLE "non-syn\t$gc\t$codon\t$snp\t";}
+	if ($codon =~ /[^ATGCatgc]/){print FEAT "ambiguous bases\t$gc\t$codon\t$snp\t";}
+	elsif ($gcodes{$gc}{$codon} eq $gcodes{$gc}{$snp}){print FEAT "synonym\t$gc\t$codon\t$snp\t";}
+	elsif ($gcodes{$gc}{$codon} ne $gcodes{$gc}{$snp}){print FEAT "non-syn\t$gc\t$codon\t$snp\t";}
 }
 sub gcodes{ ## NCBI Genetic codes
 	%gcodes = (
