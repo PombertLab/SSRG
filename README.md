@@ -71,8 +71,9 @@ The default location of the VarScan2 jar file can be updated in [get_SNPs.pl](ht
 my $varjar = '/opt/varscan/VarScan.v2.4.4.jar';
 ```
 
-### Installing dependencies
+#### Installing dependencies
 ##### ***On Fedora/RedHat***
+If starting from a fresh Fedora install, the following packages can be install from the dnf package manager to facililate the installation of read mappers and other tools from the source code.
 ```bash
 sudo dnf install \
   perl \
@@ -91,10 +92,8 @@ sudo dnf install \
   java-1.?.?-openjdk \
   java-1.?.?-openjdk-devel
 ```
-
-##### ***R***
-
-To install R dependencies, type:
+##### ***R packages***
+To install R data visualization packages, type:
 ```bash
 R
 ```
@@ -111,9 +110,6 @@ install.packages("Rtsne")
 quit()
 ```
 
-
-
-To perform genetic distance estimations, [Mash](https://github.com/marbl/Mash) by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/) is required. It is available [here](https://github.com/marbl/Mash/releases).
 
 ### Testing the installation
 ##### SSRG workflow
