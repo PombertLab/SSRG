@@ -6,14 +6,13 @@ The [SSRG pipeline](https://github.com/PombertLab/SSRG) was created as a simple 
 
 People interested in ***point mutations*** should use the read-mapping/variant calling workflow. The unique feature of the SSRG pipeline resides in the creation with [SSRG.pl](https://github.com/PombertLab/SSRG/blob/master/SSRG.pl) of synthetic short reads  from complete or draft genomes, which can then be fed to the read mapping/variant calling tools. Note that this approach works only for haploid genomes. Alternatively, users can select any FASTQ dataset to use with [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl).
 
-People interested in ***genetic distances*** should use the genetic distance estimation workflow. This workflow is based on [Mash](https://github.com/marbl/Mash), an excellent tool developed by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/). Genetic distances can be plotted as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
+People interested in ***genetic distances*** should use the genetic distance estimation workflow. This workflow is based on [Mash](https://github.com/marbl/Mash), an excellent tool developed by [Ondov *et al.*](https://pubmed.ncbi.nlm.nih.gov/27323842/), and focuses on data visualization. Genetic distances can be plotted as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
 ## Table of contents
 * [Introduction](#introduction)
-* [Installation](#installation)
-  * [Requirements](#requirements)
-    * [Compatible read aligners](#compatible-read-aligners)
-    * [Compatible variant callers](#compatible-variant-callers)
+* [Requirements](#requirements)
+  * [Compatible read aligners](#compatible-read-aligners)
+  * [Compatible variant callers](#compatible-variant-callers)
   * [Downloading from GitHub](#downloading-from-github)
   * [Installing dependencies](#installing-dependencies)
   * [Testing the installation (with cases examples)](#testing-the-installation)
@@ -42,8 +41,7 @@ Assessing the genetic diversity between genomes often involves the calculation o
 2)	Calculate pairwise SNPs between FASTQ sequences and reference genomes using standard read mapping approaches.
 3)	Run [Mash](https://github.com/marbl/Mash) and plot the estimated genetic distances as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
-## Installation
-##### Requirements
+## Requirements
 - Unix/Linux, MacOS X, or WSL2
 - [Perl 5](https://www.perl.org/), [R](https://www.r-project.org/), and [Java](https://www.java.com/) (for VarScan2)
 - [Samtools](http://www.htslib.org/) 1.3.1+
