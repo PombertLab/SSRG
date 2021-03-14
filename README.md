@@ -111,7 +111,7 @@ quit()
 
 
 ## Examples
-Lists of genomes for organisms of interest can be downloaded from [NCBI](https://www.ncbi.nlm.nih.gov/genome/browse#!/overview/). 
+Comma-separated (.csv) lists of genomes for organisms of interest can be downloaded from [NCBI](https://www.ncbi.nlm.nih.gov/genome/browse#!/overview/). 
 <p align="center"><img src="https://github.com/PombertLab/SSRG/blob/master/Images/NCBI_g1.png" alt="The NCBI Genome Information by Organism page" width="900"></p>
 
 This can be done by entering a query in the search box, then by clicking on the lineage link next to ***Overview***. This links redirects to the corresponding genomes in NCBI. 
