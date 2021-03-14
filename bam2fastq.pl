@@ -27,8 +27,8 @@ OPTIONS:
 
 ## SAM/BAM flag options
 -a (--auto)	Extract reads automatically: map or unmap
--f SAM/BAM flag -f # https://www.samformat.info/sam-format-flag
--g SAM/BAM flag -F # https://www.samformat.info/sam-format-flag
+-f SAM/BAM (-f) flag # https://www.samformat.info/sam-format-flag
+-g SAM/BAM (-F) flag # https://www.samformat.info/sam-format-flag
 OPTIONS
 die "\n$usage\n" unless @ARGV;
 
