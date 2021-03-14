@@ -70,54 +70,17 @@ while (my $line = <FASTA>){
 	else{ $sequences{$contig} .= $line; }
 }
 
-## Creating output directory + output files
+## Creating output directory
 unless (-d $outdir){ mkdir ($outdir,0755) or die "Can't create folder $outdir: $!\n"; }
-open FEAT, ">", "${outdir}/$prefix.features.tsv" or die "Can't create file ${outdir}/$prefix.features.tsv: $!\n";
-open INTER, ">", "${outdir}/$prefix.intergenic.tsv" or die "Can't create file ${outdir}/$prefix.intergenic.tsv: $!\n";
 
-my @feat_headers = (
-	'Locus_tag',
-	'Reference Contig',
-	'VCF file',
-	'Type',
-	'Start',
-	'End',
-	'Strandedness',
-	'Product',
-	'Variant Position',
-	'Reference',
-	'Variant',
-	'Synonymy',
-	'Genetic Code',
-	'RefCodon',
-	'VarCodon',
-	'Frequency',
-	'E-value'
-);
-for (0..$#feat_headers-1){ print FEAT "$feat_headers[$_]\t"; }
-print FEAT "$feat_headers[-1]\n";
-
-my @inter_headers = (
-	'Reference Contig',
-	'VCF file',
-	'Type',
-	'Variant Position',
-	'Reference',
-	'Variant',
-	'Frequency',
-	'E-value'
-);
-for (0..$#inter_headers-1){ print INTER "$inter_headers[$_]\t"; }
-print INTER "$inter_headers[-1]\n";
-
-## Building hashes of features. Must simplify the data structure to one hash of features. Will be easier to adapt for input files. Working multiline would do it.
+## Building hashes of features. Must simplify the data structure to one hash of features. 
+## Will be easier to adapt for input files. Working multiline would do it.
 open REF, "<", "$ref" or die "Can't read reference file $ref: $!\n";
 my %genes, my %features; my %hashes; ## hash of hashes for contigs and their feature locations
 my $type; my $start; my $end; my $strand; my $id; my $locus_tag; my $parent; my $product; my $key;
 if ($format eq 'gff'){
 	while (my $line = <REF>){
 		chomp $line;
-		## Looking at GFF files
 		if ($line =~ /^#/){next;}
 		elsif ($line =~ /^ID=/){next;}
 		elsif ($line =~ /^(\S+)\t.*\t(gene|pseudogene)\t(\d+)\t(\d+)\t\.\t([+-])\t[.012]\tID=(\w+).*\;locus_tag=([A-Za-z0-9 _]+)/){ ## Working on locus_tags
@@ -176,11 +139,60 @@ elsif ($format eq 'gb'){
 		}
 	}
 }
+
+## Populating genetic code from subroutine
+my %gcodes; gcodes();
+
 ## Working on VCF files
 my $codon; my $snp; my $revcodon; my $revsnp; my $locus;
-my %gcodes; gcodes();
 while (my $vcf = shift@vcf){
+	
+	## Reading VCF file
 	open VCF, "<", "$vcf" or die "Can't read VCF file $vcf: $!\n";
+	my $basename = fileparse($vcf);
+	$basename =~ s/\.\w+$//;
+
+	## Creating output tables per VCF
+	my $feature_table = "${outdir}/$basename.$prefix.features.tsv";
+	my $intergenic_table = "${outdir}/$basename.$prefix.intergenic.tsv";
+	open FEAT, ">", "$feature_table" or die "Can't create $feature_table: $!\n";
+	open INTER, ">", "$intergenic_table" or die "Can't create $intergenic_table: $!\n";
+
+	my @feat_headers = (
+		'Locus_tag',
+		'Reference Contig',
+		'VCF file',
+		'Type',
+		'Start',
+		'End',
+		'Strandedness',
+		'Product',
+		'Variant Position',
+		'Reference',
+		'Variant',
+		'Synonymy',
+		'Genetic Code',
+		'RefCodon',
+		'VarCodon',
+		'Frequency',
+		'E-value'
+	);
+	for (0..$#feat_headers-1){ print FEAT "$feat_headers[$_]\t"; }
+	print FEAT "$feat_headers[-1]\n";
+
+	my @inter_headers = (
+		'Reference Contig',
+		'VCF file',
+		'Type',
+		'Variant Position',
+		'Reference',
+		'Variant',
+		'Frequency',
+		'E-value'
+	);
+	for (0..$#inter_headers-1){ print INTER "$inter_headers[$_]\t"; }
+	print INTER "$inter_headers[-1]\n";
+
 	while (my $line = <VCF>){
 		chomp $line;
 		if ($line =~ /^#/){next;}
