@@ -127,6 +127,15 @@ queryNCBI.pl \
    -fa \
    -gb
 ```
+Options for [queryNCBI.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/NCBI/queryNCBI.pl) are:
+```
+-l (--list)	TAB/CSV-delimited list from NCBI
+-o (--outdir)	Output directory [Default: ./]
+-fa (--fasta)	Retrieve fasta files
+-gb (--genbank)	Retrieve GenBank annotation files (.gbk; if available)
+-p (--protein)	Retrieve protein sequences (.faa; if available)
+-cds		Retrieve protein coding sequences (.fna; if available)
+```
 
 2. FASTQ datasets can be generated from the downloaded genomes with [SSRG.pl](https://github.com/PombertLab/SSRG/blob/master/SSRG.pl).
 ```bash
@@ -134,6 +143,20 @@ SSRG.pl \
    -f DATASETS/*.fasta \
    -o FASTQ \
    -r 250
+```
+
+Options for [SSRG.pl](https://github.com/PombertLab/SSRG/blob/master/SSRG.pl) are:
+```
+ -f (--fasta)		Fasta/multifasta file(s)
+ -o (--outdir)		Output directory [Default: ./]
+ -l (--list)		List of fasta file(s), one per line
+ -r (--readsize)	Desired read size [default: 150]
+ -t (--type)		Read type: single (SE) or paired ends (PE) [default: PE]
+ -i (--insert)		PE insert size [default: 350]
+ -s (--sdev)		PE insert size standard deviation (in percentage) [default: 10]
+ -c (--coverage)	Desired sequencing depth [default: 50]
+ -qs (--qscore)		Quality score associated with each base [default: 30]
+ -q64          		Use the old Illumina Q64 FastQ format instead of the default Q33 Sanger/Illumina 1.8+ encoding
 ```
 
 3. To test the read-mapping step with [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) but skip variant calling, type:
@@ -168,7 +191,47 @@ get_SNPs.pl \
 	-var /opt/varscan/VarScan.v2.4.4.jar ## Replace jar file location accordingly
 ```
 
-5. To checking for synonymous/non-synonymous SNPs against a reference genome (*e.g. Streptococcus pneumoniae* R6):
+Options for [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) are:
+```
+-h (--help)	Display this list of options
+-v (--version)	Display script version
+-o (--outdir)	Output directory [Default: ./]
+
+### Mapping options ###
+-fa (--fasta)			Reference genome(s) in fasta file
+-fq (--fastq)			Fastq reads (single ends) to be mapped against reference(s)
+-pe1				Fastq reads #1 (paired ends) to be mapped against reference(s)
+-pe2				Fastq reads #2 (paired ends) to be mapped against reference(s)
+-mapper				Read mapping tool: bowtie2, minimap2, ngmlr or hisat2 [default: minimap2]
+-threads			Number of processing threads [default: 16]
+-mem				Max total memory for samtools (in Gb) [default: 16] ## mem/threads = memory per thread
+-bam				Keeps BAM files generated
+-idx (--index)		Type of bam index generated (bai or csi) [default = bai]
+-sam				Keeps SAM files generated; SAM files can be quite large
+-rmo (--read_mapping_only)	Do not perform variant calling; useful when only interested in bam/sam files and/or mapping stats
+-ns (--no_stats)		Do not calculate stats; stats can take a while to compute for large eukaryote genomes
+
+### Mapper-specific options ###
+-X				BOWTIE2 - Maximum paired ends insert size [default: 750]
+-preset				MINIMAP2 - Preset: sr, map-ont, map-pb or asm20 [default: sr]
+-algo				BWA - Mapping algorithm:  bwasw, mem, samse [default: mem]
+### Variant calling options ###
+-caller				[default: varscan2]	## Variant caller: varscan2, bcftools or freebayes
+-type				[default: snp]		## snp, indel, or both
+-ploidy				[default: 1]		## FreeBayes/BCFtools option; change ploidy (if needed)
+
+### VarScan2 parameters ### see http://dkoboldt.github.io/varscan/using-varscan.html
+-var				[default: /opt/varscan/VarScan.v2.4.4.jar]	## Which varscan jar file to use
+-mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
+-mr (--min-reads2)		[default: 15]		## Minimum supporting reads at a position to call variants
+-maq (--min-avg-qual)		[default: 28]		## Minimum base quality at a position to count a read
+-mvf (--min-var-freq)		[default: 0.7]		## Minimum variant allele frequency threshold
+-mhom (--min-freq-for-hom)	[default: 0.75]		## Minimum frequency to call homozygote
+-pv (--p-value)			[default: 1e-02]	## P-value threshold for calling variants 
+-sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
+```
+
+5. To checking for synonymous/non-synonymous SNPs against a reference genome (*e.g. Streptococcus pneumoniae* R6) with [synonymy.pl](https://github.com/PombertLab/SSRG/blob/master/synonymy.pl), type:
 ```bash
 synonymy.pl \
 	-gcode 11 \
@@ -179,28 +242,50 @@ synonymy.pl \
 	-o synonymy
 ```
 
-#### Mash workflow
-###### Case example with Mash, R and 75 *Streptococcus pneumoniae* genomes
-1. Download a CSV list of 75 *Streptococcus pneumoniae* genomes. ## This list was generated from the NCBI genome database (https://www.ncbi.nlm.nih.gov/genome/browse/#!/prokaryotes/176/)
-```bash
-wget https://raw.githubusercontent.com/PombertLab/SSRG/master/Examples/S_pneumoniae_75.csv
+Options for [synonymy.pl](https://github.com/PombertLab/SSRG/blob/master/synonymy.pl) are:
+```
+-h (--help)	Display this list of options
+-v (--version)	Display script version
+-fa (--fasta)	Reference genome in fasta format
+-r (--ref)	Reference genome annotation in GBK or GFF format
+-f (--format)	Reference file format; gb or gff [default: gff]
+-vcf (--vcf)	SNPs in Variant Calling Format (VCF)
+-o (--output)	Table prefix [Default: synonymy] The .features/.intergenic suffixes and .tsv file extension will be added automatically.
+-gc (--gcode)	NCBI genetic code; e.g.:
+		1  - The Standard Code
+		2  - The Vertebrate Mitochondrial Code
+		3  - The Yeast Mitochondrial Code
+		4  - The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code
+		11 - The Bacterial, Archaeal and Plant Plastid Code
+		NOTE - For complete list; see https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi
 ```
 
-2. Download the FASTA files automatically with [queryNCBI.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/NCBI/queryNCBI.pl), then run Mash with [run_Mash.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/run_Mash.pl).
+#### Mash workflow
+###### Case example with Mash, R and 75 *Streptococcus pneumoniae* genomes
+1. To download FASTA and GenBank files from a CSV list of 75 *Streptococcus pneumoniae* genomes, type:
 ```bash
-mkdir FASTA; cd FASTA/;
-queryNCBI.pl -l ../S_pneumoniae_75.csv -fa
-run_Mash.pl -f *.fasta -o ../S_pneumoniae_75.mash
-cd ../
+queryNCBI.pl \
+   -l Examples/S_pneumoniae_75.csv \
+   -o DATASETS \
+   -fa
 ```
-3. Convert the Mash output to a distance matrix with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashToDistanceMatrix.pl).
+
+2. To run Mash on the downloaded FASTA files with [run_Mash.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/run_Mash.pl), type:
+```bash
+run_Mash.pl \
+   -f *.fasta \
+   -o S_pneumoniae_75.mash
+```
+
+3. To convert the Mash output to a distance matrix with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashToDistanceMatrix.pl), type:
 ```bash
 MashToDistanceMatrix.pl  \
 	-i S_pneumoniae_75.mash \
 	-o S_pneumoniae_75 \
 	-f tsv
 ```
-4. Generate a quick neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar to [S_pneumoniae_75_NJ_tree.pdf](https://github.com/PombertLab/SSRG/blob/master/Images/S_pneumoniae_75_NJ_tree.pdf) from the Misc subdirectory.
+
+4. To generate a quick neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl), tyoe:
 ```bash
 MashR_plotter.pl \
 	-i S_pneumoniae_75.tsv \
@@ -211,7 +296,9 @@ MashR_plotter.pl \
 	-o S_pneumoniae_75_NJ_tree \
 	-he 20
 ```
-5. Generate a quick heatmap with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar to [S_pneumoniae_75_heatmap.pdf](https://github.com/PombertLab/SSRG/blob/master/Images/S_pneumoniae_75_heatmap.pdf) from the Misc subdirectory.
+The PDF generated should be similar to [S_pneumoniae_75_NJ_tree.pdf](https://github.com/PombertLab/SSRG/blob/master/Images/S_pneumoniae_75_NJ_tree.pdf) from the [Images/](https://github.com/PombertLab/SSRG/tree/master/Images) directory.
+
+5. To generate a quick heatmap with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl), type:
 ```bash
 MashR_plotter.pl \
 	-i S_pneumoniae_75.tsv \
@@ -223,7 +310,9 @@ MashR_plotter.pl \
 	-he 20 \
 	-wd 20
 ```
-6. Generate a quick t-SNE multidimensional reduction plot with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar, ***but not identical***, to [S_pneumoniae_75_tSNE.pdf](https://github.com/PombertLab/SSRG/blob/master/Images/S_pneumoniae_75_tSNE.pdf) from the Misc subdirectory. ## t-SNE graphs are generated using random seeds, which affect how the distances are represented in 2D.
+The PDF generated should be similar to [S_pneumoniae_75_heatmap.pdf](https://github.com/PombertLab/SSRG/blob/master/Images/S_pneumoniae_75_heatmap.pdf) from the [Images/](https://github.com/PombertLab/SSRG/tree/master/Images) directory.
+
+6. To generate a quick t-SNE multidimensional reduction plot with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl), type:
 ```bash
 MashR_plotter.pl \
 	-i S_pneumoniae_75.tsv \
@@ -239,6 +328,7 @@ MashR_plotter.pl \
 	-lb \
 	-fs 25
 ```
+The PDF generated should be similar, ***but not identical***, to [S_pneumoniae_75_tSNE.pdf](https://github.com/PombertLab/SSRG/blob/master/Images/S_pneumoniae_75_tSNE.pdf) from the [Images/](https://github.com/PombertLab/SSRG/tree/master/Images) directory. t-SNE graphs are generated using random seeds, which affect how the distances are represented in 2D.
 
 ## Funding and acknowledgments
 This work was supported in part by the National Institute of Allergy and Infectious Diseases of the National Institutes of Health (award number R15AI128627) to Jean-Francois Pombert. The content is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health.
