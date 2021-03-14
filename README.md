@@ -13,7 +13,7 @@ People interested in ***genetic distances*** should use the genetic distance est
 * [Requirements](#Requirements)
   * [Downloading from GitHub](#downloading-from-github)
   * [Installing dependencies](#installing-dependencies)
-* [Examples)](#Examples)
+* [Examples](#Examples)
     * [SSRG workflow](#SSRG-workflow)
     * [Mash workflow](#Mash-workflow)
 * [Detailed options](#detailed-options)
@@ -35,7 +35,7 @@ Assessing the genetic diversity between genomes often involves the calculation o
 -	Because bases from complete or draft genomes have been queried multiple times by the sequencing depth, the underlying confidence in the base being called is higher than from single sequencing reads (assuming of course that the corresponding loci in the assembled genomes are error-free). This in turn should lead to fewer problems caused by sequencing errors.
 
 ##### The SSRG pipeline currently can:
-1)	Download genomes automatically from NCBI using a CSV/Tab-delimited list of desired operational taxonomic units (OTU)
+1)	Download genomes automatically from [NCBI](https://www.ncbi.nlm.nih.gov/genome/browse#!/overview/) using a CSV/Tab-delimited list of desired operational taxonomic units (OTU)
 2)	Calculate pairwise SNPs between FASTQ sequences and reference genomes using standard read mapping approaches.
 3)	Run [Mash](https://github.com/marbl/Mash) and plot the estimated genetic distances as heatmaps, neighbor-joining trees, or clusters (using dimensionality reduction techniques).
 
