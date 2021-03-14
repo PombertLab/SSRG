@@ -42,12 +42,12 @@ Assessing the genetic diversity between genomes often involves the calculation o
 
 ## Requirements
 - [Perl 5](https://www.perl.org/)
-###### For read mapping
+#### For read mapping
 - [Samtools](http://www.htslib.org/) 1.3.1+
 - [Minimap2](https://github.com/lh3/minimap2) 2.14+
 - [VarScan2](http://dkoboldt.github.io/varscan/) 2.4.2+
 - [Java](https://www.java.com/) (for VarScan2)
-###### For genetic distance estimations with Mash
+#### For genetic distance estimations with Mash
 - [Mash](https://github.com/marbl/Mash)
 - [R](https://www.r-project.org/)
 
