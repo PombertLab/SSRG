@@ -16,7 +16,6 @@ People interested in ***genetic distances*** should use the genetic distance est
 * [Examples)](#Examples)
     * [SSRG workflow](#SSRG-workflow)
     * [Mash workflow](#Mash-workflow)
-
 * [Detailed options](#detailed-options)
   * [Read mapping + variant calling](#read-mapping-and-variant-calling)
     * [Synthetic reads](#synthetic-reads)
