@@ -249,7 +249,6 @@ synonymy.pl \
 	-format gb \
 	-vcf RESULTS/minimap2.varscan2.VCFs/*.vcf \
 	-o SYNONYMY \
-	-p synonymy \
 	-v
 ```
 
