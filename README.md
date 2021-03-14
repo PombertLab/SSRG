@@ -14,6 +14,7 @@ People interested in ***genetic distances*** should use the genetic distance est
   * [Downloading from GitHub](#downloading-from-github)
   * [Installing dependencies](#installing-dependencies)
 * [Examples](#Examples)
+    * [Creating NCBI genome lists](#Creating-NCBI-genome-lists)
     * [SSRG workflow](#SSRG-workflow)
     * [Mash workflow](#Mash-workflow)
 * [Detailed options](#detailed-options)
@@ -111,6 +112,7 @@ quit()
 
 
 ## Examples
+#### Creating NCBI genome lists
 Comma-separated (.csv) lists of genomes for organisms of interest can be downloaded from [NCBI](https://www.ncbi.nlm.nih.gov/genome/browse#!/overview/).
 <p align="center"><img src="https://github.com/PombertLab/SSRG/blob/master/Images/NCBI_g1.png" alt="The NCBI Genome Information by Organism page" width="900"></p>
 
