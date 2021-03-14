@@ -25,10 +25,10 @@ OPTIONS:
 -p (--prefix)	Output file(s) prefix ## Defaults to bam file name if not set
 -s (--suffix)	Output file(s) suffix [Default: fastq]
 
-## BAM flag options
+## SAM/BAM flag options
 -a (--auto)	Extract reads automatically: map or unmap
--f BAM flag -f
--g BAM flag -F
+-f SAM/BAM flag -f # https://www.samformat.info/sam-format-flag
+-g SAM/BAM flag -F # https://www.samformat.info/sam-format-flag
 OPTIONS
 die "\n$usage\n" unless @ARGV;
 
