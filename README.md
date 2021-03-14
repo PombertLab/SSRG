@@ -298,7 +298,7 @@ run_Mash.pl \
    -n S_pneumoniae_75.mash
 ```
 
-Options for [run_Mash.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/run_Mash.pl)] are:
+Options for [run_Mash.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/run_Mash.pl) are:
 ```
 -f (--fasta)	Reference genome(s) in fasta file
 -o (--outdir)	Output directory [Default: ./]
@@ -315,7 +315,7 @@ MashToDistanceMatrix.pl  \
 	-f tsv
 ```
 
-Options for [MashToDistanceMatrix.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashToDistanceMatrix.pl)] are:
+Options for [MashToDistanceMatrix.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashToDistanceMatrix.pl) are:
 ```
 -i (--input)	Mash output file
 -o (--outdir)	Output folder [Default: ./]
