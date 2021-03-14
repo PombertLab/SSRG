@@ -11,8 +11,7 @@ People interested in ***genetic distances*** should use the genetic distance est
 ## Table of contents
 * [Introduction](#introduction)
 * [Requirements](#requirements)
-  * [Compatible read aligners](#compatible-read-aligners)
-  * [Compatible variant callers](#compatible-variant-callers)
+* [Compatible read mappers and variant callers](#compatible-read-mappers-and-variant-callers)
   * [Downloading from GitHub](#downloading-from-github)
   * [Installing dependencies](#installing-dependencies)
   * [Testing the installation (with cases examples)](#testing-the-installation)
@@ -47,13 +46,13 @@ Assessing the genetic diversity between genomes often involves the calculation o
 - [Samtools](http://www.htslib.org/) 1.3.1+
 - [Mash](https://github.com/marbl/Mash) (for genetic distance estimations)
 
-##### Compatible read aligners
+## Compatible read mapper and variant callers
+##### Read mappers
 - [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) 2.2.9+
 - [HISAT2](https://ccb.jhu.edu/software/hisat2/index.shtml) 2.0+
 - [Minimap2](https://github.com/lh3/minimap2) 2.14+ (recommended)
 - [NGMLR](https://github.com/philres/ngmlr) 0.2.7+ (partial support)
-
-##### Compatible variant callers
+##### Variant callers
 - [VarScan2](http://dkoboldt.github.io/varscan/) 2.4.2+
 - [BCFtools](http://samtools.github.io/bcftools/) 1.3.1+
 - [FreeBayes](https://github.com/ekg/freebayes)
