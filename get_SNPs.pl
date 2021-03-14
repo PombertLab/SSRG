@@ -41,6 +41,7 @@ OPTIONS:
 -threads			Number of processing threads [default: 16]
 -mem				Max total memory for samtools (in Gb) [default: 16] ## mem/threads = memory per thread
 -bam				Keeps BAM files generated
+-idx (--index)		Type of bam index generated (bai or csi) [default = bai]
 -sam				Keeps SAM files generated; SAM files can be quite large
 -rmo (--read_mapping_only)	Do not perform variant calling; useful when only interested in bam/sam files and/or mapping stats
 -ns (--no_stats)		Do not calculate stats; stats can take a while to compute for large eukaryote genomes
@@ -48,6 +49,7 @@ OPTIONS:
 ### Mapper-specific options ###
 -X				BOWTIE2 - Maximum paired ends insert size [default: 750]
 -preset				MINIMAP2 - Preset: sr, map-ont, map-pb or asm20 [default: sr]
+-algo				BWA - Mapping algorithm:  bwasw, mem, samse [default: mem]
 
 ### Variant calling options ###
 -caller				[default: varscan2]	## Variant caller: varscan2, bcftools or freebayes
@@ -74,6 +76,7 @@ my $outdir = './';
 my $mapper = 'minimap2';
 my $threads = 16;
 my $mem = 16;
+my $index = "bai";
 my $sam = '';
 my $bam = '';
 my @fasta;
@@ -86,7 +89,7 @@ my $nostat;
 ## Mapper-specific
 my $maxins = '750';
 my $preset = 'sr';
-
+my $algo = 'mem';
 ## Variant calling
 my $caller = 'varscan2';
 my $type = 'snp';
@@ -111,6 +114,7 @@ GetOptions(
 	'mapper=s' => \$mapper,
 	'threads=i' => \$threads,
 	'mem=i' => \$mem,
+	'idx|index=s' => \$index,
 	'sam' => \$sam,
 	'bam' => \$bam,
 	'fa|fasta=s@{1,}' => \@fasta,
@@ -123,7 +127,7 @@ GetOptions(
 	## Mapper-specific
 	'X=i' => \$maxins,
 	'preset=s' => \$preset,
-	
+	'algo=s' => \$algo,
 	## Variant calling
 	'caller=s' => \$caller,
 	'type=s' => \$type,
@@ -408,7 +412,9 @@ sub samtools{
 	print "Using $sammem Mb per thread for samtools\n";
 	system "samtools view -@ $threads -bS ${outdir}/$file.$fa.$mapper.sam -o ${outdir}/$file.$fa.bam";
 	system "samtools sort -@ $threads -m ${sammem}M -o ${outdir}/$file.$fa.$mapper.bam ${outdir}/$file.$fa.bam";
-	system "samtools index -@ $threads -m ${sammem}M ${outdir}/$file.$fa.$mapper.bam";
+	my $idx;
+	if($index eq 'bai') { $idx = '-b'; } else { $idx = '-c'; }
+	system "samtools index $idx -@ $threads -m ${sammem}M ${outdir}/$file.$fa.$mapper.bam";
 	system "samtools depth -aa ${outdir}/$file.$fa.$mapper.bam > ${outdir}/$file.$fa.$mapper.coverage"; ## Printing per base coverage information
 	system "rm ${outdir}/$file.$fa.bam"; ## Discarding unsorted BAM file
 	$flagstat = `samtools flagstat ${outdir}/$file.$fa.$mapper.bam`;
