@@ -127,6 +127,7 @@ queryNCBI.pl \
    -fa \
    -gb
 ```
+
 Options for [queryNCBI.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/NCBI/queryNCBI.pl) are:
 ```
 -l (--list)	TAB/CSV-delimited list from NCBI
@@ -269,6 +270,16 @@ queryNCBI.pl \
    -l Examples/S_pneumoniae_75.csv \
    -o DATASETS \
    -fa
+```
+
+Options for [queryNCBI.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/NCBI/queryNCBI.pl) are:
+```
+-l (--list)	TAB/CSV-delimited list from NCBI
+-o (--outdir)	Output directory [Default: ./]
+-fa (--fasta)	Retrieve fasta files
+-gb (--genbank)	Retrieve GenBank annotation files (.gbk; if available)
+-p (--protein)	Retrieve protein sequences (.faa; if available)
+-cds		Retrieve protein coding sequences (.fna; if available)
 ```
 
 2. To run Mash on the downloaded FASTA files with [run_Mash.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/run_Mash.pl), type:
