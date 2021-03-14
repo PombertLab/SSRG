@@ -178,7 +178,8 @@ if ($type eq 'cluster'){
 		if ($cmode eq 'rainbow'){print OUT 'palette('."$cmode".'('."$nclust".'))'."\n";}
 		elsif ($cmode eq 'none'){}
 		else{print OUT 'palette('."$cmode".'.colors('."$nclust".'))'."\n";}
-		print OUT 'tsne <- Rtsne(distance_matrix[,-1], dims = '."$dimensions".', perplexity='."$perplexity".', check_duplicates=FALSE, is_distance=TRUE, verbose=TRUE, max_iter = '."$iterations".')$Y'."\n";
+		print OUT 'tsne <- Rtsne(distance_matrix[,-1], dims = '."$dimensions".', perplexity='."$perplexity";
+		print OUT ', check_duplicates=FALSE, is_distance=TRUE, verbose=TRUE, max_iter = '."$iterations".')$Y'."\n";
 		if ($edge){$edge = ' t="o",';}
 		my $id = '$clustering'; if ($cluster eq 'kmeans'){$id = '$cluster'}
 		if ($cmode eq 'none'){
