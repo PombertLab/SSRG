@@ -112,7 +112,10 @@ quit()
 
 ## Examples
 
-Genomes for organisms of interest can be downloaded from [NCBI](https://www.ncbi.nlm.nih.gov/genome/browse#!/overview/). Insert examples and images....
+Lists of genomes for organisms of interest can be downloaded from [NCBI](https://www.ncbi.nlm.nih.gov/genome/browse#!/overview/). This can be done by entering a query in the search box, then by clicking on the lineage link next to **Overview**. This links redirects to the corresponding genomes in NCBI. Filters can be applied, then the list of corresponding genomes downloaded. Note that while the tooltip displays TSV Download, the file downloaded will be in CSV format.
+<p align="center"><img src="https://github.com/PombertLab/SSRG/blob/master/Images/NCBI_g1.png" alt="The NCBI Genome Information by Organism page" width="900"></p>
+<p align="center"><img src="https://github.com/PombertLab/SSRG/blob/master/Images/NCBI_g2.png" alt="Searching the NCBI Genome Information page" width="900"></p>
+<p align="center"><img src="https://github.com/PombertLab/SSRG/blob/master/Images/NCBI_g3.png" alt="Filtering the queries for complete genomes" width="900"></p>
 
 #### SSRG workflow
 ###### A case example with Minimap2, VarScan2 and 3 *Streptococcus pneumoniae* genomes
