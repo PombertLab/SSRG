@@ -72,7 +72,7 @@ my $varjar = '/opt/varscan/VarScan.v2.4.4.jar';
 
 #### Installing dependencies
 ##### ***On Fedora/RedHat***
-If starting from a fresh Fedora install, the following packages can be install from the dnf package manager to facililate the installation of read mappers and other tools from the source code.
+On a Fedora distribution, the following packages can be installed with the DNF package manager to facililate the installation/compilation of read mappers and other tools from the source code.
 ```bash
 sudo dnf install \
   perl \
