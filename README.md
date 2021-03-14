@@ -60,12 +60,12 @@ export PATH=$PATH:$(pwd)/
 export PATH=$PATH:$(pwd)/Tools/MASH
 export PATH=$PATH:$(pwd)/Tools/NCBI
 ```
-If desired, the default location of the VarScan2 jar file can be updated in [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) by modifying the following line:
+If desired, the default location of the [VarScan2](http://dkoboldt.github.io/varscan/) jar file can be updated in [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) by modifying the following line:
 ```perl
 my $varjar = '/opt/varscan/VarScan.v2.4.4.jar';
 ```
 
-If an error message appears relating to a corrupted jar file, download varscan with curl rather than git clone. To download the latest varscan2 with curl, type:
+If an error message appears relating to a corrupted jar file, download varscan with curl rather than git clone. To download the latest [VarScan2](http://dkoboldt.github.io/varscan/) with curl, type:
 ```Bash
 curl \
    -o VarScan.v2.4.4.jar \
