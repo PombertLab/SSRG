@@ -215,6 +215,7 @@ Options for [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNP
 -X				BOWTIE2 - Maximum paired ends insert size [default: 750]
 -preset				MINIMAP2 - Preset: sr, map-ont, map-pb or asm20 [default: sr]
 -algo				BWA - Mapping algorithm:  bwasw, mem, samse [default: mem]
+
 ### Variant calling options ###
 -caller				[default: varscan2]	## Variant caller: varscan2, bcftools or freebayes
 -type				[default: snp]		## snp, indel, or both
