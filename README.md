@@ -206,7 +206,7 @@ MashToDistanceMatrix.pl  \
 	-o S_pneumoniae_75 \
 	-f tsv
 ```
-4. Generate a quick neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar to [S_pneumoniae_75_NJ_tree.pdf](https://github.com/PombertLab/SSRG/blob/master/Examples/S_pneumoniae_75_NJ_tree.pdf) from the Misc subdirectory.
+4. Generate a quick neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar to [S_pneumoniae_75_NJ_tree.pdf](https://github.com/PombertLab/SSRG/blob/master/Images/S_pneumoniae_75_NJ_tree.pdf) from the Misc subdirectory.
 ```bash
 MashR_plotter.pl \
 	-i S_pneumoniae_75.tsv \
@@ -217,7 +217,7 @@ MashR_plotter.pl \
 	-o S_pneumoniae_75_NJ_tree \
 	-he 20
 ```
-5. Generate a quick heatmap with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar to [S_pneumoniae_75_heatmap.pdf](https://github.com/PombertLab/SSRG/blob/master/Examples/S_pneumoniae_75_heatmap.pdf) from the Misc subdirectory.
+5. Generate a quick heatmap with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar to [S_pneumoniae_75_heatmap.pdf](https://github.com/PombertLab/SSRG/blob/master/Images/S_pneumoniae_75_heatmap.pdf) from the Misc subdirectory.
 ```bash
 MashR_plotter.pl \
 	-i S_pneumoniae_75.tsv \
@@ -229,7 +229,7 @@ MashR_plotter.pl \
 	-he 20 \
 	-wd 20
 ```
-6. Generate a quick t-SNE multidimensional reduction plot with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar, ***but not identical***, to [S_pneumoniae_75_tSNE.pdf](https://github.com/PombertLab/SSRG/blob/master/Examples/S_pneumoniae_75_tSNE.pdf) from the Misc subdirectory. ## t-SNE graphs are generated using random seeds, which affect how the distances are represented in 2D.
+6. Generate a quick t-SNE multidimensional reduction plot with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl). The PDF generated should be similar, ***but not identical***, to [S_pneumoniae_75_tSNE.pdf](https://github.com/PombertLab/SSRG/blob/master/Images/S_pneumoniae_75_tSNE.pdf) from the Misc subdirectory. ## t-SNE graphs are generated using random seeds, which affect how the distances are represented in 2D.
 ```bash
 MashR_plotter.pl \
 	-i S_pneumoniae_75.tsv \
