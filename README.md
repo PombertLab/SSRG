@@ -14,15 +14,9 @@ People interested in ***genetic distances*** should use the genetic distance est
   * [Downloading from GitHub](#downloading-from-github)
   * [Installing dependencies](#installing-dependencies)
 * [Examples](#Examples)
-    * [Creating NCBI genome lists](#Creating-NCBI-genome-lists)
-    * [SSRG workflow](#SSRG-workflow)
-    * [Mash workflow](#Mash-workflow)
-* [Detailed options](#detailed-options)
-  * [Read mapping + variant calling](#read-mapping-and-variant-calling)
-    * [Synthetic reads](#synthetic-reads)
-    * [Read mapping](#read-mapping)
-    * [Variant calling](#variant-calling)
-  * [Genetic distance estimation with Mash](#genetic-distance-estimation-with-Mash)
+  * [Creating NCBI genome lists](#Creating-NCBI-genome-lists)
+  * [SSRG workflow](#SSRG-workflow)
+  * [Mash workflow](#Mash-workflow)
 * [Funding and acknowledgments](#Funding-and-acknowledgments)
 * [References](#references)
 
@@ -245,115 +239,6 @@ MashR_plotter.pl \
 	-lb \
 	-fs 25
 ```
-
-## Detailed options
-#### Read mapping and variant calling
-##### Synthetic reads
-[SSRG.pl](https://github.com/PombertLab/SSRG/blob/master/SSRG.pl) can be used to generate FASTQ datasets from complete or draft genomes (ploidy = 1). For example, to generate FASTQ datasets (paired ends; 250 bp; 50x sequencing depth) from one or more genomes:
-```Bash
-SSRG.pl -f *.fasta -r 250 
-```
-Options for SSRG.pl are:
-```
- -f (--fasta)		Fasta/multifasta file(s)
- -l (--list)		List of fasta file(s), one per line
- -r (--readsize)	Desired read size [default: 150]
- -t (--type)		Read type: single (SE) or paired ends (PE) [default: PE]
- -i (--insert)		PE insert size [default: 350]
- -s (--sdev)		PE insert size standard deviation (in percentage) [default: 10]
- -c (--coverage)	Desired sequencing depth [default: 50]
- -qs (--qscore)		Quality score associated with each base [default: 30]
- -q64          		Use the old Illumina Q64 FastQ format instead of the default Q33 Sanger/Illumina 1.8+ encoding
-```
-
-
-##### Read mapping
-[get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) is the main script that handles read mapping and variant calling. The default read mapper in get_SNPs.pl is [Minimap2](https://github.com/lh3/minimap2), and can be changed by invoking the **--mapper** switch from the command line. Users can also change the default read mapper settings by modifying the following line in [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl):
-```perl
-my $mapper = 'minimap2';
-```
-
-[get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) can be used with single or paired ends datasets. BAM files generated during the alignments can be kept with the **--bam** command line switch (BAM files are discarded by default to save on disk space). The **--rmo** option (read mapping only) skips the variant calling process. When combined, the **--rmo** and **--bam** options generate BAM alignment files using the selected read mapper.
-
-To generate BAM alignments with ***single end*** FASTQ datasets using the default read mapper, [Minimap2](https://github.com/lh3/minimap2), with its default sr (short reads) preset:
-```bash
-get_SNPs.pl -fa *.fasta -fq *.fastq -rmo -bam
-```
-
-To generate BAM alignments with ***paired end*** FASTQ datasets, this time using [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) as read mapper:
-```Bash
-get_SNPs.pl -fa *.fasta -pe1 *R1.fastq -pe2 *R2.fastq -mapper bowtie2 -rmo -bam
-```
-
-General and read mapping options for get_SNPs.pl are:
-```
-### Mapping options ###
--fa (--fasta)			Reference genome(s) in fasta file
--fq (--fastq)			Fastq reads (single ends) to be mapped against reference(s)
--pe1				Fastq reads #1 (paired ends) to be mapped against reference(s)
--pe2				Fastq reads #2 (paired ends) to be mapped against reference(s)
--mapper				Read mapping tool: bowtie2, minimap2, ngmlr or hisat2 [default: minimap2]
--threads			Number of processing threads [default: 16]
--mem				Max total memory for samtools (in Gb) [default: 16] ## mem/threads = memory per thread
--bam				Keeps BAM files generated
--sam				Keeps SAM files generated; SAM files can be quite large
--rmo (--read_mapping_only)	Do not perform variant calling; useful when only interested in bam/sam files and/or mapping stats
--ns (--no_stats)		Do not calculate stats; stats can take a while to compute for large eukaryote genomes
-
-### Mapper-specific options ###
--X				BOWTIE2 - Maximum paired ends insert size [default: 750]
--preset				MINIMAP2 - Preset: sr, map-ont, map-pb or asm20 [default: sr]
-```
-
-##### Variant calling
-The default variant caller in get_SNPs.pl is [VarScan2](http://dkoboldt.github.io/varscan/). Other variant callers are implemented only partially. To perform variant calling with [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) using default settings ([Minimap2](https://github.com/lh3/minimap2) + [VarScan2](http://dkoboldt.github.io/varscan/)) and single end datasets, simply type:
-```bash
-get_SNPs.pl -fa *.fasta -fq *.fastq
-```
-
-A more detailed command line using Minimap2, VarScan2, and paired end datasets should look like:
-```bash
-get_SNPs.pl \
-   -threads 16 \
-   -fa *.fasta \
-   -pe1 *R1.fastq \
-   -pe2 *R2.fastq \
-   -mapper minimap2 \
-   -caller varscan2 \
-   -type both \
-   -var ./VarScan.v2.4.3.jar
-```
-
-Variant calling options for get_SNPs.pl are:
-```
-### Variant calling options ###
--caller				[default: varscan2]	## Variant caller: varscan2, bcftools or freebayes
--type				[default: snp]		## snp, indel, or both
--ploidy				[default: 1]		## FreeBayes/BCFtools option; change ploidy (if needed)
-
-### VarScan2 parameters ### see http://dkoboldt.github.io/varscan/using-varscan.html
--var				[default: /opt/varscan/VarScan.v2.4.4.jar]	## Which varscan jar file to use
--mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
--mr (--min-reads2)		[default: 15]		## Minimum supporting reads at a position to call variants
--maq (--min-avg-qual)		[default: 28]		## Minimum base quality at a position to count a read
--mvf (--min-var-freq)		[default: 0.7]		## Minimum variant allele frequency threshold
--mhom (--min-freq-for-hom)	[default: 0.75]		## Minimum frequency to call homozygote
--pv (--p-value)			[default: 1e-02]	## P-value threshold for calling variants 
--sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
-```
-
-#### Genetic distance estimation with Mash
-Runnning Mash with [run_Mash.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/run_Mash.pl) and converting output to distance matrices with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashToDistanceMatrix.pl)
-```
-run_Mash.pl -f *.fasta -o Mash.txt
-MashToDistanceMatrix.pl  -i Mash.txt -o Mash -f tsv
-```
-Plotting a quick Neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl)
-```
-MashR_plotter.pl -i Mash.tsv -if tsv -t tree -newick Mash.txt.tre
-```
-Plotting the same data using dimensionality reduction techniques
-MashR_plotter.pl -t cluster -m tsne -i Mash.tsv -if tsv -o cluster_tsne --format pdf -fs 8 -lb -pe 10
 
 ## Funding and acknowledgments
 This work was supported in part by the National Institute of Allergy and Infectious Diseases of the National Institutes of Health (award number R15AI128627) to Jean-Francois Pombert. The content is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health.
