@@ -197,7 +197,7 @@ Options for [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNP
 -v (--version)	Display script version
 -o (--outdir)	Output directory [Default: ./]
 
-### Mapping options ###
+# Mapping options
 -fa (--fasta)			Reference genome(s) in fasta file
 -fq (--fastq)			Fastq reads (single ends) to be mapped against reference(s)
 -pe1				Fastq reads #1 (paired ends) to be mapped against reference(s)
@@ -206,12 +206,12 @@ Options for [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNP
 -threads			Number of processing threads [default: 16]
 -mem				Max total memory for samtools (in Gb) [default: 16] ## mem/threads = memory per thread
 -bam				Keeps BAM files generated
--idx (--index)		Type of bam index generated (bai or csi) [default = bai]
+-idx (--index)			Type of bam index generated (bai or csi) [default = bai]
 -sam				Keeps SAM files generated; SAM files can be quite large
 -rmo (--read_mapping_only)	Do not perform variant calling; useful when only interested in bam/sam files and/or mapping stats
 -ns (--no_stats)		Do not calculate stats; stats can take a while to compute for large eukaryote genomes
 
-### Mapper-specific options ###
+# Mapper-specific options
 -X				BOWTIE2 - Maximum paired ends insert size [default: 750]
 -preset				MINIMAP2 - Preset: sr, map-ont, map-pb or asm20 [default: sr]
 -algo				BWA - Mapping algorithm:  bwasw, mem, samse [default: mem]
@@ -220,7 +220,7 @@ Options for [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNP
 -type				[default: snp]		## snp, indel, or both
 -ploidy				[default: 1]		## FreeBayes/BCFtools option; change ploidy (if needed)
 
-### VarScan2 parameters ### see http://dkoboldt.github.io/varscan/using-varscan.html
+# VarScan2 parameters - see http://dkoboldt.github.io/varscan/using-varscan.html
 -var				[default: /opt/varscan/VarScan.v2.4.4.jar]	## Which varscan jar file to use
 -mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
 -mr (--min-reads2)		[default: 15]		## Minimum supporting reads at a position to call variants
