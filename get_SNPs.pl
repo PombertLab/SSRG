@@ -355,10 +355,10 @@ if ($mapper =~ /bowtie2|hisat2|ngmlr/){
 	mkdir ("${outdir}/$mapper.indexes",0755);
 }
 if ($mapper eq 'bowtie2'){
-	system "mv ${outdir}/*.bt2 ${outdir}/${dir}*.fai ${outdir}/$mapper.indexes/";
+	system "mv ${outdir}/*.bt2 ${outdir}/*.fai ${outdir}/$mapper.indexes/";
 }
 elsif ($mapper eq 'hisat2'){
-	system "mv ${outdir}/*.ht2 ${outdir}/${dir}*.fai ${outdir}/$mapper.indexes/";
+	system "mv ${outdir}/*.ht2 ${outdir}/*.fai ${outdir}/$mapper.indexes/";
 }
 elsif ($mapper eq 'ngmlr'){
 	system "mv ${outdir}/*.ngm ${outdir}/$mapper.indexes/";
