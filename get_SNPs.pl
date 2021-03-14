@@ -271,7 +271,7 @@ if (@fastq){
 			logs();
 
 			## Cleaning SAM/BAM files
-			unless ($bam) {system "rm ${outdir}/$file.$fa.$mapper.bam ${outdir}/$file.$fa.$mapper.bam.csi";}
+			unless ($bam) {system "rm ${outdir}/$file.$fa.$mapper.bam ${outdir}/$file.$fa.$mapper.bam.$index";}
 			unless ($sam) {system "rm ${outdir}/$file.$fa.$mapper.sam";}
 		}
 	}
