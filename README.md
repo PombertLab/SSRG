@@ -65,7 +65,7 @@ export PATH=$PATH:$(pwd)/
 export PATH=$PATH:$(pwd)/Tools/MASH
 export PATH=$PATH:$(pwd)/Tools/NCBI
 ```
-The default location of the VarScan2 jar file can be updated in [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) by modifying the following line:
+If desired, the default location of the VarScan2 jar file can be updated in [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) by modifying the following line:
 ```perl
 my $varjar = '/opt/varscan/VarScan.v2.4.4.jar';
 ```
