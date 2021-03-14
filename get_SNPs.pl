@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2020
-my $version = '2.0 alpha RC2';
+my $version = '2.0 alpha RC3';
 my $name = 'get_SNPs.pl';
-my $updated = '13/03/2021; Code minification + readability';
+my $updated = '14/03/2021; Code minification + readability';
 
 use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
 
@@ -41,7 +41,7 @@ OPTIONS:
 -threads			Number of processing threads [default: 16]
 -mem				Max total memory for samtools (in Gb) [default: 16] ## mem/threads = memory per thread
 -bam				Keeps BAM files generated
--idx (--index)		Type of bam index generated (bai or csi) [default = bai]
+-idx (--index)		Type of bam index generated (bai or csi) [default = csi] ## .bai not compatible with -mem
 -sam				Keeps SAM files generated; SAM files can be quite large
 -rmo (--read_mapping_only)	Do not perform variant calling; useful when only interested in bam/sam files and/or mapping stats
 -ns (--no_stats)		Do not calculate stats; stats can take a while to compute for large eukaryote genomes
@@ -76,7 +76,7 @@ my $outdir = './';
 my $mapper = 'minimap2';
 my $threads = 16;
 my $mem = 16;
-my $index = "bai";
+my $index = "csi";
 my $sam = '';
 my $bam = '';
 my @fasta;
@@ -365,7 +365,7 @@ elsif ($mapper eq 'ngmlr'){
 }
 if ($bam){
 	mkdir ("${outdir}/$mapper.BAM",0755);
-	system "mv ${outdir}/*.bam ${outdir}/$mapper.BAM/; mv ${outdir}/*.csi ${outdir}/$mapper.BAM/";
+	system "mv ${outdir}/*.bam ${outdir}/$mapper.BAM/; mv ${outdir}/*.$index ${outdir}/$mapper.BAM/";
 }
 if ($sam){
 	mkdir ("${outdir}/$mapper.SAM",0755);
@@ -412,9 +412,14 @@ sub samtools{
 	print "Using $sammem Mb per thread for samtools\n";
 	system "samtools view -@ $threads -bS ${outdir}/$file.$fa.$mapper.sam -o ${outdir}/$file.$fa.bam";
 	system "samtools sort -@ $threads -m ${sammem}M -o ${outdir}/$file.$fa.$mapper.bam ${outdir}/$file.$fa.bam";
-	my $idx;
-	if($index eq 'bai') { $idx = '-b'; } else { $idx = '-c'; }
-	system "samtools index $idx -@ $threads -m ${sammem}M ${outdir}/$file.$fa.$mapper.bam";
+	if($index eq 'bai') { ## Can't use the memory -m CMD line switch with -b / .bai indexes
+		print "samtools index (-b) not compatible with (-m); ";
+		print "running samtools index with default memory settings...\n";
+		system "samtools index -b -@ $threads ${outdir}/$file.$fa.$mapper.bam";
+	}
+	else { ## .csi indexes; work with -m
+		system "samtools index -c -@ $threads -m ${sammem}M ${outdir}/$file.$fa.$mapper.bam";
+	}
 	system "samtools depth -aa ${outdir}/$file.$fa.$mapper.bam > ${outdir}/$file.$fa.$mapper.coverage"; ## Printing per base coverage information
 	system "rm ${outdir}/$file.$fa.bam"; ## Discarding unsorted BAM file
 	$flagstat = `samtools flagstat ${outdir}/$file.$fa.$mapper.bam`;
