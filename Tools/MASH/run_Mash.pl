@@ -20,10 +20,10 @@ USAGE		${name} \
 		  -n S_pneumoniae_75.mash 
 
 OPTIONS:
--f (--fasta)		Reference genome(s) in fasta file
--o (--outdir)		Output directory [Default: ./]
--n (--name)		Output file name [Default: Mash.mash]
--s (--sort)		Sort Mash output by decreasing order of similarity
+-f (--fasta)	Reference genome(s) in fasta file
+-o (--outdir)	Output directory [Default: ./]
+-n (--name)	Output file name [Default: Mash.mash]
+-s (--sort)	Sort Mash output by decreasing order of similarity
 OPTIONS
 die "\n$usage\n" unless@ARGV;
 

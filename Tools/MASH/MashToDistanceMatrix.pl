@@ -20,7 +20,7 @@ USAGE		${name} \\
 		  -f csv
 
 OPTIONS:
--i (--input)		Mash output file
+-i (--input)	Mash output file
 -o (--outdir)	Output folder [Default: ./]
 -p (--prefix)	Output file prefix [Default: Mash]
 -f (--format)	Output format; csv or tsv [Default: csv]

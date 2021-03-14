@@ -298,6 +298,14 @@ run_Mash.pl \
    -n S_pneumoniae_75.mash
 ```
 
+Options for [run_Mash.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/run_Mash.pl)] are:
+```
+-f (--fasta)	Reference genome(s) in fasta file
+-o (--outdir)	Output directory [Default: ./]
+-n (--name)	Output file name [Default: Mash.mash]
+-s (--sort)	Sort Mash output by decreasing order of similarity
+```
+
 3. To convert the Mash output to a distance matrix with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashToDistanceMatrix.pl), type:
 ```bash
 MashToDistanceMatrix.pl  \
@@ -305,6 +313,14 @@ MashToDistanceMatrix.pl  \
 	-o MASH/ \
 	-p S_pneumoniae_75 \
 	-f tsv
+```
+
+Options for [MashToDistanceMatrix.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashToDistanceMatrix.pl)] are:
+```
+-i (--input)	Mash output file
+-o (--outdir)	Output folder [Default: ./]
+-p (--prefix)	Output file prefix [Default: Mash]
+-f (--format)	Output format; csv or tsv [Default: csv]
 ```
 
 4. To generate a quick neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl), tyoe:
