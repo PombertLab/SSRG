@@ -294,8 +294,8 @@ Options for [queryNCBI.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/
 ```bash
 run_Mash.pl \
    -f DATASETS/*.fasta \
-   -d MASH \
-   -o S_pneumoniae_75.mash
+   -o MASH \
+   -n S_pneumoniae_75.mash
 ```
 
 3. To convert the Mash output to a distance matrix with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashToDistanceMatrix.pl), type:

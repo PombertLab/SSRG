@@ -17,24 +17,24 @@ REQUIREMENTS	Mash - https://github.com/marbl/Mash (Ondov et al. DOI: 10.1186/s13
 USAGE		${name} \
 		  -f DATASETS/*.fasta \
 		  -d MASH \
-		  -o S_pneumoniae_75.mash 
+		  -n S_pneumoniae_75.mash 
 
 OPTIONS:
 -f (--fasta)		Reference genome(s) in fasta file
--d (--dir)		Output directory [Default: ./]
--o (--out)		Output file name [Default: Mash.mash]
+-o (--outdir)		Output directory [Default: ./]
+-n (--name)		Output file name [Default: Mash.mash]
 -s (--sort)		Sort Mash output by decreasing order of similarity
 OPTIONS
 die "\n$usage\n" unless@ARGV;
 
 my @fasta;
 my $outdir = './';
-my $out = 'Mash.mash';
+my $name = 'Mash.mash';
 my $sort;
 GetOptions(
 	'f|fasta=s@{1,}' => \@fasta,
 	'd|dir=s' => \$outdir,
-	'o|out=s' => \$out,
+	'n|name=s' => \$name,
 	's|sort' => \$sort,
 );
 
@@ -53,8 +53,8 @@ unless (-d $outdir){
 ## Running Mash
 print "Running Mash genetic distance analysis...";
 system "mash sketch -o reference @fasta";
-system "mash dist reference.msh @fasta > ${outdir}/$out";
+system "mash dist reference.msh @fasta > ${outdir}/$name";
 if ($sort){
-	print "Sorting out Mash results -- See ${outdir}/$out.sorted";
-	system "sort -gk3 ${outdir}/$out > ${outdir}/$out.sorted";
+	print "Sorting out Mash results -- See ${outdir}/$name.sorted";
+	system "sort -gk3 ${outdir}/$name > ${outdir}/$name.sorted";
 }
