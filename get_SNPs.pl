@@ -41,7 +41,7 @@ OPTIONS:
 -threads			Number of processing threads [default: 16]
 -mem				Max total memory for samtools (in Gb) [default: 16] ## mem/threads = memory per thread
 -bam				Keeps BAM files generated
--idx (--index)		Type of bam index generated (bai or csi) [default = csi] ## .bai not compatible with -mem
+-idx (--index)			Type of bam index generated (bai or csi) [default = csi] ## .bai not compatible with -mem
 -sam				Keeps SAM files generated; SAM files can be quite large
 -rmo (--read_mapping_only)	Do not perform variant calling; useful when only interested in bam/sam files and/or mapping stats
 -ns (--no_stats)		Do not calculate stats; stats can take a while to compute for large eukaryote genomes
