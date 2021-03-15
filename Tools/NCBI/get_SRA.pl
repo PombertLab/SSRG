@@ -1,40 +1,40 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2019
-## Downloads SRA files from the NCBI FTP site 
-my $version = '0.2';
+my $version = '0.3; No longer works, needs an overhaul';
 my $name = 'get_SRA.pl';
+my $updated = '15/03/2021';
 
-use strict; use warnings; use Getopt::Long qw(GetOptions);  
+use strict; use warnings; use Getopt::Long qw(GetOptions);
 
 ## Usage definition
 my $usage = <<"OPTIONS";
-
-NAME		$name
-VERSION		$version
-SYNOPSIS	Downloads data from NCBI SRA and converts to FASTQ format
+NAME		${name}
+VERSION		${version}
+UPDATED		${updated}
+SYNOPSIS	Downloads data from NCBI SRA files from the NCBI FTP site and converts to FASTQ format
 REQUIREMENTS	NCBI SRA toolkit:
 		https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software
-		
-EXAMPLE		get_SRA.pl -l accession_list(s) -fq pe -Q 33 -sra /opt/sratoolkit.2.9.6/bin/
+
+EXAMPLE		${name} \\
+		  -l accession_list(s) \\
+		  -fq pe \\
+		  -Q 33
 
 OPTIONS:
 -l (--list)	List(s) of SRA accesssion numbers, one accession number per line
 -fq (--fastq)	Converts SRA files to FASTQ paired-end (pe) or single (se) format [default: pe] ## Non-pe files will default to se
 -Q		FASTQ quality score format; 33 (Sanger) or 64 (illumina) [default: 33]
--sra		Path to NCBI sratoolkit binaries
 OPTIONS
-die "$usage\n" unless @ARGV;
+die "\n$usage\n" unless @ARGV;
 
 ## Defining options
 my @list;
 my $fastq = 'pe';
 my $qscore = 33;
-my $sratoolkit = ''; ## Path to NCBI SRA toolkit binaries
 GetOptions(
 	'l|list=s' => \@list,
 	'fq|fastq=s' => \$fastq,
-	'Q=i' => \$qscore,
-	'sra=s' => \$sratoolkit
+	'Q=i' => \$qscore
 );
 
 ## Downloading/converting SRA data
@@ -44,7 +44,7 @@ my $run = undef;
 my $id = undef;
 my $sra = undef;
 while (my $list = shift@list){ 
-	open IN, "<$list";
+	open IN, "<", "$list";
 	while (my $line = <IN>){
 		chomp $line;
 		if ($line =~ /^#/){next;}
@@ -54,16 +54,16 @@ while (my $list = shift@list){
 			$id = $3;
 			$sra = "$line.sra";
 			my $url = "$ftp$prefix".'/'."$prefix$run".'/'."$line".'/'."$sra";
-			system "echo Downloading $sra...";
+			print "Downloading $sra...";
 			system "wget $url";
 		}
 		if ($fastq eq 'pe'){
-			system "echo Converting $sra to FASTQ format...";
-			system "$sratoolkit"."fastq-dump -Q $qscore --split-3 $sra";
+			print "Converting $sra to FASTQ format...";
+			system "fastq-dump -Q $qscore --split-3 $sra";
 		}
 		elsif ($fastq eq 'se'){
-			system "echo Converting $sra to FASTQ format...";
-			system "$sratoolkit"."fastq-dump -Q $qscore $sra";
+			print "Converting $sra to FASTQ format...";
+			system "fastq-dump -Q $qscore $sra";
 		}
 	}
 }
