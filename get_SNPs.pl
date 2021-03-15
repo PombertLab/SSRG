@@ -90,6 +90,7 @@ my $nostat;
 my $maxins = '750';
 my $preset = 'sr';
 my $algo = 'mem';
+
 ## Variant calling
 my $caller = 'varscan2';
 my $type = 'snp';
@@ -128,6 +129,7 @@ GetOptions(
 	'X=i' => \$maxins,
 	'preset=s' => \$preset,
 	'algo=s' => \$algo,
+	
 	## Variant calling
 	'caller=s' => \$caller,
 	'type=s' => \$type,
