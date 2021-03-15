@@ -196,7 +196,7 @@ get_SNPs.pl \
 	-preset sr \
 	-bam \
 	-caller varscan2 \
-	-var /opt/varscan/VarScan.v2.4.4.jar ## Replace jar file location accordingly
+	-var VarScan.v2.4.4.jar ## Replace jar file location accordingly
 ```
 
 Options for [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) are:
