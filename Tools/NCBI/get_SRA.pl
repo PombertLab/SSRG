@@ -12,7 +12,9 @@ my $usage = <<"OPTIONS";
 NAME		$name
 VERSION		$version
 SYNOPSIS	Downloads data from NCBI SRA and converts to FASTQ format
-REQUIREMENTS	NCBI SRA toolkit - https://www.ncbi.nlm.nih.gov/sra/docs/toolkitsoft/
+REQUIREMENTS	NCBI SRA toolkit:
+		https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software
+		
 EXAMPLE		get_SRA.pl -l accession_list(s) -fq pe -Q 33 -sra /opt/sratoolkit.2.9.6/bin/
 
 OPTIONS:
