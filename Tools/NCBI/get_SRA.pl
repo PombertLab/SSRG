@@ -20,13 +20,15 @@ EXAMPLE		${name} \\
 		  -t 10 \\
 		  -o FASTQ \\
 		  -l accession_list(s) \\
+		  -p \\
 		  -v
 
 OPTIONS:
 -t (--threads)	Number of CPU threads to use [Default: 10]
 -o (--outdir)	Output directory [Default: ./]
 -l (--list)	List(s) of SRA accesssion numbers, one accession number per line
--v (--verbose)	Adds verbosity
+-p (--progess)	Show progess
+-v (--verbose)	Add verbosity
 -f (--force)	Force to overwrite existing file(s)
 OPTIONS
 die "\n$usage\n" unless @ARGV;
@@ -36,20 +38,24 @@ my $threads = 8;
 my $outdir = './';
 my @list;
 my $verbose;
+my $progess;
 my $force;
 GetOptions(
 	't|threads=i' => \$threads,
 	'o|outdir=s' => \$outdir,
 	'l|list=s' => \@list,
 	'v|verbose' => \$verbose,
+	'p|progress' => \$progess,
 	'f|force' => \$force
 );
 
 ## Creating flags
 my $verbosity = '';
 my $overwrite = '';
+my $pgress;
 if ($verbose){ $verbosity = '--verbose'; }
 if ($force){ $overwrite = '--force'; }
+if ($progess){ $pgress = '--progress'; }
 
 ## Working on list file
 while (my $list = shift@list){ 
@@ -64,6 +70,7 @@ while (my $list = shift@list){
 			  --threads $threads \\
 			  $verbosity \\
 			  $overwrite \\
+			  $pgress \\
 			  --outdir $outdir \\
 			  --force \\
 			  -3 $sra";
