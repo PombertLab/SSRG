@@ -47,7 +47,7 @@ while (my $list = shift@list){
 	while (my $line = <IN>){
 		chomp $line;
 		if ($line =~ /^#/){next;}
-		unless ($line eq ''){
+		elsif ($line =~ /^\w+/){
 			my $sra = $line;
 			my $verbosity = '';
 			if ($verbose){ $verbosity = '--verbose'; }
