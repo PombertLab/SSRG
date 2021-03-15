@@ -142,6 +142,7 @@ Options for [queryNCBI.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/
 -o (--outdir)	Output directory [Default: ./]
 -fa (--fasta)	Retrieve fasta files
 -gb (--genbank)	Retrieve GenBank annotation files (.gbk; if available)
+-gff (--gff3)	Retreeve GFF3 annotation files (.gff; if available)
 -p (--protein)	Retrieve protein sequences (.faa; if available)
 -cds		Retrieve protein coding sequences (.fna; if available)
 ```
@@ -287,6 +288,7 @@ Options for [queryNCBI.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/
 -o (--outdir)	Output directory [Default: ./]
 -fa (--fasta)	Retrieve fasta files
 -gb (--genbank)	Retrieve GenBank annotation files (.gbk; if available)
+-gff (--gff3)	Retreeve GFF3 annotation files (.gff; if available)
 -p (--protein)	Retrieve protein sequences (.faa; if available)
 -cds		Retrieve protein coding sequences (.fna; if available)
 ```
