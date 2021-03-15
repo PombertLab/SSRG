@@ -129,7 +129,7 @@ GetOptions(
 	'X=i' => \$maxins,
 	'preset=s' => \$preset,
 	'algo=s' => \$algo,
-	
+
 	## Variant calling
 	'caller=s' => \$caller,
 	'type=s' => \$type,
@@ -164,7 +164,7 @@ if (scalar@fasta == 0) { die "\nPlease enter at least one FASTA reference before
 if ((scalar@fastq == 0) && (scalar@pe1 == 0)) { die "\nPlease enter at least one FASTQ dataset before proceeding...\n\n"; }
 
 ## Setting the caller variable to rmo (read-mapping only); doesn't make sense to
-## keep the default variant caller for file names if -rmo is enabled...)
+## keep the default variant caller label for file names if -rmo is enabled...
 if ($rmo){$caller = 'rmo';} 
 
 ## Creating output directory
