@@ -27,6 +27,7 @@ OPTIONS:
 -o (--outdir)	Output directory [Default: ./]
 -l (--list)	List(s) of SRA accesssion numbers, one accession number per line
 -v (--verbose)	Adds verbosity
+-f (--force)	Frce to overwrite existing file(s)
 OPTIONS
 die "\n$usage\n" unless @ARGV;
 
@@ -35,13 +36,22 @@ my $threads = 8;
 my $outdir = './';
 my @list;
 my $verbose;
+my $force;
 GetOptions(
 	't|threads=i' => \$threads,
 	'o|outdir=s' => \$outdir,
 	'l|list=s' => \@list,
 	'v|verbose' => \$verbose,
+	'f|force' => \$force
 );
 
+## Creating flags
+my $verbosity = '';
+my $overwrite = '';
+if ($verbose){ $verbosity = '--verbose'; }
+if ($force){ $overwrite = '--force'; }
+
+## Working on list file
 while (my $list = shift@list){ 
 	open IN, "<", "$list" or die "Can't read file $list: $!\n";
 	while (my $line = <IN>){
@@ -49,13 +59,13 @@ while (my $list = shift@list){
 		if ($line =~ /^#/){next;}
 		elsif ($line =~ /^\w+/){
 			my $sra = $line;
-			my $verbosity = '';
-			if ($verbose){ $verbosity = '--verbose'; }
-			print "Downloading/converting $sra to FASTQ format with fasterq-dump ...\n";
+			print "\nDownloading/converting $sra to FASTQ format with fasterq-dump ...\n\n";
 			system "fasterq-dump \\
 			  --threads $threads \\
 			  $verbosity \\
+			  $overwrite \\
 			  --outdir $outdir \\
+			  --force \\
 			  -3 $sra";
 		}
 	}
