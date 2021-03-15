@@ -32,12 +32,12 @@ die "\n$usage\n" unless @ARGV;
 
 ## Defining options
 my $threads = 8;
-my $outdir = './';
+my $outdir = '';
 my @list;
 my $verbose;
 GetOptions(
-	't|threads=i' => $threads,
-	'o|outdir=s' => $outdir,
+	't|threads=i' => \$threads,
+	'o|outdir=s' => \$outdir,
 	'l|list=s' => \@list,
 	'v|verbose' => \$verbose,
 );
