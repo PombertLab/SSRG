@@ -57,7 +57,7 @@ OPTIONS:
 -ploidy				[default: 1]		## FreeBayes/BCFtools option; change ploidy (if needed)
 
 ### VarScan2 parameters ### see http://dkoboldt.github.io/varscan/using-varscan.html
--var				[default: /opt/varscan/VarScan.v2.4.4.jar]	## Which varscan jar file to use
+-var				[default: VarScan.v2.4.4.jar]	## Which varscan jar file to use
 -mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
 -mr (--min-reads2)		[default: 15]		## Minimum supporting reads at a position to call variants
 -maq (--min-avg-qual)		[default: 28]		## Minimum base quality at a position to count a read
@@ -97,7 +97,7 @@ my $type = 'snp';
 my $ploidy = 1;
 
 ## VarScan-specific
-my $varjar = '/opt/varscan/VarScan.v2.4.4.jar';	## Define which VarScan2 jar file to use; or use -var from the CMD line
+my $varjar = 'VarScan.v2.4.4.jar';
 my $mc = 15;
 my $mr = 15;
 my $maq = 28;
