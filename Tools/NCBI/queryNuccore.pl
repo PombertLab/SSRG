@@ -1,30 +1,35 @@
 #!/usr/bin/perl
 ## Pombert JF,  Illinois Tech 2019
-## Retrieve genomes/proteins from the NCBI Nucleotide database using a list of accession numbers (one per line)
-## Based on NCBI's efetch tool - http://www.ncbi.nlm.nih.gov/books/NBK25499/
-my $version = 0.3;
+my $version = 0.4;
 my $name = 'queryNuccore.pl';
+my $updated = '15/03/2021';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions);
 
 ## Usage definition
 my $usage = <<"OPTIONS";
+NAME		${name}
+VERSION		${version}
+UPDATED		${updated}
+SYNOPSIS	Retrieve genomes/proteins from the NCBI Nucleotide database using a list of accession numbers
+		(one per line). Based on NCBI's efetch tool - http://www.ncbi.nlm.nih.gov/books/NBK25499/
 
-NAME		$name
-VERSION		$version
-SYNOPSIS	Runs raptorX 3D structure prediction on provided fasta files
-EXAMPLE		queryNuccore.pl -fa -gbk -l accession.txt
+EXAMPLE		${name} \\
+		  -db nuccore \\
+		  -fa \\
+		  -gb \\
+		  -l accession.txt
 
 OPTIONS:
+-db (--database)	NCBI database to be queried [default: nuccore]
 -fa (--fasta)		Reference genome(s) in fasta format
 -gb (--genbank)		Reference genome(s) in GenBank format
 -sqn (--sequin)		Reference genome(s) in Sequin ASN format
--db (--database)	NCBI database to be queried [default: nuccore]
 -p (--proteins)		Protein sequences (amino acids)
 -c (--cds)		Protein sequences (nucleotides)
 -l (--list)		Accession numbers list, one accession per line
 OPTIONS
-die "$usage\n" unless@ARGV;
+die "\n$usage\n" unless@ARGV;
 
 ## Defining options
 my $fasta;
@@ -36,62 +41,58 @@ my $db = 'nuccore';
 my $list = '';
 
 GetOptions(
-	'fasta|fa' => \$fasta,
-	'genbank|gb' => \$genbank,
-	'proteins|p' => \$proteins,
-	'sequin|sqn' => \$sequin,
-	'cds|c' => \$cds,
-	'list|l=s' => \$list,
 	'db|database=s' => \$db,
+	'fa|fasta' => \$fasta,
+	'gb|genbank' => \$genbank,
+	'p|proteins' => \$proteins,
+	'sqn|sequin' => \$sequin,
+	'c|cds' => \$cds,
+	'l|list=s' => \$list,
 );
 
 ## Downloading data from Nuccore
 my $start = localtime();
 my $tstart = time;
-open IN, "<$list";
 my $efetch = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi';
-my $rettype = undef;
-my $retmode = undef;
-while (my $accession = <IN>){
+my $rettype;
+my $retmode;
+my $filename;
+my $accession;
+
+open IN, "<", "$list" or die "Can't read file $list: $!\n";
+while ($accession = <IN>){
 	chomp $accession;
 	$accession =~ s/ //g;
 	if ($accession =~ /^#/){next;} ## Discarding comments
 	if ($fasta || $genbank || $proteins || $sequin || $cds){
 		$retmode = 'text';
 		if ($fasta){
-			$rettype ='fasta';
-			my $name = "$accession".'.fasta';
-			my $URL = $efetch.'?db='.$db.'&id='.$accession.'&rettype='.$rettype.'&retmode='.$retmode;
-			system "echo Downloading $accession.fasta ...";
-			system "curl \'${efetch}?db=${db}&id=${accession}&rettype=${rettype}&retmode=${retmode}\' > $accession.fasta";
+			$rettype = 'fasta';
+			$filename = $accession . '.fasta';
+			curl();
 		}
+
 		if ($genbank){
-			$rettype ='gbwithparts';
-			my $name = "$accession".'.gbk';
-			my $URL = $efetch.'?db='.$db.'&id='.$accession.'&rettype='.$rettype.'&retmode='.$retmode;
-			system "echo Downloading $accession.gbk ...";
-			system "curl \'${efetch}?db=${db}&id=${accession}&rettype=${rettype}&retmode=${retmode}\' > $accession.gbk";
+			$rettype = 'gbwithparts';
+			$filename = $accession . '.gbk';
+			curl();
 		}
+
 		if ($sequin){
-			$rettype ='';
-			my $name = "$accession".'.sqn';
-			my $URL = $efetch.'?db='.$db.'&id='.$accession.'&rettype='.$rettype.'&retmode='.$retmode;
-			system "echo Downloading $accession.sqn ...";
-			system "curl \'${efetch}?db=${db}&id=${accession}&rettype=${rettype}&retmode=${retmode}\' > $accession.sqn";
+			$rettype = '';
+			$filename = $accession . '.sqn';
+			curl();
 		}
+
 		if ($cds){
-			$rettype ='fasta_cds_na';
-			my $name = "$accession".'.fna';
-			my $URL = $efetch.'?db='.$db.'&id='.$accession.'&rettype='.$rettype.'&retmode='.$retmode;
-			system "echo Downloading $accession.fna ...";
-			system "curl \'${efetch}?db=${db}&id=${accession}&rettype=${rettype}&retmode=${retmode}\' > $accession.fna";
+			$rettype = 'fasta_cds_na';
+			$filename = $accession . '.fna';
+			curl();
 		}
 		if ($proteins){
-			$rettype ='fasta_cds_aa';
-			my $name = "$accession".'.faa';
-			my $URL = $efetch.'?db='.$db.'&id='.$accession.'&rettype='.$rettype.'&retmode='.$retmode;
-			system "echo Downloading $accession.faa ...";
-			system "curl \'${efetch}?db=${db}&id=${accession}&rettype=${rettype}&retmode=${retmode}\' > $accession.faa";
+			$rettype = 'fasta_cds_aa';
+			$filename = $accession . '.faa';
+			curl();
 		}
 	}
 }
@@ -102,3 +103,14 @@ my $end = localtime();
 print "\nDownloading started on: $start\n";
 print "Downloading ended on: $end\n";
 print "Time elapsed: $time_taken seconds\n";
+
+## Subroutine
+sub curl{
+	print "Downloading $filename ...\n";
+	my $URL = $efetch.'?db='.$db.'&id='.$accession.'&rettype='.$rettype.'&retmode='.$retmode;
+	system "curl \\
+	  -o $filename \\
+	  --progress-bar \\
+	  -L \'$URL\' ";
+	print "\n";
+}
