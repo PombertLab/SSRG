@@ -119,7 +119,6 @@ sub curl{
 	my $URL = $efetch.'?db='.$db.'&id='.$accession.'&rettype='.$rettype.'&retmode='.$retmode;
 	system "curl \\
 	  -o ${outdir}/$filename \\
-	  --progress-bar \\
 	  -L \'$URL\' ";
-	print "\n";
+	print "\n\n";
 }
