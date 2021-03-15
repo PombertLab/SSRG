@@ -1,0 +1,9 @@
+prefix_s,project_s,src_db_s,targeted_locus_name_s,div_s,organism_an,bioproject_s,biosample_ss,infra_name_ss,other_src_ss,contigs_total_length_l,contigs_count_l,contigs_proteins_count_l,contigs_annotated_s,scaffolds_count_l,scaffolds_proteins_count_l,scaffolds_total_length_l,scaffolds_annotated_s,scaffolds_range_ss,chromosome_range_ss,update_date_dt,create_date_dt
+FOVA01,WGS,ENA,,BCT,Peptostreptococcus anaerobius,PRJEB17122,SAMN05660467,strain: C,,2116810,60,1992,Yes,0,0,0,No,,,2016-10-31T00:00:00Z,2016-10-31T00:00:00Z
+LSDI01,WGS,GenBank,,BCT,Peptostreptococcus anaerobius,PRJNA272075,SAMN03854409,strain: KA00810,"host: Homo sapiens,isolation_source: vagina",2000882,106,1849,Yes,88,0,2002682,No,KQ960256-KQ960343,,2016-02-08T00:00:00Z,2016-02-08T00:00:00Z
+LSQZ01,WGS,GenBank,,BCT,Peptostreptococcus anaerobius,PRJNA272087,SAMN03854410,strain: MJR8628A,"host: Homo sapiens,isolation_source: vagina",2019341,105,1936,Yes,65,0,2023341,No,KQ961782-KQ961846,,2016-02-18T00:00:00Z,2016-02-18T00:00:00Z
+NZ_LSDI01,WGS,RefSeq,,BCT,Peptostreptococcus anaerobius,PRJNA224116,SAMN03854409,strain: KA00810,"host: Homo sapiens,isolation_source: vagina",0,0,0,No,0,0,0,No,,,2017-04-04T00:00:00Z,2016-02-09T00:00:00Z
+NZ_LSQZ01,WGS,RefSeq,,BCT,Peptostreptococcus anaerobius,PRJNA224116,SAMN03854410,strain: MJR8628A,"host: Homo sapiens,isolation_source: vagina",0,0,0,No,0,0,0,No,,,2017-04-04T00:00:00Z,2016-02-19T00:00:00Z
+NZ_FOVA01,WGS,RefSeq,,BCT,Peptostreptococcus anaerobius,PRJNA224116,SAMN05660467,strain: C,,0,0,0,No,0,0,0,No,NZ_FOVA01000001-NZ_FOVA01000060,,2017-04-29T00:00:00Z,2016-12-22T00:00:00Z
+NZ_UGTB01,WGS,RefSeq,,BCT,Peptostreptococcus anaerobius,PRJNA224116,SAMEA4504051,strain: NCTC11460,,0,0,0,No,0,0,0,No,NZ_UGTB01000001-NZ_UGTB01000005,,2018-08-07T00:00:00Z,2018-08-07T00:00:00Z
+UGTB01,WGS,ENA,,BCT,Peptostreptococcus anaerobius,PRJEB6403,SAMEA4504051,strain: NCTC11460,,2256756,5,2068,Yes,0,0,0,No,,,2018-07-30T00:00:00Z,2018-07-30T00:00:00Z
