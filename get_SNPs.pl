@@ -369,35 +369,34 @@ if (@pe1 && @pe2){
 }
 
 ## Cleaning up
-if ($mapper =~ /bowtie2|hisat2|ngmlr/){
-	mkdir ("${outdir}/$mapper.indexes",0755);
-}
-if ($mapper eq 'bowtie2'){
-	system "mv ${outdir}/*.bt2 ${outdir}/*.fai ${outdir}/$mapper.indexes/";
-}
-elsif ($mapper eq 'hisat2'){
-	system "mv ${outdir}/*.ht2 ${outdir}/*.fai ${outdir}/$mapper.indexes/";
-}
-elsif ($mapper eq 'ngmlr'){
-	system "mv ${outdir}/*.ngm ${outdir}/$mapper.indexes/";
-}
+if ($mapper =~ /bowtie2|hisat2|ngmlr/){	mkdir ("${outdir}/$mapper.indexes",0755);}
+
+if ($mapper eq 'bowtie2'){ system "mv ${outdir}/*.bt2 ${outdir}/*.fai ${outdir}/$mapper.indexes/"; }
+elsif ($mapper eq 'hisat2'){ system "mv ${outdir}/*.ht2 ${outdir}/*.fai ${outdir}/$mapper.indexes/"; }
+elsif ($mapper eq 'ngmlr'){ system "mv ${outdir}/*.ngm ${outdir}/$mapper.indexes/"; }
+
 if ($bam){
 	mkdir ("${outdir}/$mapper.BAM",0755);
 	system "mv ${outdir}/*.bam ${outdir}/*.$index ${outdir}/$mapper.BAM/";
 }
+
 if ($sam){
 	mkdir ("${outdir}/$mapper.SAM",0755);
 	system "mv ${outdir}/*.sam ${outdir}/$mapper.SAM/";
 }
+
 unless ($rmo) {
 	mkdir ("${outdir}/$mapper.$caller.VCFs",0755);
-	system "mv ${outdir}/*.vcf ${outdir}/$mapper.$caller.VCFs/";}
+	system "mv ${outdir}/*.vcf ${outdir}/$mapper.$caller.VCFs/";
+}
+
 unless ($nostat){
 	mkdir ("${outdir}/$mapper.$caller.depth",0755);
 	mkdir ("${outdir}/$mapper.$caller.stats",0755);
 	system "mv ${outdir}/*.$mapper.depth ${outdir}/$mapper.$caller.depth/";
 	system "mv ${outdir}/*.$mapper.$type.stats ${outdir}/$mapper.$caller.stats/";
 }
+
 mkdir ("${outdir}/$mapper.$caller.coverage",0755);
 system "mv ${outdir}/*.$mapper.coverage ${outdir}/$mapper.$caller.coverage/";
 
