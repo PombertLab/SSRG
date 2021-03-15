@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2019
-my $version = '0.3; No longer works, needs an overhaul';
+my $version = '0.5';
 my $name = 'get_SRA.pl';
 my $updated = '15/03/2021';
 
@@ -11,59 +11,47 @@ my $usage = <<"OPTIONS";
 NAME		${name}
 VERSION		${version}
 UPDATED		${updated}
-SYNOPSIS	Downloads data from NCBI SRA files from the NCBI FTP site and converts to FASTQ format
+SYNOPSIS	Downloads data from NCBI SRA files from the NCBI FTP site and converts to FASTQ format using fasterq-dump
+		from the NCBI SRA toolkit
 REQUIREMENTS	NCBI SRA toolkit:
 		https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software
 
 EXAMPLE		${name} \\
-		  -l accession_list(s) \\
-		  -fq pe \\
-		  -Q 33
+		  -t 10 \\
+		  -o FASTQ \\
+		  -l accession_list(s)
 
 OPTIONS:
+-t (--threads)	Number of CPU threads to use [Default: 10]
+-o (--outdir)	Output directory [Default: ./]
 -l (--list)	List(s) of SRA accesssion numbers, one accession number per line
--fq (--fastq)	Converts SRA files to FASTQ paired-end (pe) or single (se) format [default: pe] ## Non-pe files will default to se
--Q		FASTQ quality score format; 33 (Sanger) or 64 (illumina) [default: 33]
 OPTIONS
 die "\n$usage\n" unless @ARGV;
 
 ## Defining options
+my $threads = 8;
+my $outdir = './';
 my @list;
-my $fastq = 'pe';
-my $qscore = 33;
 GetOptions(
+	't|threads=i' => $threads,
 	'l|list=s' => \@list,
 	'fq|fastq=s' => \$fastq,
 	'Q=i' => \$qscore
 );
 
-## Downloading/converting SRA data
-my $ftp = 'ftp://ftp-trace.ncbi.nih.gov/sra/sra-instant/reads/ByRun/sra/';
-my $prefix = undef;
-my $run = undef;
-my $id = undef;
-my $sra = undef;
 while (my $list = shift@list){ 
-	open IN, "<", "$list";
+	open IN, "<", "$list" or die "Can't read file $list: $!\n";
 	while (my $line = <IN>){
 		chomp $line;
 		if ($line =~ /^#/){next;}
-		elsif ($line =~ /^(\w{3})(\w{3})(\w{3,})/){
-			$prefix = $1;
-			$run = $2;
-			$id = $3;
-			$sra = "$line.sra";
-			my $url = "$ftp$prefix".'/'."$prefix$run".'/'."$line".'/'."$sra";
-			print "Downloading $sra...";
-			system "wget $url";
-		}
-		if ($fastq eq 'pe'){
-			print "Converting $sra to FASTQ format...";
-			system "fastq-dump -Q $qscore --split-3 $sra";
-		}
-		elsif ($fastq eq 'se'){
-			print "Converting $sra to FASTQ format...";
-			system "fastq-dump -Q $qscore $sra";
+		else{
+			my $sra = $line;
+			print "Downloading/converting $sra to FASTQ format with fasterq-dump ...\n";
+			system "fasterq-dump \\
+			  --threads $threads \\
+			  --outdir $outdir \\ 
+			  --outfile $sra \\
+			 --split-3 $sra ";
 		}
 	}
 }
