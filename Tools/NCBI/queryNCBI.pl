@@ -21,6 +21,7 @@ EXAMPLE		${name} \\
 		  -o DATASETS \\
 		  -fa \\
 		  -gb \\
+		  -gff \\
 		  -p \\
 		  -cds
 
@@ -29,6 +30,7 @@ OPTIONS:
 -o (--outdir)	Output directory [Default: ./]
 -fa (--fasta)	Retrieve fasta files
 -gb (--genbank)	Retrieve GenBank annotation files (.gbk; if available)
+-gff (--gff3)	Retreeve GFF3 annotation files (.gff; if available)
 -p (--protein)	Retrieve protein sequences (.faa; if available)
 -cds		Retrieve protein coding sequences (.fna; if available)
 OPTIONS
@@ -39,6 +41,7 @@ my $list;
 my $outdir = './';
 my $fasta;
 my $gbk;
+my $gff;
 my $protein;
 my $cds;
 GetOptions(
@@ -46,6 +49,7 @@ GetOptions(
 	'o|outdir=s' => \$outdir,
 	'fa|fasta' => \$fasta,
 	'gb|genbank' => \$gbk,
+	'gff|gff3' => \$gff,
 	'p|protein' => \$protein,
 	'cds' => \$cds
 );
@@ -101,6 +105,10 @@ while (my $line = <IN>){
 		if ($gbk){
 			$url = $genbankFTP.'/'.$accession.'_genomic.gbff.gz';
 			curl('gbk');
+		}
+		if ($gff){
+			$url = $genbankFTP.'/'.$accession.'_genomic.gff.gz';
+			curl('gff');
 		}
 		if ($protein){
 			$url = $genbankFTP.'/'.$accession.'_protein.faa.gz';
