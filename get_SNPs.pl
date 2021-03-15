@@ -193,7 +193,8 @@ my $fasta; my $fastq; my $file; my $fa; my $dir; my $qdir; my $flagstat;
 
 ## Creating indexes
 foreach (@fasta){
-	$fasta = $_; ($fa, $dir) = fileparse($fasta);
+	$fasta = $_;
+	($fa, $dir) = fileparse($fasta);
 	unless (-f $fasta) { die "\nFASTA file named $fasta not found. Please check your command line...\n\n"; }
 	if ($mapper eq 'bowtie2'){system "bowtie2-build --threads $threads $_ $fa.bt2";}
 	elsif ($mapper eq 'hisat2'){system "hisat2-build $_ $fa.ht";}
