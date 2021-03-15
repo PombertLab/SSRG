@@ -19,12 +19,14 @@ REQUIREMENTS	NCBI SRA toolkit:
 EXAMPLE		${name} \\
 		  -t 10 \\
 		  -o FASTQ \\
-		  -l accession_list(s)
+		  -l accession_list(s) \\
+		  -v
 
 OPTIONS:
 -t (--threads)	Number of CPU threads to use [Default: 10]
 -o (--outdir)	Output directory [Default: ./]
 -l (--list)	List(s) of SRA accesssion numbers, one accession number per line
+-v (--verbose)	Adds verbosity
 OPTIONS
 die "\n$usage\n" unless @ARGV;
 
@@ -32,11 +34,12 @@ die "\n$usage\n" unless @ARGV;
 my $threads = 8;
 my $outdir = './';
 my @list;
+my $verbose;
 GetOptions(
 	't|threads=i' => $threads,
+	'o|outdir=s' => $outdir,
 	'l|list=s' => \@list,
-	'fq|fastq=s' => \$fastq,
-	'Q=i' => \$qscore
+	'v|verbose' => \$verbose,
 );
 
 while (my $list = shift@list){ 
@@ -46,12 +49,15 @@ while (my $list = shift@list){
 		if ($line =~ /^#/){next;}
 		else{
 			my $sra = $line;
+			my $verbosity = '';
+			if ($verbose){ $verbosity = '--verbose'; }
 			print "Downloading/converting $sra to FASTQ format with fasterq-dump ...\n";
 			system "fasterq-dump \\
 			  --threads $threads \\
+			  $verbosity \\
 			  --outdir $outdir \\ 
 			  --outfile $sra \\
-			 --split-3 $sra ";
+			  --split-3 $sra ";
 		}
 	}
 }
