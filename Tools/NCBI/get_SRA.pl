@@ -32,7 +32,7 @@ die "\n$usage\n" unless @ARGV;
 
 ## Defining options
 my $threads = 8;
-my $outdir = '';
+my $outdir = './';
 my @list;
 my $verbose;
 GetOptions(
@@ -55,9 +55,8 @@ while (my $list = shift@list){
 			system "fasterq-dump \\
 			  --threads $threads \\
 			  $verbosity \\
-			  --outdir $outdir \\ 
-			  --outfile $sra \\
-			  --split-3 $sra ";
+			  --outdir $outdir \\
+			  -3 $sra";
 		}
 	}
 }
