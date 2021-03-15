@@ -206,12 +206,8 @@ print LOG "Time required to create all indexes: $index_time seconds\n";
 
 ## Read mapping files
 my $log_file = "${outdir}/mapping.$mapper.log";
-my $sam_file = "${outdir}/$file.$fa.$mapper.sam";
-my $bam_file = "${outdir}/$file.$fa.$mapper.bam";
-my $coverage_file = "${outdir}/$file.$fa.$mapper.coverage";
-my $stats_file = "${outdir}/$file.$fa.$mapper.$type.stats";
-my $vcf_file = "${outdir}/$file.$fa.$mapper.$type.vcf";
-my $depth_file = "${outdir}/$file.$fa.$mapper.depth";
+my $sam_file;
+my $bam_file;
 
 ## Single end read-mapping
 if (@fastq){
@@ -226,6 +222,9 @@ if (@fastq){
 		foreach (@fasta){
 			$fasta = $_;
 			($fa, $dir) = fileparse($fasta);
+			$sam_file = "${outdir}/$file.$fa.$mapper.sam";
+			$bam_file = "${outdir}/$file.$fa.$mapper.bam";
+
 			print "\n## FASTA information:\n";
 			print "FASTA parsed as: $fa\n";
 			print "FASTA input DIR parsed as: $dir\n\n";
@@ -308,6 +307,9 @@ if (@pe1 && @pe2){
 		foreach (@fasta){
 			$fasta = $_;
 			($fa, $dir) = fileparse($fasta);
+			$sam_file = "${outdir}/$file.$fa.$mapper.sam";
+			$bam_file = "${outdir}/$file.$fa.$mapper.bam";
+
 			print "\n## FASTA information:\n";
 			print "FASTA parsed as: $fa\n";
 			print "FASTA input DIR parsed as: $dir\n\n";
@@ -446,6 +448,8 @@ sub variant{
 	(my $passQC) = ($flagstat =~ /(\d+)\s+\+\s+\d+ in total/s);
 	print "\nQC-passed reads mapping to the genome = $passQC\n\n";
 
+	my $vcf_file = "${outdir}/$file.$fa.$mapper.$type.vcf";
+
 	## Checking if BAM file is empty
 	if ($passQC == 0){
 		print "No QC-passed reads mapped to the genome; skipping variants calling\n\n";
@@ -526,6 +530,10 @@ sub variant{
 ## Sub to calculate read mapping stats/metrics
 sub stats{
 	my $run_time = time - $tstart; my $mend = localtime();
+
+	my $coverage_file = "${outdir}/$file.$fa.$mapper.coverage";
+	my $stats_file = "${outdir}/$file.$fa.$mapper.$type.stats";
+	my $depth_file = "${outdir}/$file.$fa.$mapper.depth";
 
 	open COV, "<", "$coverage_file" or die "Can't read file $coverage_file: $!\n";
 	open STATS, ">", "$stats_file" or die "Can't create file $stats_file: $!\n";
