@@ -425,6 +425,8 @@ sub chkinstall{
 
 # sub to run convert SAM files to binary (BAM) format with samtools
 sub samtools{
+	my $coverage_file = "${outdir}/$file.$fa.$mapper.coverage";
+
 	my $sammem = int(($mem/$threads)*1024);
 	print "Running samtools on $sam_file...\n";
 	print "Using $sammem Mb per thread for samtools\n";
@@ -529,11 +531,14 @@ sub variant{
 
 ## Sub to calculate read mapping stats/metrics
 sub stats{
+	
+	
 	my $run_time = time - $tstart; my $mend = localtime();
 
 	my $coverage_file = "${outdir}/$file.$fa.$mapper.coverage";
 	my $stats_file = "${outdir}/$file.$fa.$mapper.$type.stats";
 	my $depth_file = "${outdir}/$file.$fa.$mapper.depth";
+	my $vcf_file = "${outdir}/$file.$fa.$mapper.$type.vcf";
 
 	open COV, "<", "$coverage_file" or die "Can't read file $coverage_file: $!\n";
 	open STATS, ">", "$stats_file" or die "Can't create file $stats_file: $!\n";
