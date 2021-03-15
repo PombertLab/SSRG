@@ -60,16 +60,16 @@ export PATH=$PATH:$(pwd)/
 export PATH=$PATH:$(pwd)/Tools/MASH
 export PATH=$PATH:$(pwd)/Tools/NCBI
 ```
-If desired, the default location of the [VarScan2](http://dkoboldt.github.io/varscan/) jar file can be updated in [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) by modifying the following line:
-```perl
-my $varjar = '/opt/varscan/VarScan.v2.4.4.jar';
-```
-
-If an error message appears relating to a corrupted jar file, download varscan with curl rather than git clone. To download the latest [VarScan2](http://dkoboldt.github.io/varscan/) with curl, type:
+To download the latest [VarScan2](http://dkoboldt.github.io/varscan/) with curl, type:
 ```Bash
 curl \
    -o VarScan.v2.4.4.jar \
    -L https://github.com/dkoboldt/varscan/blob/master/VarScan.v2.4.4.jar?raw=true
+```
+
+If desired, the default location of the [VarScan2](http://dkoboldt.github.io/varscan/) jar file can be updated in [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) by modifying the following line:
+```perl
+my $varjar = 'VarScan.v2.4.4.jar';
 ```
 
 #### Installing dependencies
@@ -230,7 +230,7 @@ Options for [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNP
 -ploidy				[default: 1]		## FreeBayes/BCFtools option; change ploidy (if needed)
 
 # VarScan2 parameters - see http://dkoboldt.github.io/varscan/using-varscan.html
--var				[default: /opt/varscan/VarScan.v2.4.4.jar]	## Which varscan jar file to use
+-var				[default: VarScan.v2.4.4.jar]	## Which varscan jar file to use
 -mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
 -mr (--min-reads2)		[default: 15]		## Minimum supporting reads at a position to call variants
 -maq (--min-avg-qual)		[default: 28]		## Minimum base quality at a position to count a read
