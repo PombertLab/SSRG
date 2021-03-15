@@ -531,8 +531,6 @@ sub variant{
 
 ## Sub to calculate read mapping stats/metrics
 sub stats{
-	
-	
 	my $run_time = time - $tstart; my $mend = localtime();
 
 	my $coverage_file = "${outdir}/$file.$fa.$mapper.coverage";
