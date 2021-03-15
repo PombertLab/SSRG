@@ -60,7 +60,8 @@ export PATH=$PATH:$(pwd)/
 export PATH=$PATH:$(pwd)/Tools/MASH
 export PATH=$PATH:$(pwd)/Tools/NCBI
 ```
-To download the latest [VarScan2](http://dkoboldt.github.io/varscan/) with curl, type:
+
+Note that downloading [VarScan2](http://dkoboldt.github.io/varscan/) from GitHub with git clone can result in corrupted jar files. Instead, to download the latest [VarScan2](http://dkoboldt.github.io/varscan/) with curl, type:
 ```Bash
 curl \
    -o VarScan.v2.4.4.jar \
