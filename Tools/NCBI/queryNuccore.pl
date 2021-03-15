@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF,  Illinois Tech 2019
-my $version = 0.4;
+my $version = 0.5;
 my $name = 'queryNuccore.pl';
 my $updated = '15/03/2021';
 
@@ -16,12 +16,14 @@ SYNOPSIS	Retrieve genomes/proteins from the NCBI Nucleotide database using a lis
 
 EXAMPLE		${name} \\
 		  -db nuccore \\
+		  -o DATASETS \\
 		  -fa \\
 		  -gb \\
 		  -l accession.txt
 
 OPTIONS:
--db (--database)	NCBI database to be queried [default: nuccore]
+-db (--database)	NCBI database to be queried [Default: nuccore]
+-o (--outdir)		Output folder [Default: ./]
 -fa (--fasta)		Reference genome(s) in fasta format
 -gb (--genbank)		Reference genome(s) in GenBank format
 -sqn (--sequin)		Reference genome(s) in Sequin ASN format
@@ -32,16 +34,18 @@ OPTIONS
 die "\n$usage\n" unless@ARGV;
 
 ## Defining options
+my $db = 'nuccore';
+my $outdir = './';
 my $fasta;
 my $genbank;
 my $proteins;
 my $sequin;
 my $cds;
-my $db = 'nuccore';
 my $list = '';
 
 GetOptions(
 	'db|database=s' => \$db,
+	'o|outdir=s' => \$outdir,
 	'fa|fasta' => \$fasta,
 	'gb|genbank' => \$genbank,
 	'p|proteins' => \$proteins,
@@ -49,6 +53,11 @@ GetOptions(
 	'c|cds' => \$cds,
 	'l|list=s' => \$list,
 );
+
+## Creating output directory
+unless (-d $outdir){
+	mkdir ($outdir,0755) or die "Can't create output folder $outdir: $!\n";
+}
 
 ## Downloading data from Nuccore
 my $start = localtime();
@@ -109,7 +118,7 @@ sub curl{
 	print "Downloading $filename ...\n";
 	my $URL = $efetch.'?db='.$db.'&id='.$accession.'&rettype='.$rettype.'&retmode='.$retmode;
 	system "curl \\
-	  -o $filename \\
+	  -o ${outdir}/$filename \\
 	  --progress-bar \\
 	  -L \'$URL\' ";
 	print "\n";
