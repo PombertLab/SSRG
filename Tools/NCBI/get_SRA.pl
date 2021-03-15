@@ -27,7 +27,7 @@ OPTIONS:
 -o (--outdir)	Output directory [Default: ./]
 -l (--list)	List(s) of SRA accesssion numbers, one accession number per line
 -v (--verbose)	Adds verbosity
--f (--force)	Frce to overwrite existing file(s)
+-f (--force)	Force to overwrite existing file(s)
 OPTIONS
 die "\n$usage\n" unless @ARGV;
 
