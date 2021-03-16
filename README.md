@@ -51,7 +51,6 @@ Assessing the genetic diversity between genomes often involves the calculation o
 - [HISAT2](https://ccb.jhu.edu/software/hisat2/index.shtml) 2.0+
 - [NGMLR](https://github.com/philres/ngmlr) 0.2.7+ (partial support)
 - [BCFtools](http://samtools.github.io/bcftools/) 1.3.1+
-- [FreeBayes](https://github.com/ekg/freebayes)
 
 #### Downloading from GitHub
 ```bash
@@ -223,14 +222,13 @@ Options for [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNP
 -ns (--no_stats)		Do not calculate stats; stats can take a while to compute for large eukaryote genomes
 
 # Mapper-specific options
--X				BOWTIE2 - Maximum paired ends insert size [default: 750]
 -preset				MINIMAP2 - Preset: sr, map-ont, map-pb or asm20 [default: sr]
--algo				BWA - Mapping algorithm:  bwasw, mem, samse [default: mem]
+-X				BOWTIE2 - Maximum paired ends insert size [default: 750]
 
-### Variant calling options ###
--caller				[default: varscan2]	## Variant caller: varscan2, bcftools or freebayes
+# Variant calling options
+-caller				[default: varscan2]	## Variant caller: varscan2 or bcftools
 -type				[default: snp]		## snp, indel, or both
--ploidy				[default: 1]		## FreeBayes/BCFtools option; change ploidy (if needed)
+-ploidy				[default: 1]		## BCFtools option; change ploidy (if needed)
 
 # VarScan2 parameters - see http://dkoboldt.github.io/varscan/using-varscan.html
 -var				[default: VarScan.v2.4.4.jar]	## Which varscan jar file to use
@@ -445,10 +443,8 @@ This work was supported in part by the National Institute of Allergy and Infecti
 
 8.	Ondov BD, Treangen TJ, Mallonee AB, Bergman NH, Koren S, Phillippy AM. **Fast genome and metagenome distance estimation using MinHash.** 2016. *Genome Biol.* 17, 132. PMID: [27323842](https://pubmed.ncbi.nlm.nih.gov/27323842) PMCID: [PMC4915045](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4915045) DOI: [10.1186/s13059-016-0997-x](https://doi.org/10.1186/s13059-016-0997-x)
 
-9.	Garrison E, Marth G. **Haplotype-based variant detection from short-read sequencing.** *arXiv* Prepr. 2012. 9, [arXiv1207.3907](https://arxiv.org/abs/1207.3907).
+9.	R Core Team. **R: A language and environment for statistical computing.** 2021. [URL](https://www.r-project.org/).
 
-10.	R Core Team. **R: A language and environment for statistical computing.** 2021. [URL](https://www.r-project.org/).
+10.	van der Maaten LJP. **Barnes-Hut-SNE.** *arxiv.org* 2013. [1301.3342v2](https://arxiv.org/abs/1301.3342)
 
-11.	van der Maaten LJP. **Barnes-Hut-SNE.** *arxiv.org* 2013. [1301.3342v2](https://arxiv.org/abs/1301.3342)
-
-12.	van der Maaten LJP,  Hinton GE. **Visualizing High-Dimensional Data Using t-SNE.** *J. Mach. Learn. Res.* 2008. 9, 2579–2605. [URL](https://jmlr.csail.mit.edu/papers/volume9/vandermaaten08a/vandermaaten08a.pdf)
+11.	van der Maaten LJP,  Hinton GE. **Visualizing High-Dimensional Data Using t-SNE.** *J. Mach. Learn. Res.* 2008. 9, 2579–2605. [URL](https://jmlr.csail.mit.edu/papers/volume9/vandermaaten08a/vandermaaten08a.pdf)

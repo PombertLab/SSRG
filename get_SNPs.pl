@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2020
-my $version = '2.0 alpha RC4';
+my $version = '2.0';
 my $name = 'get_SNPs.pl';
-my $updated = '15/03/2021; Code minification + readability';
+my $updated = '16/03/2021';
 
 use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
 
@@ -20,7 +20,7 @@ USAGE		${name} [options]
 EXAMPLES:
 simple			${name} -fa *.fasta -fq *.fastq -o RESULTS
 advanced		${name} --fasta *.fasta --fastq *.fastq --mapper bowtie2 --caller varscan2 --type both --var ./VarScan.v2.4.3.jar --threads 16
-paired ends		${name} --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --caller freebayes --threads 16
+paired ends		${name} --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --caller bcftools --threads 16
 read-mapping only	${name} --fasta *.fasta --pe1 *R1.fastq --pe2 *R2.fastq --X 1000 --mapper bowtie2 --rmo --bam --threads 16
 USAGE
 die "\n$usage\n$hint\n" unless@ARGV;
@@ -32,7 +32,7 @@ OPTIONS:
 -v (--version)	Display script version
 -o (--outdir)	Output directory [Default: ./]
 
-### Mapping options ###
+# Mapping options
 -fa (--fasta)			Reference genome(s) in fasta file
 -fq (--fastq)			Fastq reads (single ends) to be mapped against reference(s)
 -pe1				Fastq reads #1 (paired ends) to be mapped against reference(s)
@@ -46,17 +46,16 @@ OPTIONS:
 -rmo (--read_mapping_only)	Do not perform variant calling; useful when only interested in bam/sam files and/or mapping stats
 -ns (--no_stats)		Do not calculate stats; stats can take a while to compute for large eukaryote genomes
 
-### Mapper-specific options ###
--X				BOWTIE2 - Maximum paired ends insert size [default: 750]
+# Mapper-specific options
 -preset				MINIMAP2 - Preset: sr, map-ont, map-pb or asm20 [default: sr]
--algo				BWA - Mapping algorithm:  bwasw, mem, samse [default: mem]
+-X				BOWTIE2 - Maximum paired ends insert size [default: 750]
 
-### Variant calling options ###
--caller				[default: varscan2]	## Variant caller: varscan2, bcftools or freebayes
+# Variant calling options
+-caller				[default: varscan2]	## Variant caller: varscan2 or bcftools
 -type				[default: snp]		## snp, indel, or both
--ploidy				[default: 1]		## FreeBayes/BCFtools option; change ploidy (if needed)
+-ploidy				[default: 1]		## BCFtools option; change ploidy (if needed)
 
-### VarScan2 parameters ### see http://dkoboldt.github.io/varscan/using-varscan.html
+# VarScan2 parameters - see http://dkoboldt.github.io/varscan/using-varscan.html
 -var				[default: VarScan.v2.4.4.jar]	## Which varscan jar file to use
 -mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
 -mr (--min-reads2)		[default: 15]		## Minimum supporting reads at a position to call variants
@@ -87,9 +86,8 @@ my $rmo;
 my $nostat;
 
 ## Mapper-specific
-my $maxins = '750';
 my $preset = 'sr';
-my $algo = 'mem';
+my $maxins = '750';
 
 ## Variant calling
 my $caller = 'varscan2';
@@ -126,9 +124,8 @@ GetOptions(
 	'ns|no_stats' => \$nostat,
 	
 	## Mapper-specific
-	'X=i' => \$maxins,
 	'preset=s' => \$preset,
-	'algo=s' => \$algo,
+	'X=i' => \$maxins,
 
 	## Variant calling
 	'caller=s' => \$caller,
@@ -154,9 +151,9 @@ chkinstall('samtools');
 if ($mapper =~ /bowtie2|hisat2|minimap2|ngmlr/){ chkinstall($mapper);}
 else {die "\nMapper option $mapper is unrecognized. Please use bowtie2, hisat2, minimap2 or ngmlr...\n\n";}
 unless ($rmo){
-	if ($caller =~ /freebayes|bcftools/){ chkinstall($caller);}
+	if ($caller =~ /bcftools/){ chkinstall($caller);}
 	elsif ($caller eq 'varscan2'){ unless (-f $varjar){ die "Cannot find varscan jar file: $varjar\n";} }
-	else {die "\nVariant caller option $caller is unrecognized. Please use varscan2, bcftools, freebayes...\n\n";}
+	else {die "\nVariant caller option $caller is unrecognized. Please use varscan2 or bcftools...\n\n";}
 }
 
 ## Option checks
@@ -464,44 +461,31 @@ sub variant{
 	else{
 		print "Calling variants with $caller on $fasta...\n\n";
 		if ($caller eq 'varscan2'){
-			if (($type eq 'snp')||($type eq 'indel')){
-				system "samtools \\
-				  mpileup \\
-				  -f $fasta \\
-				  $bam_file \\
-				  | \\
-				  java -jar $varjar \\
-				  mpileup2$type \\
-				  --min-coverage $mc \\
-				  --min-reads2 $mr \\
-				  --min-avg-qual $maq \\
-				  --min-var-freq $mvf \\
-				  --min-freq-for-hom $mhom \\
-				  --p-value $pv \\
-				  --strand-filter $sf \\
-				  --output-vcf \\
-				  > $vcf_file";
-			}
+			my $vflag = '';
+			my $cns;
+			if (($type eq 'snp')||($type eq 'indel')){ $cns = $type; }
 			elsif ($type eq 'both'){
-				system "samtools \\
-				  mpileup \\
-				  -f $fasta \\
-				  $bam_file \\
-				  | \\
-				  java -jar $varjar \\
-				  mpileup2cns \\
-				  --min-coverage $mc \\
-				  --min-reads2 $mr \\
-				  --min-avg-qual $maq \\
-				  --min-var-freq $mvf \\
-				  --min-freq-for-hom $mhom \\
-				  --p-value $pv \\
-				  --strand-filter $sf \\
-				  --variants \\
-				  --output-vcf \\
-				  > $vcf_file";
+				$cns = 'cns';
+				$vflag = '--variants';
 			}
 			else {die "\nERROR: Unrecognized variant type. Please use: snp, indel, or both\n\n";}
+			system "samtools \\
+			  mpileup \\
+			  -f $fasta \\
+			  $bam_file \\
+			  | \\
+			  java -jar $varjar \\
+			  mpileup2$cns \\
+			  --min-coverage $mc \\
+			  --min-reads2 $mr \\
+			  --min-avg-qual $maq \\
+			  --min-var-freq $mvf \\
+			  --min-freq-for-hom $mhom \\
+			  --p-value $pv \\
+			  --strand-filter $sf \\
+			  $vflag \\
+			  --output-vcf \\
+			  > $vcf_file";
 		}
 		elsif ($caller eq 'bcftools'){ ## tested with 1.10.2
 			unless ($type =~ /snp|indel|both/){ die "\nERROR: Unrecognized variant type. Please use: snp, indel, or both\n\n"; }
@@ -509,21 +493,16 @@ sub variant{
 			if ($type eq 'snp'){ $varV = '-V indels'; }
 			elsif ($type eq 'indel') { $varV = '-V snps'; }
 			system "bcftools \\
-				mpileup \\
-				-f $fasta \\
-				$bam_file \\
-				| \\
-				bcftools \\
-				call \\
-				-vmO v \\
-				$varV \\
-				--ploidy $ploidy \\
-				--output $vcf_file";
-		}
-		elsif ($caller eq 'freebayes'){ ## single thread only, parallel version behaving wonky
-			system "samtools index $bam_file";
-			system "freebayes -f $fasta -p $ploidy $bam_file > $vcf_file";
-			unless ($index eq 'csi') { system "rm $bam_file.bai"; }
+			  mpileup \\
+			  -f $fasta \\
+			  $bam_file \\
+			  | \\
+			  bcftools \\
+			  call \\
+			  -vmO v \\
+			  $varV \\
+			  --ploidy $ploidy \\
+			  --output $vcf_file";
 		}
 	}
 }
@@ -666,7 +645,7 @@ sub print_options{
 			print MAP "   P-value threshold for calling variants: $pv\n";
 			print MAP "   Strand filter: $sf\t\#\# 1 ignores variants with >90% support on one strand\n";
 		}
-		if ($caller eq "bcftools|freebayes"){print MAP "Setting ploidy to: $ploidy\n";}
+		if ($caller eq "bcftools"){print MAP "Setting ploidy to: $ploidy\n";}
 		if ($type eq 'snp'){print MAP "Searching for SNPs...\n";}
 		elsif ($type eq 'indel') {print MAP "Searching for indels...\n";}
 		elsif ($type eq 'both') {print MAP "Searching for SNPs and indels...\n";}
