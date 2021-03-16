@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2017-2018 Illinois Tech
-my $version = '0.4a';
+my $version = '0.5';
 my $name = 'synonymy.pl';
-my $updated = '14/03/2021';
+my $updated = '16/03/2021';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions); use File::Basename;
 
@@ -73,39 +73,59 @@ while (my $line = <FASTA>){
 ## Creating output directory
 unless (-d $outdir){ mkdir ($outdir,0755) or die "Can't create folder $outdir: $!\n"; }
 
-## Building hashes of features. Must simplify the data structure to one hash of features. 
-## Will be easier to adapt for input files. Working multiline would do it.
+## Building hashes of features
 open REF, "<", "$ref" or die "Can't read reference file $ref: $!\n";
-my %genes, my %features; my %hashes; ## hash of hashes for contigs and their feature locations
-my $type; my $start; my $end; my $strand; my $id; my $locus_tag; my $parent; my $product; my $key;
+my %features; 
+my %loci; ## loci -> contig -> genomic_locus (e.g. 79553) = corresponding feature
+my $type; my $start; my $end; my $strand; my $gene_id; my $locus_tag; my $parent; my $product;
+
 if ($format eq 'gff'){
 	while (my $line = <REF>){
 		chomp $line;
 		if ($line =~ /^#/){next;}
 		elsif ($line =~ /^ID=/){next;}
-		elsif ($line =~ /^(\S+)\t.*\t(gene|pseudogene)\t(\d+)\t(\d+)\t\.\t([+-])\t[.012]\tID=(\w+).*\;locus_tag=([A-Za-z0-9 _]+)/){ ## Working on locus_tags
-			$contig = $1; $type = $2; $start = $3; $end = $4; $strand = $5; $id = $6; $locus_tag = $7;
-			$genes{$id}[0] = $contig;
-			$genes{$id}[1] = $start;
-			$genes{$id}[2] = $end;
-			$genes{$id}[3] = $strand;
-			$genes{$id}[4] = $locus_tag;
+
+		my @columns = split ("\t", $line);
+
+		$contig = $columns[0];
+		$type = $columns[2];
+		$start = $columns[3];
+		$end = $columns[4];
+		$strand = $columns[6];
+
+		## Putting descriptions into an hash for easy parsing and access
+		my $description = $columns[8];
+		my %descriptors;
+		my @descriptors = split (";", $description);
+		foreach my $desc (@descriptors){
+			my ($key, $value) = $desc =~ /(.*?)=(.*)/;
+			$descriptors{$key} = $value;
 		}
-		elsif ($line =~ /^(\S+)\t.*\t(tRNA|rRNA|CDS|)\t(\d+)\t(\d+)\t\.\t([+-])\t[.012]\tID=(\w+).*Parent=([A-Za-z0-9_]+).*product=([A-Za-z0-9 -]+)/){	## Working on features
-			$contig = $1; $type = $2; $start = $3; $end = $4; $strand = $5; $id = $6; $parent = $7; $product = $8;
-			$features{$id}[0] = $type;
-			$features{$id}[1] = $start;
-			$features{$id}[2] = $end;
-			$features{$id}[3] = $strand;
-			$features{$id}[4] = $parent;
-			$features{$id}[5] = $product;
+
+		$gene_id = $descriptors{'ID'};
+
+		if ($type =~ /tRNA|rRNA|CDS/){
+			$locus_tag = $descriptors{'locus_tag'};
+			$product = $descriptors{'product'};
+
+			## Populating features DB
+			$features{$gene_id}{'type'} = $type;
+			$features{$gene_id}{'start'} = $start;
+			$features{$gene_id}{'end'} = $end;
+			$features{$gene_id}{'strand'}= $strand;
+			$features{$gene_id}{'locus_tag'} = $locus_tag;
+			$features{$gene_id}{'product'} = $product;
+
 			if ($verbose){ print "$contig\t$type\t$strand\t$locus_tag\t$product\n"; }
+
+			## creating a hash of genomic loci and their associated gene_ID
 			for ($start..$end){
-				push (@{$hashes{$contig}{$_}}, $id);
+				push (@{$loci{$contig}{$_}}, $gene_id);
 			}
 		}
 	}
 }
+
 elsif ($format eq 'gb'){
 	my $gbk; while (my $line = <REF>){$gbk .= $line;}
 	my @contigs = split ("\/\/\n", $gbk);
@@ -122,18 +142,27 @@ elsif ($format eq 'gb'){
 				$type = $1; $start = $2; $end = $3;
 				if ($line =~ /complement/){$strand = '-';}
 				else{$strand = '+';}
-				($locus_tag) = ($line =~ /\/locus_tag="(.*?)"/s); $locus_tag =~ s/\s{2,}/ /g; $locus_tag =~ s/\n//g; ## removing new lines, if any
-				($product) = ($line =~ /\/product="(.*?)"/s); $product =~ s/\s{2,}/ /g; $product =~ s/\n//g; ## removing new lines, if any
+
+				($locus_tag) = ($line =~ /\/locus_tag="(.*?)"/s);
+				$locus_tag =~ s/\s{2,}/ /g;
+				$locus_tag =~ s/\n//g; ## removing new lines, if any
+
+				($product) = ($line =~ /\/product="(.*?)"/s);
+				$product =~ s/\s{2,}/ /g;
+				$product =~ s/\n//g; ## removing new lines, if any
+
+				$features{$locus_tag}{'type'} = $type;
+				$features{$locus_tag}{'start'} = $start;
+				$features{$locus_tag}{'end'} = $end;
+				$features{$locus_tag}{'strand'} = $strand;
+				$features{$locus_tag}{'locus_tag'} = $locus_tag;
+				$features{$locus_tag}{'product'} = $product;
+
 				if ($verbose){ print "$contig\t$type\t$strand\t$locus_tag\t$product\n"; }
-				$genes{$locus_tag}[0] = $contig;
-				$genes{$locus_tag}[1] = $start; $features{$locus_tag}[1] = $start;
-				$genes{$locus_tag}[2] = $end; $features{$locus_tag}[2] = $end;
-				$genes{$locus_tag}[3] = $strand; $features{$locus_tag}[3] = $strand;
-				$genes{$locus_tag}[4] = $locus_tag; $features{$locus_tag}[4] = $locus_tag;
-				$features{$locus_tag}[0] = $type;
-				$features{$locus_tag}[5] = $product;
+
+				## creating a hash of genomic loci and their associated gene_ID
 				for ($start..$end){
-					push (@{$hashes{$contig}{$_}}, $locus_tag);
+					push (@{$loci{$contig}{$_}}, $locus_tag);
 				}
 			}
 		}
@@ -207,16 +236,20 @@ while (my $vcf = shift@vcf){
 			my $freq = $params[6];
 			my $evalue = $params[7];
 			
-			if (exists $hashes{$contig}{$position}){
-				for (0..$#{$hashes{$contig}{$position}}){
-					$locus = $hashes{$contig}{$position}[$_];
-					$type = $features{$hashes{$contig}{$position}[$_]}[0];
-					$start = $features{$hashes{$contig}{$position}[$_]}[1];
-					$end = $features{$hashes{$contig}{$position}[$_]}[2];
-					$strand = $features{$hashes{$contig}{$position}[$_]}[3];
-					$parent = $features{$hashes{$contig}{$position}[$_]}[4];
-					$product = $features{$hashes{$contig}{$position}[$_]}[5];
-					print FEAT "$genes{$parent}[4]\t$contig\t$vcf\t$type\t$start\t$end\t$strand\t$product\t$position\t$ref\t$alt\t";
+			if (exists $loci{$contig}{$position}){
+				for (0..$#{$loci{$contig}{$position}}){
+
+					$locus = $loci{$contig}{$position}[$_];
+
+					$type = $features{$locus}{'type'};
+					$start = $features{$locus}{'start'};
+					$end = $features{$locus}{'end'};
+					$strand = $features{$locus}{'end'};
+					$locus_tag = $features{$locus}{'locus_tag'};
+					$product = $features{$locus}{'product'};
+
+					print FEAT "$locus_tag\t$contig\t$vcf\t$type\t$start\t$end\t$strand\t$product\t$position\t$ref\t$alt\t";
+
 					if ($type eq 'tRNA'){print FEAT "N\/A\tN\/A\tN\/A\tN\/A\t";}
 					elsif ($type eq 'rRNA'){print FEAT "N\/A\tN\/A\tN\/A\tN\/A\t";}
 					elsif ($type eq 'CDS'){
