@@ -17,6 +17,7 @@ People interested in ***genetic distances*** should use the genetic distance est
   * [Creating NCBI genome lists](#Creating-NCBI-genome-lists)
   * [SSRG workflow](#SSRG-workflow)
   * [Mash workflow](#Mash-workflow)
+* [Misc scripts](#Misc-scripts)
 * [Funding and acknowledgments](#Funding-and-acknowledgments)
 * [References](#references)
 
@@ -373,6 +374,54 @@ MashR_plotter.pl \
 	-fs 25
 ```
 The PDF generated should be similar, ***but not identical***, to [S_pneumoniae_75_tSNE.pdf](https://github.com/PombertLab/SSRG/blob/master/Images/S_pneumoniae_75_tSNE.pdf) from the [Images/](https://github.com/PombertLab/SSRG/tree/master/Images) directory. t-SNE graphs are generated using random seeds, which affect how the distances are represented in 2D.
+
+## Misc scripts
+The script [queryNuccore.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/NCBI/queryNuccore.pl) retrieves genomes/proteins from the NCBI Nucleotide database using a list of accession numbers (one per line). This script uses [efetch](https://dataguide.nlm.nih.gov/edirect/efetch.html) from NCBI's [E-utilities](http://www.ncbi.nlm.nih.gov/books/NBK25499/) suite.
+
+To download FASTA and GenBank files with [queryNuccore.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/NCBI/queryNuccore.pl), type:
+```Bash
+queryNuccore.pl \
+  -l Examples/list_example_queryNuccore.txt
+  -o DATASETS \
+  -fa \
+  -gb
+```
+
+Options for [queryNuccore.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/NCBI/queryNuccore.pl) are:
+```
+-l (--list)		Accession numbers list, one accession per line
+-o (--outdir)		Output folder [Default: ./]
+-db (--database)	NCBI database to be queried [Default: nuccore]
+-fa (--fasta)		Reference genome(s) in fasta format
+-gb (--genbank)		Reference genome(s) in GenBank format
+-sqn (--sequin)		Reference genome(s) in Sequin ASN format
+-p (--proteins)		Protein sequences (amino acids)
+-c (--cds)		Protein sequences (nucleotides)
+```
+
+The script [get_SRA.pl](https://github.com/PombertLab/SSRG/tree/master/Tools/NCBI) downloads data from the [NCBI Sequence Read Archive](https://www.ncbi.nlm.nih.gov/sra) and converts it to FASTQ format using fasterq-dump from the [NCBI SRA toolkit](https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software).
+
+To download NCBI SRA datasets with [get_SRA.pl](https://github.com/PombertLab/SSRG/tree/master/Tools/NCBI) using 10 thread (-t 10), type:
+```Bash
+get_SRA.pl \
+   -t 10 \
+   -o FASTQ \
+   -l Examples/list_example_get_SRA.txt \
+   -p \
+   -v
+```
+
+Note that this process can take quite a while depending on the size of the requested datasets and the available bandwidth.
+
+Options for [get_SRA.pl](https://github.com/PombertLab/SSRG/tree/master/Tools/NCBI) are:
+```
+-t (--threads)	Number of CPU threads to use [Default: 10]
+-o (--outdir)	Output directory [Default: ./]
+-l (--list)	List(s) of SRA accesssion numbers, one accession number per line
+-p (--progess)	Show progess
+-v (--verbose)	Add verbosity
+-f (--force)	Force to overwrite existing file(s)
+```
 
 ## Funding and acknowledgments
 This work was supported in part by the National Institute of Allergy and Infectious Diseases of the National Institutes of Health (award number R15AI128627) to Jean-Francois Pombert. The content is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health.
