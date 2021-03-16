@@ -401,7 +401,7 @@ Options for [queryNuccore.pl](https://github.com/PombertLab/SSRG/blob/master/Too
 
 The script [get_SRA.pl](https://github.com/PombertLab/SSRG/tree/master/Tools/NCBI) downloads data from the [NCBI Sequence Read Archive](https://www.ncbi.nlm.nih.gov/sra) and converts it to FASTQ format using fasterq-dump from the [NCBI SRA toolkit](https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software).
 
-To download NCBI SRA datasets with [get_SRA.pl](https://github.com/PombertLab/SSRG/tree/master/Tools/NCBI) using 10 thread (-t 10), type:
+To download NCBI SRA datasets with [get_SRA.pl](https://github.com/PombertLab/SSRG/tree/master/Tools/NCBI) using 10 threads (-t 10), type:
 ```Bash
 get_SRA.pl \
    -t 10 \
@@ -428,18 +428,17 @@ This work was supported in part by the National Institute of Allergy and Infecti
 
 ## References
 1.	[Ondov BD, Treangen TJ, Mallonee AB, Bergman NH, Koren S, Phillippy AM. Fast genome and metagenome distance estimation using MinHash](https://pubmed.ncbi.nlm.nih.gov/27323842/) 2016. Genome Biol. 17, 132. PMID: 27323842 PMCID: PMC4915045 DOI: 10.1186/s13059-016-0997-x
-2.	[Li H, Durbin R. Fast and accurate long-read alignment with Burrows-Wheeler transform](https://pubmed.ncbi.nlm.nih.gov/20080505/) 2010. Bioinformatics 26, 589–595. PMID: 20080505 PMCID: PMC2828108 DOI: 10.1093/bioinformatics/btp698
-3.	[Langmead B, Salzberg SL. Fast gapped-read alignment with Bowtie 2](https://pubmed.ncbi.nlm.nih.gov/22388286/) 2012. Nat Methods 9, 357–359. PMID: 22388286 PMCID: PMC3322381 DOI: 10.1038/nmeth.1923
-4.	[Kim D, Langmead B, Salzberg SL. HISAT: a fast spliced aligner with low memory requirements](https://pubmed.ncbi.nlm.nih.gov/25751142/) 2015. Nat. Methods 12, 357–360. PMID: 25751142 PMCID: PMC4655817 DOI: 10.1038/nmeth.3317
-5.	[Li H. Minimap2: pairwise alignment for nucleotide sequences](https://pubmed.ncbi.nlm.nih.gov/29750242/) 2018. Bioinformatics 34, 3094–3100. PMID: 29750242 PMCID: PMC6137996 DOI: 10.1093/bioinformatics/bty191
-6.	[Sedlazeck FJ, Rescheneder P, Smolka M, Fang H, Nattestad M, von Haeseler A,  Schatz MC. Accurate detection of complex structural variations using single-molecule sequencing](https://pubmed.ncbi.nlm.nih.gov/29713083/) 2018. Nat. Methods 15, 461–468. PMID: 29713083 PMCID: PMC5990442 DOI: 10.1038/s41592-018-0001-7
-7.	[Li H, Handsaker B, Wysoker A, Fennell T, Ruan J, Homer N, Marth G, Abecasis G, Durbin R. The Sequence Alignment/Map format and SAMtools](https://pubmed.ncbi.nlm.nih.gov/19505943/) 2009. Bioinformatics 25, 2078–2079. PMID: 19505943 PMCID: PMC2723002 DOI: 10.1093/bioinformatics/btp352
-8.	[Koboldt DC, Zhang Q, Larson DE, Shen D, McLellan, MD, Lin L, Miller CA, Mardis ER, Ding L, Wilson RK. VarScan 2: somatic mutation and copy number alteration discovery in cancer by exome sequencing](https://pubmed.ncbi.nlm.nih.gov/22300766/) 2012. Genome Res. 22, 568–576. PMID: 22300766 PMCID: PMC3290792 DOI: 10.1101/gr.129684.111
-9.	[Narasimhan V, Danecek P, Scally A, Xue Y, Tyler-Smith C, Durbin R. BCFtools/RoH: a hidden Markov model approach for detecting autozygosity from next-generation sequencing data](https://pubmed.ncbi.nlm.nih.gov/26826718/) 2016. Bioinformatics 32, 1749–1751. PMID: 26826718 PMCID: PMC4892413 DOI: 10.1093/bioinformatics/btw044
-10.	[Garrison E, Marth G. Haplotype-based variant detection from short-read sequencing](https://arxiv.org/abs/1207.3907) 2012. arXiv Prepr. arXiv1207.3907, 9.
-11.	[R Core Team. R: A language and environment for statistical computing](https://www.r-project.org/). 2020.
-12.	[van der Maaten LJP. Barnes-Hut-SNE](https://arxiv.org/abs/1301.3342) 2013. arxiv.org, 1301.3342v2.
-13.	[van der Maaten LJP,  Hinton GE. Visualizing High-Dimensional Data Using t-SNE](https://jmlr.csail.mit.edu/papers/volume9/vandermaaten08a/vandermaaten08a.pdf) 2008. J. Mach. Learn. Res. 9, 2579–2605.
+2.	[Langmead B, Salzberg SL. Fast gapped-read alignment with Bowtie 2](https://pubmed.ncbi.nlm.nih.gov/22388286/) 2012. Nat Methods 9, 357–359. PMID: 22388286 PMCID: PMC3322381 DOI: 10.1038/nmeth.1923
+3.	[Kim D, Langmead B, Salzberg SL. HISAT: a fast spliced aligner with low memory requirements](https://pubmed.ncbi.nlm.nih.gov/25751142/) 2015. Nat. Methods 12, 357–360. PMID: 25751142 PMCID: PMC4655817 DOI: 10.1038/nmeth.3317
+4.	[Li H. Minimap2: pairwise alignment for nucleotide sequences](https://pubmed.ncbi.nlm.nih.gov/29750242/) 2018. Bioinformatics 34, 3094–3100. PMID: 29750242 PMCID: PMC6137996 DOI: 10.1093/bioinformatics/bty191
+5.	[Sedlazeck FJ, Rescheneder P, Smolka M, Fang H, Nattestad M, von Haeseler A,  Schatz MC. Accurate detection of complex structural variations using single-molecule sequencing](https://pubmed.ncbi.nlm.nih.gov/29713083/) 2018. Nat. Methods 15, 461–468. PMID: 29713083 PMCID: PMC5990442 DOI: 10.1038/s41592-018-0001-7
+6.	[Li H, Handsaker B, Wysoker A, Fennell T, Ruan J, Homer N, Marth G, Abecasis G, Durbin R. The Sequence Alignment/Map format and SAMtools](https://pubmed.ncbi.nlm.nih.gov/19505943/) 2009. Bioinformatics 25, 2078–2079. PMID: 19505943 PMCID: PMC2723002 DOI: 10.1093/bioinformatics/btp352
+7.	[Koboldt DC, Zhang Q, Larson DE, Shen D, McLellan, MD, Lin L, Miller CA, Mardis ER, Ding L, Wilson RK. VarScan 2: somatic mutation and copy number alteration discovery in cancer by exome sequencing](https://pubmed.ncbi.nlm.nih.gov/22300766/) 2012. Genome Res. 22, 568–576. PMID: 22300766 PMCID: PMC3290792 DOI: 10.1101/gr.129684.111
+8.	[Narasimhan V, Danecek P, Scally A, Xue Y, Tyler-Smith C, Durbin R. BCFtools/RoH: a hidden Markov model approach for detecting autozygosity from next-generation sequencing data](https://pubmed.ncbi.nlm.nih.gov/26826718/) 2016. Bioinformatics 32, 1749–1751. PMID: 26826718 PMCID: PMC4892413 DOI: 10.1093/bioinformatics/btw044
+9.	[Garrison E, Marth G. Haplotype-based variant detection from short-read sequencing](https://arxiv.org/abs/1207.3907) 2012. arXiv Prepr. arXiv1207.3907, 9.
+10.	[R Core Team. R: A language and environment for statistical computing](https://www.r-project.org/). 2020.
+11.	[van der Maaten LJP. Barnes-Hut-SNE](https://arxiv.org/abs/1301.3342) 2013. arxiv.org, 1301.3342v2.
+12.	[van der Maaten LJP,  Hinton GE. Visualizing High-Dimensional Data Using t-SNE](https://jmlr.csail.mit.edu/papers/volume9/vandermaaten08a/vandermaaten08a.pdf) 2008. J. Mach. Learn. Res. 9, 2579–2605.
 
 
 
