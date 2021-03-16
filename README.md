@@ -427,26 +427,27 @@ Options for [get_SRA.pl](https://github.com/PombertLab/SSRG/tree/master/Tools/NC
 This work was supported in part by the National Institute of Allergy and Infectious Diseases of the National Institutes of Health (award number R15AI128627) to Jean-Francois Pombert. The content is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health.
 
 ## References
-1.	Ondov BD, Treangen TJ, Mallonee AB, Bergman NH, Koren S, Phillippy AM. **Fast genome and metagenome distance estimation using MinHash.** 2016. *Genome Biol.* 17, 132. PMID: [27323842](https://pubmed.ncbi.nlm.nih.gov/27323842) PMCID: [PMC4915045](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4915045) DOI: [10.1186/s13059-016-0997-x](https://doi.org/10.1186/s13059-016-0997-x)
+
+1.	Li H. **Minimap2: pairwise alignment for nucleotide sequences.** *Bioinformatics.* 2018. 34, 3094–3100. PMID: [29750242](https://pubmed.ncbi.nlm.nih.gov/29750242) PMCID: [PMC6137996](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6137996) DOI: [10.1093/bioinformatics/bty191](https://doi.org/10.1093/bioinformatics/bty191)
 
 2.	Langmead B, Salzberg SL. **Fast gapped-read alignment with Bowtie 2.** *Nat Methods.* 2012. 9, 357–359. PMID: [22388286](https://pubmed.ncbi.nlm.nih.gov/22388286) PMCID: [PMC3322381](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3322381) DOI: [10.1038/nmeth.1923](https://doi.org/10.1038/nmeth.1923)
 
 3.	Kim D, Langmead B, Salzberg SL. **HISAT: a fast spliced aligner with low memory requirements.** *Nat. Methods.* 2015. 12, 357–360. PMID: [25751142](https://pubmed.ncbi.nlm.nih.gov/25751142) PMCID: [PMC4655817](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4655817) DOI: [10.1038/nmeth.3317](https://doi.org/10.1038/nmeth.3317)
 
-4.	Li H. **Minimap2: pairwise alignment for nucleotide sequences.** *Bioinformatics.* 2018. 34, 3094–3100. PMID: [29750242](https://pubmed.ncbi.nlm.nih.gov/29750242) PMCID: [PMC6137996](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6137996) DOI: [10.1093/bioinformatics/bty191](https://doi.org/10.1093/bioinformatics/bty191)
+4.	Sedlazeck FJ, Rescheneder P, Smolka M, Fang H, Nattestad M, von Haeseler A,  Schatz MC. **Accurate detection of complex structural variations using single-molecule sequencing.** *Nat. Methods.* 2018. 15, 461–468. PMID: [29713083](https://pubmed.ncbi.nlm.nih.gov/29713083) PMCID: [PMC5990442](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5990442) DOI: [10.1038/s41592-018-0001-7](https://doi.org/10.1038/s41592-018-0001-7)
 
-5.	Sedlazeck FJ, Rescheneder P, Smolka M, Fang H, Nattestad M, von Haeseler A,  Schatz MC. **Accurate detection of complex structural variations using single-molecule sequencing.** *Nat. Methods.* 2018. 15, 461–468. PMID: [29713083](https://pubmed.ncbi.nlm.nih.gov/29713083) PMCID: [PMC5990442](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5990442) DOI: [10.1038/s41592-018-0001-7](https://doi.org/10.1038/s41592-018-0001-7)
+5.	Li H, Handsaker B, Wysoker A, Fennell T, Ruan J, Homer N, Marth G, Abecasis G, Durbin R. **The Sequence Alignment/Map format and SAMtools.** *Bioinformatics.* 2009. 25, 2078–2079. PMID: [19505943](https://pubmed.ncbi.nlm.nih.gov/19505943) PMCID: [PMC2723002](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2723002) DOI: [10.1093/bioinformatics/btp352](https://doi.org/10.1093/bioinformatics/btp352)
 
-6.	Li H, Handsaker B, Wysoker A, Fennell T, Ruan J, Homer N, Marth G, Abecasis G, Durbin R. **The Sequence Alignment/Map format and SAMtools.** *Bioinformatics.* 2009. 25, 2078–2079. PMID: [19505943](https://pubmed.ncbi.nlm.nih.gov/19505943) PMCID: [PMC2723002](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2723002) DOI: [10.1093/bioinformatics/btp352](https://doi.org/10.1093/bioinformatics/btp352)
+6.	Koboldt DC, Zhang Q, Larson DE, Shen D, McLellan, MD, Lin L, Miller CA, Mardis ER, Ding L, Wilson RK. **VarScan 2: somatic mutation and copy number alteration discovery in cancer by exome sequencing.** *Genome Res.* 2012. 22, 568–576. PMID: [22300766](https://pubmed.ncbi.nlm.nih.gov/22300766) PMCID: [PMC3290792](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3290792) DOI: [10.1101/gr.129684.111](https://doi.org/10.1101/gr.129684.111)
 
-7.	Koboldt DC, Zhang Q, Larson DE, Shen D, McLellan, MD, Lin L, Miller CA, Mardis ER, Ding L, Wilson RK. **VarScan 2: somatic mutation and copy number alteration discovery in cancer by exome sequencing.** *Genome Res.* 2012. 22, 568–576. PMID: [22300766](https://pubmed.ncbi.nlm.nih.gov/22300766) PMCID: [PMC3290792](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3290792) DOI: [10.1101/gr.129684.111](https://doi.org/10.1101/gr.129684.111)
+7.	Narasimhan V, Danecek P, Scally A, Xue Y, Tyler-Smith C, Durbin R. **BCFtools/RoH: a hidden Markov model approach for detecting autozygosity from next-generation sequencing data.** *Bioinformatics.* 2016. 32, 1749–1751. PMID: [26826718](https://pubmed.ncbi.nlm.nih.gov/26826718) PMCID: [PMC4892413](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4892413) DOI: [10.1093/bioinformatics/btw044](https://doi.org/10.1093/bioinformatics/btw044)
 
-8.	Narasimhan V, Danecek P, Scally A, Xue Y, Tyler-Smith C, Durbin R. **BCFtools/RoH: a hidden Markov model approach for detecting autozygosity from next-generation sequencing data.** *Bioinformatics.* 2016. 32, 1749–1751. PMID: [26826718](https://pubmed.ncbi.nlm.nih.gov/26826718) PMCID: [PMC4892413](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4892413) DOI: [10.1093/bioinformatics/btw044](https://doi.org/10.1093/bioinformatics/btw044)
+8.	Ondov BD, Treangen TJ, Mallonee AB, Bergman NH, Koren S, Phillippy AM. **Fast genome and metagenome distance estimation using MinHash.** 2016. *Genome Biol.* 17, 132. PMID: [27323842](https://pubmed.ncbi.nlm.nih.gov/27323842) PMCID: [PMC4915045](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4915045) DOI: [10.1186/s13059-016-0997-x](https://doi.org/10.1186/s13059-016-0997-x)
 
 9.	Garrison E, Marth G. **Haplotype-based variant detection from short-read sequencing.** *arXiv* Prepr. 2012. 9, [arXiv1207.3907](https://arxiv.org/abs/1207.3907).
 
 10.	R Core Team. **R: A language and environment for statistical computing.** 2021. [URL](https://www.r-project.org/).
 
-11.	van der Maaten LJP. **Barnes-Hut-SNE.** *arxiv.org* 2013. 1[301.3342v2](https://arxiv.org/abs/1301.3342)
+11.	van der Maaten LJP. **Barnes-Hut-SNE.** *arxiv.org* 2013. [1301.3342v2](https://arxiv.org/abs/1301.3342)
 
 12.	van der Maaten LJP,  Hinton GE. **Visualizing High-Dimensional Data Using t-SNE.** *J. Mach. Learn. Res.* 2008. 9, 2579–2605. [URL](https://jmlr.csail.mit.edu/papers/volume9/vandermaaten08a/vandermaaten08a.pdf)
