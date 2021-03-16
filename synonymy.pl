@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2017-2018 Illinois Tech
-my $version = '0.5';
+my $version = '0.5a';
 my $name = 'synonymy.pl';
 my $updated = '16/03/2021';
 
@@ -127,21 +127,37 @@ if ($format eq 'gff'){
 }
 
 elsif ($format eq 'gb'){
-	my $gbk; while (my $line = <REF>){$gbk .= $line;}
+	
+	## Putting the gbk file in a single string, then split per conting
+	my $gbk; while (my $line = <REF>){ $gbk .= $line; }
 	my @contigs = split ("\/\/\n", $gbk);
+
+	## Parsing contigs
 	while (my $cg = shift @contigs){
-		my @data = split ("ORIGIN.*?\n", $cg); ## $data[0] => annotations, $data[1] => sequences
-		my $sequence = $data[1]; $sequence =~ s/[0-9\s\n]//g;
-		my $locus; ($locus) = ($data[0] =~ /LOCUS\s+(\S+)/);
-		my $contig; ($contig) = ($data[0] =~ /VERSION\s+(\S+)/);
+
+		my @data = split ("ORIGIN.*?\n", $cg);
+
+		## $data[0] => annotations
+		my ($locus) = ($data[0] =~ /LOCUS\s+(\S+)/);
+		my ($contig) = ($data[0] =~ /VERSION\s+(\S+)/);
+		my ($feat) = ($data[0] =~ /FEATURES(.*)/s);
+
+		## $data[1] => sequences
+		my $sequence = $data[1];
+		$sequence =~ s/[0-9\s\n]//g;
+
 		if ($verbose){ print "Working on $locus version $contig\n"; }
-		my $feat; ($feat) = ($data[0] =~ /FEATURES(.*)/s);
+
+		## Working on features
 		my @features = split("     gene            ", $feat);
 		while (my $line = shift@features){
 			if ($line =~ /\s+(CDS|rRNA|tRNA)\s+.*?(\d+)\.\.(\d+)/m){
-				$type = $1; $start = $2; $end = $3;
-				if ($line =~ /complement/){$strand = '-';}
-				else{$strand = '+';}
+				$type = $1;
+				$start = $2;
+				$end = $3;
+
+				if ($line =~ /complement/){ $strand = '-'; }
+				else{ $strand = '+'; }
 
 				($locus_tag) = ($line =~ /\/locus_tag="(.*?)"/s);
 				$locus_tag =~ s/\s{2,}/ /g;
@@ -244,7 +260,7 @@ while (my $vcf = shift@vcf){
 					$type = $features{$locus}{'type'};
 					$start = $features{$locus}{'start'};
 					$end = $features{$locus}{'end'};
-					$strand = $features{$locus}{'end'};
+					$strand = $features{$locus}{'strand'};
 					$locus_tag = $features{$locus}{'locus_tag'};
 					$product = $features{$locus}{'product'};
 
