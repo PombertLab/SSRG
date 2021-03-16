@@ -245,12 +245,13 @@ Options for [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNP
 
 5. To checking for synonymous/non-synonymous SNPs against a reference genome (*e.g. Streptococcus pneumoniae* R6) with [synonymy.pl](https://github.com/PombertLab/SSRG/blob/master/synonymy.pl), type:
 ```bash
+REF=Streptococcus_pneumoniae_R6.fasta
 synonymy.pl \
 	-gcode 11 \
-	-fa DATASETS/Streptococcus_pneumoniae_R6.fasta \
+	-fa DATASETS/$REF \
 	-ref DATASETS/Streptococcus_pneumoniae_R6.gbk \
 	-format gb \
-	-vcf RESULTS/minimap2.varscan2.VCFs/*.vcf \
+	-vcf RESULTS/minimap2.varscan2.VCFs/*$REF*.vcf \
 	-o SYNONYMY \
 	-v
 ```
