@@ -138,9 +138,9 @@ elsif ($format eq 'gb'){
 		my @data = split ("ORIGIN.*?\n", $cg);
 
 		## $data[0] => annotations
-		my ($locus) = ($data[0] =~ /LOCUS\s+(\S+)/);
-		my ($contig) = ($data[0] =~ /VERSION\s+(\S+)/);
-		my ($feat) = ($data[0] =~ /FEATURES(.*)/s);
+		my ($locus) = $data[0] =~ /LOCUS\s+(\S+)/;
+		my ($contig) = $data[0] =~ /VERSION\s+(\S+)/;
+		my ($feat) = $data[0] =~ /FEATURES(.*)/s;
 
 		## $data[1] => sequences
 		my $sequence = $data[1];
@@ -159,11 +159,11 @@ elsif ($format eq 'gb'){
 				if ($line =~ /complement/){ $strand = '-'; }
 				else{ $strand = '+'; }
 
-				($locus_tag) = ($line =~ /\/locus_tag="(.*?)"/s);
+				($locus_tag) = $line =~ /\/locus_tag="(.*?)"/s;
 				$locus_tag =~ s/\s{2,}/ /g;
 				$locus_tag =~ s/\n//g; ## removing new lines, if any
 
-				($product) = ($line =~ /\/product="(.*?)"/s);
+				($product) = $line =~ /\/product="(.*?)"/s;
 				$product =~ s/\s{2,}/ /g;
 				$product =~ s/\n//g; ## removing new lines, if any
 
