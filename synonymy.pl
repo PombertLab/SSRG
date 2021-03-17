@@ -340,8 +340,8 @@ while (my $vcf = shift@vcf){
 
 ## Subroutines
 sub rev{
-	$codon = reverse($revcodon); $codon=~ tr/ATGCNatgcn/TACGNtacgn/;
-	$snp = reverse($revsnp); $snp=~ tr/ATGCNatgcn/TACGNtacgn/;	
+	$codon = reverse($revcodon); $codon =~ tr/ATGCNatgcn/TACGNtacgn/;
+	$snp = reverse($revsnp); $snp =~ tr/ATGCNatgcn/TACGNtacgn/;
 }
 sub translation{
 	$codon = uc($codon); $snp = uc($snp);
