@@ -78,21 +78,21 @@ my $varjar = 'VarScan.v2.4.4.jar';
 On a Fedora distribution, the following packages can be installed with the DNF package manager to facililate the installation/compilation of read mappers and other tools from the source code.
 ```bash
 sudo dnf install \
-  perl \
-  R \
-  boost \
-  boost-devel \
-  zlib \
-  zlib-devel \
-  gsl \
-  gsl-devel \
-  autoconf \
-  automake \
-  libcurl-devel \
-  openssl-devel \
-  ncurses-devel \
-  java-1.?.?-openjdk \
-  java-1.?.?-openjdk-devel
+   perl \
+   R \
+   boost \
+   boost-devel \
+   zlib \
+   zlib-devel \
+   gsl \
+   gsl-devel \
+   autoconf \
+   automake \
+   libcurl-devel \
+   openssl-devel \
+   ncurses-devel \
+   java-1.?.?-openjdk \
+   java-1.?.?-openjdk-devel
 ```
 ##### ***R packages***
 To install R data visualization packages, type:
