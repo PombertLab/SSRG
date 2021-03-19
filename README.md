@@ -173,32 +173,32 @@ Options for [SSRG.pl](https://github.com/PombertLab/SSRG/blob/master/SSRG.pl) ar
 ```bash
 ## Running get_SNPs.pl with 8 threads, 16 Gb RAM (change according to your settings)
 get_SNPs.pl \
-	-threads 8 \
-	-mem 16 \
-	-fa DATASETS/*.fasta \
-	-pe1 FASTQ/*R1.fastq \
-	-pe2 FASTQ/*R2.fastq \
-	-o RESULTS \
-	-mapper minimap2 \
-	-preset sr \
-	-rmo \
-	-bam
+   -threads 8 \
+   -mem 16 \
+   -fa DATASETS/*.fasta \
+   -pe1 FASTQ/*R1.fastq \
+   -pe2 FASTQ/*R2.fastq \
+   -o RESULTS \
+   -mapper minimap2 \
+   -preset sr \
+   -rmo \
+   -bam
 ```
 4. To test the read-mapping and variant calling steps with [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl), type:
 ```bash
 ## Running get_SNPs.pl with 8 threads, 16 Gb RAM (change according to your settings)
 get_SNPs.pl \
-	-threads 8 \
-	-mem 16 \
-	-fa DATASETS/*.fasta \
-	-pe1 FASTQ/*R1.fastq \
-	-pe2 FASTQ/*R2.fastq \
-	-o RESULTS \
-	-mapper minimap2 \
-	-preset sr \
-	-bam \
-	-caller varscan2 \
-	-var VarScan.v2.4.4.jar ## Replace jar file location accordingly
+   -threads 8 \
+   -mem 16 \
+   -fa DATASETS/*.fasta \
+   -pe1 FASTQ/*R1.fastq \
+   -pe2 FASTQ/*R2.fastq \
+   -o RESULTS \
+   -mapper minimap2 \
+   -preset sr \
+   -bam \
+   -caller varscan2 \
+   -var VarScan.v2.4.4.jar ## Replace jar file location accordingly
 ```
 
 Options for [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNPs.pl) are:
@@ -241,17 +241,17 @@ Options for [get_SNPs.pl](https://github.com/PombertLab/SSRG/blob/master/get_SNP
 -sf (--strand-filter)		[default: 0]		## 0 or 1; 1 ignores variants with >90% support on one strand
 ```
 
-5. To checking for synonymous/non-synonymous SNPs against a reference genome (*e.g. Streptococcus pneumoniae* R6) with [synonymy.pl](https://github.com/PombertLab/SSRG/blob/master/synonymy.pl), type:
+5. To check for synonymous/non-synonymous SNPs against a reference genome (*e.g. Streptococcus pneumoniae* R6) with [synonymy.pl](https://github.com/PombertLab/SSRG/blob/master/synonymy.pl), type:
 ```bash
 REF=Streptococcus_pneumoniae_R6.fasta
 synonymy.pl \
-	-gcode 11 \
-	-fa DATASETS/$REF \
-	-ref DATASETS/Streptococcus_pneumoniae_R6.gbk \
-	-format gb \
-	-vcf RESULTS/minimap2.varscan2.VCFs/*$REF*.vcf \
-	-o SYNONYMY \
-	-v
+   -gcode 11 \
+   -fa DATASETS/$REF \
+   -ref DATASETS/Streptococcus_pneumoniae_R6.gbk \
+   -format gb \
+   -vcf RESULTS/minimap2.varscan2.VCFs/*$REF*.vcf \
+   -o SYNONYMY \
+   -v
 ```
 
 Options for [synonymy.pl](https://github.com/PombertLab/SSRG/blob/master/synonymy.pl) are:
@@ -312,10 +312,10 @@ Options for [run_Mash.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/M
 3. To convert the Mash output to a distance matrix with [MashToDistanceMatrix.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashToDistanceMatrix.pl), type:
 ```bash
 MashToDistanceMatrix.pl  \
-	-i MASH/S_pneumoniae_75.mash \
-	-o MASH/ \
-	-p S_pneumoniae_75 \
-	-f tsv
+   -i MASH/S_pneumoniae_75.mash \
+   -o MASH/ \
+   -p S_pneumoniae_75 \
+   -f tsv
 ```
 
 Options for [MashToDistanceMatrix.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashToDistanceMatrix.pl) are:
@@ -329,48 +329,48 @@ Options for [MashToDistanceMatrix.pl](https://github.com/PombertLab/SSRG/blob/ma
 4. To generate a quick neighbor-joining tree with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl), type:
 ```bash
 MashR_plotter.pl \
-	-i MASH/S_pneumoniae_75.tsv \
-	-if tsv \
-	-t tree \
-	-newick S_pneumoniae_75.tre \
-	-f pdf \
-	-o PLOTS \
-	-n S_pneumoniae_75_NJ_tree \
-	-he 20
+   -i MASH/S_pneumoniae_75.tsv \
+   -if tsv \
+   -t tree \
+   -newick S_pneumoniae_75.tre \
+   -f pdf \
+   -o PLOTS \
+   -n S_pneumoniae_75_NJ_tree \
+   -he 20
 ```
 The PDF generated should be similar to [S_pneumoniae_75_NJ_tree.pdf](https://github.com/PombertLab/SSRG/blob/master/Images/S_pneumoniae_75_NJ_tree.pdf) from the [Images/](https://github.com/PombertLab/SSRG/tree/master/Images) directory.
 
 5. To generate a quick heatmap with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl), type:
 ```bash
 MashR_plotter.pl \
-	-i MASH/S_pneumoniae_75.tsv \
-	-if tsv \
-	-t heatmap \
-	-f pdf \
-	-o PLOTS \
-	-n S_pneumoniae_75_heatmap \
-	-colors white cyan magenta \
-	-he 20 \
-	-wd 20
+   -i MASH/S_pneumoniae_75.tsv \
+   -if tsv \
+   -t heatmap \
+   -f pdf \
+   -o PLOTS \
+   -n S_pneumoniae_75_heatmap \
+   -colors white cyan magenta \
+   -he 20 \
+   -wd 20
 ```
 The PDF generated should be similar to [S_pneumoniae_75_heatmap.pdf](https://github.com/PombertLab/SSRG/blob/master/Images/S_pneumoniae_75_heatmap.pdf) from the [Images/](https://github.com/PombertLab/SSRG/tree/master/Images) directory.
 
 6. To generate a quick t-SNE multidimensional reduction plot with [MashR_plotter.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/MASH/MashR_plotter.pl), type:
 ```bash
 MashR_plotter.pl \
-	-i MASH/S_pneumoniae_75.tsv \
-	-if tsv \
-	-t cluster \
-	-m tsne \
-	-pe 15 \
-	-cmode terrain \
-	-f pdf \
-	-o PLOTS \
-	-n S_pneumoniae_75_tSNE \
-	-he 20 \
-	-wd 20 \
-	-lb \
-	-fs 25
+   -i MASH/S_pneumoniae_75.tsv \
+   -if tsv \
+   -t cluster \
+   -m tsne \
+   -pe 15 \
+   -cmode terrain \
+   -f pdf \
+   -o PLOTS \
+   -n S_pneumoniae_75_tSNE \
+   -he 20 \
+   -wd 20 \
+   -lb \
+   -fs 25
 ```
 The PDF generated should be similar, ***but not identical***, to [S_pneumoniae_75_tSNE.pdf](https://github.com/PombertLab/SSRG/blob/master/Images/S_pneumoniae_75_tSNE.pdf) from the [Images/](https://github.com/PombertLab/SSRG/tree/master/Images) directory. t-SNE graphs are generated using random seeds, which affect how the distances are represented in 2D.
 
@@ -380,10 +380,10 @@ The script [queryNuccore.pl](https://github.com/PombertLab/SSRG/blob/master/Tool
 To download FASTA and GenBank files with [queryNuccore.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/NCBI/queryNuccore.pl), type:
 ```Bash
 queryNuccore.pl \
-  -l Examples/list_example_queryNuccore.txt
-  -o DATASETS \
-  -fa \
-  -gb
+   -l Examples/list_example_queryNuccore.txt
+   -o DATASETS \
+   -fa \
+   -gb
 ```
 
 Options for [queryNuccore.pl](https://github.com/PombertLab/SSRG/blob/master/Tools/NCBI/queryNuccore.pl) are:
