@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, Illinois Tech (2015-2020)
-my $version = '1.8';
+my $version = '1.9';
 my $name = 'SSRG.pl';
-my $updated = '13/03/2021';
+my $updated = '22/03/2021';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions); use File::Basename;
 
@@ -102,12 +102,14 @@ while ($fasta = shift @fasta) {
 	$fasta =~ s/\.\w+$//; ## Removing file extensions
 	$type = lc($type);
 	my $basename = fileparse($fasta);
+	my $filename = "${outdir}/$basename.$readsize";
+	
 	if($type eq 'se'){
-		open SE, ">", "${outdir}/$basename.$readsize.SE.fastq" or die "Can't create file ${outdir}/$basename.$readsize.SE.fastq: $!\n";
+		open SE, ">", "$filename.SE.fastq" or die "Can't create file $filename.SE.fastq: $!\n";
 	}
 	elsif($type eq 'pe'){
-		open R1, ">", "${outdir}/$basename.$readsize.R1.fastq" or die "Can't create file ${outdir}/$basename.$readsize.R1.fastq: $!\n";
-		open R2, ">", "${outdir}/$basename.$readsize.R2.fastq" or die "Can't create file ${outdir}/$basename.$readsize.R2.fastq: $!\n";
+		open R1, ">", "$filename.R1.fastq" or die "Can't create file $filename.R1.fastq: $!\n";
+		open R2, ">", "$filename.R2.fastq" or die "Can't create file $filename.R2.fastq: $!\n";
 	}
 	stats();
 
@@ -131,9 +133,11 @@ while ($fasta = shift @fasta) {
 		my $seq = $contigs{$todo};
 		my $rev = reverse($seq);	## get the reverse complement of the contig
 		$rev =~ tr/ATGCNRYSWKMBVDHatgcnryswkmbvdh/TACGNYRWSMKVBHDtacgnyrwsmkvbhd/;
+
 		if ($type eq 'se'){
 			my $numreads = int(($len*$cov)/$readsize);	## Number of reads to achieve desired depth
 			my $stdreads = int($numreads/2);			## Number of reads per strand +/-
+
 			for (1..$stdreads){
 				my $max = $len - $readsize -1;
 				my $plus = int(rand($max));
@@ -148,24 +152,34 @@ while ($fasta = shift @fasta) {
 			my $stdreads = int($numreads/4);			## Number of reads per strand +/-
 			my $gap = $insert - ($readsize*2);
 			my $dev = int($insert/$sdev);
+
 			for (1..$stdreads){
 				my $max = $len - $insert -$dev -1;
 				my $rand = int(rand($dev) - ($dev/2));
 				my $plus = int(rand($max));
 				my $minus = int(rand($max));
-				$pe1 = substr($seq, $plus, $readsize); $pe2 = substr($seq, $plus+$gap+$rand+$readsize, $readsize); $pe2 = reverse($pe2); $pe2 =~ tr/ATGCNRYSWKMBVDHatgcnryswkmbvdh/TACGNYRWSMKVBHDtacgnyrwsmkvbhd/;
-				$rev1 = substr($rev, $minus, $readsize); $rev2 = substr($rev, $minus+$gap+$rand+$readsize, $readsize); $rev2 = reverse($rev2); $rev2 =~ tr/ATGCNRYSWKMBVDHatgcnryswkmbvdh/TACGNYRWSMKVBHDtacgnyrwsmkvbhd/;
+
+				$pe1 = substr($seq, $plus, $readsize);
+				$pe2 = substr($seq, $plus+$gap+$rand+$readsize, $readsize);
+				$pe2 = reverse($pe2);
+				$pe2 =~ tr/ATGCNRYSWKMBVDHatgcnryswkmbvdh/TACGNYRWSMKVBHDtacgnyrwsmkvbhd/;
+				$rev1 = substr($rev, $minus, $readsize);
+				$rev2 = substr($rev, $minus+$gap+$rand+$readsize, $readsize);
+				$rev2 = reverse($rev2);
+				$rev2 =~ tr/ATGCNRYSWKMBVDHatgcnryswkmbvdh/TACGNYRWSMKVBHDtacgnyrwsmkvbhd/;
+
 				pe();
 			}
 		}
 	}
 }
 
-my $end = localtime(); my $time_taken = time - $tstart;
+my $end = localtime();
+my $time_taken = time - $tstart;
 print "\nSSRG started on: $start\nSSRG ended on: $end\nTime elapsed: $time_taken seconds\n";
 close IN; 
 if($type eq 'se'){close SE;}
-elsif($type eq 'pe'){close R1; close R2;}
+elsif($type eq 'pe'){ close R1; close R2; }
 exit;
 
 ## Subroutines
@@ -188,16 +202,24 @@ sub qscore{								## Take qscore, calculate appropriate offset, determine corre
 }
 sub stats{
 	print "\nInput File:\t$fasta\n";
-	if ($type eq 'se'){print "Output File:\t$fasta.$readsize.SE.fastq\n";}
-	else {print "Output Files:\t$fasta.$readsize.R1.fastq + $fasta.$readsize.R2.fastq\n";}
+	if ($type eq 'se'){
+		print "Output File:\t$fasta.$readsize.SE.fastq\n";
+	}
+	else {
+		print "Output Files:\t$fasta.$readsize.R1.fastq + $fasta.$readsize.R2.fastq\n";
+	}
 	print "Coverage:\t$cov"."X\n";
 	print "Quality score:\t$qscore\n";
-	if ($q64){print "Format:\t\tQ64 Illumina <= 1.7 ; Base quality set to $qscore \(ASCII character = $score\)\n";}
-	else{print "Format:\t\tQ33 Sanger/Illumina 1.8+; Base quality set to $qscore \(ASCII character = $score\)\n";}
+	if ($q64){
+		print "Format:\t\tQ64 Illumina <= 1.7 ; Base quality set to $qscore \(ASCII character = $score\)\n";
+	}
+	else{
+		print "Format:\t\tQ33 Sanger/Illumina 1.8+; Base quality set to $qscore \(ASCII character = $score\)\n";
+	}
 	print "Read size:\t$readsize nt\n";
 	print "Type:\t\t";
-	if ($type eq 'se'){print "Single ends\n";}
-	elsif ($type eq 'pe'){print "Paired ends\n";}
+	if ($type eq 'se'){ print "Single ends\n"; }
+	elsif ($type eq 'pe') {print "Paired ends\n"; }
 }
 sub se{ ## Print SE FastQ output:
 	$count++;
@@ -215,23 +237,23 @@ sub se{ ## Print SE FastQ output:
 }
 sub pe{ ## Print PE FastQ output:
 	$count++;
-	print R1 '@SYNTHREAD_'."$count".'_R1'."\n";
+	print R1 '@SYNTHREAD_'."$count".' 1'."\n";
 	print R1 "$pe1\n";
 	print R1 '+'."\n";
 	print R1 "$score" x $readsize;   ## assign fake quality score
 	print R1 "\n";
-	print R2 '@SYNTHREAD_'."$count".'_R2'."\n";
+	print R2 '@SYNTHREAD_'."$count".' 2'."\n";
 	print R2 "$pe2\n";
 	print R2 '+'."\n";
 	print R2 "$score" x $readsize;
 	print R2 "\n";
 	$count++;
-	print R1 '@SYNTHREAD_'."$count".'_R1'."\n";
+	print R1 '@SYNTHREAD_'."$count".' 1'."\n";
 	print R1 "$rev1\n";
 	print R1 '+'."\n";
 	print R1 "$score" x $readsize;   ## assign fake quality score
 	print R1 "\n";
-	print R2 '@SYNTHREAD_'."$count".'_R2'."\n";
+	print R2 '@SYNTHREAD_'."$count".' 2'."\n";
 	print R2 "$rev2\n";
 	print R2 '+'."\n";
 	print R2 "$score" x $readsize;
