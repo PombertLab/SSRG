@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, IIT, 2019
 my $name = 'bam2fastq.pl';
-my $version = '0.3';
-my $updated = '13/03/2021';
+my $version = '0.3a';
+my $updated = '22/03/2021';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions); use File::Basename;
 
@@ -80,24 +80,32 @@ unless ($prefix){
 
 ## Extracting reads from BAM files with samtools bam2fq
 my $flags;
-## Single ends
-if ($type eq 'se'){ 
+
+if ($type eq 'se'){ ## Single ends
+
+	my $filename_SE = "${outdir}/$prefix.$suffix";
+
 	if ($auto){
 		if ($auto eq 'map'){ $flags = '-F 4'; }
 		elsif ($auto eq 'unmap'){ $flags = '-f 4';} 
 	}
 	elsif ($F1){ $flags = "-f $F1";}
 	elsif ($F2){ $flags = "-F $F2";}
+
 	print "\nExtracting single reads [flag: $flags] from $bam\n";
-	print "Saving to ${outdir}/$prefix.$suffix\n\n";
+	print "Saving to $filename_SE\n\n";
 	system "samtools \\
 		bam2fq \\
 		$flags \\
 		$bam \\
-		> ${outdir}/$prefix.$suffix";
+		> $filename_SE";
 }
-## Paired ends (illumina)
-elsif ($type eq 'pe'){
+
+elsif ($type eq 'pe'){ ## Paired ends (illumina)
+
+	my $filename_R1 = "${outdir}/${prefix}_R1.$suffix";
+	my $filename_R2 = "${outdir}/${prefix}_R2.$suffix";
+
 	if ($auto){
 		if ($auto eq 'map'){ $flags = '-f 1 -F 12'; } ## R1 + R2 mapped
 		elsif ($auto eq 'unmap'){  $flags = '-f 12 -F 256'; } ## R1 + R2 didn’t map
@@ -107,12 +115,13 @@ elsif ($type eq 'pe'){
 		my $f2 = "-F $F2";
 		$flags = "$f1".' '."$f2";
 	}
+
 	print "\nExtracting paired-end reads [flags: $flags] from $bam\n";
-	print "Saving to ${outdir}/${prefix}_R1.$suffix and ${outdir}/${prefix}_R2.$suffix\n\n";
+	print "Saving to $filename_R1 and $filename_R2\n\n";
 	system "samtools \\
 		bam2fq \\
 		$flags \\
-		-1 ${outdir}/${prefix}_R1.$suffix \\
-		-2 ${outdir}/${prefix}_R2.$suffix \\
+		-1 $filename_R1 \\
+		-2 $filename_R2 \\
 		$bam";
 }
