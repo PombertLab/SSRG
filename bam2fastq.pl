@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ## Pombert Lab, IIT, 2019
 my $name = 'bam2fastq.pl';
-my $version = '0.3a';
+my $version = '0.3b';
 my $updated = '22/03/2021';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions); use File::Basename;
@@ -31,6 +31,7 @@ OPTIONS:
 -g SAM/BAM (-F) flag # https://www.samformat.info/sam-format-flag
 OPTIONS
 die "\n$usage\n" unless @ARGV;
+my @command_line = @ARGV;
 
 my $bam;
 my $outdir = './';
@@ -70,6 +71,14 @@ if ($auto){
 unless (-d $outdir){
 	mkdir ($outdir,0755) or die "Can't create folder $outdir: $!\n";
 }
+
+## Creating log file
+my $log_file = "${outdir}/b2fq.log";
+my $date = localtime();
+my $time_start = time;
+open LOG, ">", "$log_file" or die "Can't create log file $log_file: $!\n";
+print LOG "Command executed on $date:\n\n";
+print LOG "${name} @command_line\n";
 
 ## Autopopulating prefix from basename if not defined from command line
 unless ($prefix){
@@ -125,3 +134,7 @@ elsif ($type eq 'pe'){ ## Paired ends (illumina)
 		-2 $filename_R2 \\
 		$bam";
 }
+
+my $time_end = time;
+my $run_time = $time_end - $time_start;
+print LOG "\nRuntime: $run_time seconds\n";
