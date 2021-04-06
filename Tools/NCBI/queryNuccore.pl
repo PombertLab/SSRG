@@ -2,7 +2,7 @@
 ## Pombert JF,  Illinois Tech 2019
 my $version = 0.5;
 my $name = 'queryNuccore.pl';
-my $updated = '15/03/2021';
+my $updated = '2021-03-15';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions);
 

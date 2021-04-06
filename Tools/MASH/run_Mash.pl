@@ -2,7 +2,7 @@
 ## Pombert JF, Illinois Tech - 2019
 my $version = '1.1';
 my $name = 'run_Mash.pl';
-my $updated = '14/03/2021';
+my $updated = '2021-03-14';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions);
 

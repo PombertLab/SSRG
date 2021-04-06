@@ -2,7 +2,7 @@
 ## Pombert JF, Illinois Tech - 2020
 my $version = '2.0';
 my $name = 'get_SNPs.pl';
-my $updated = '16/03/2021';
+my $updated = '2021-03-16';
 
 use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
 

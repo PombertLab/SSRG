@@ -2,7 +2,7 @@
 ## Pombert lab 2019
 my $version= '0.3a';
 my $name = 'sort_stats.pl';
-my $updated = '14/03/2021';
+my $updated = '2021-03-14';
 
 use strict; use warnings; use Math::Complex; use Getopt::Long qw(GetOptions);
 

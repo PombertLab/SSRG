@@ -2,7 +2,7 @@
 ## Pombert JF,  Illinois Tech 2020
 my $version = '1.4';
 my $name = 'queryNCBI.pl';
-my $updated = '13/03/2021';
+my $updated = '2021-03-13';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions);
 

@@ -2,7 +2,7 @@
 ## Pombert Lab, 2017-2018 Illinois Tech
 my $version = '0.5a';
 my $name = 'synonymy.pl';
-my $updated = '16/03/2021';
+my $updated = '2021-03-16';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions); use File::Basename;
 

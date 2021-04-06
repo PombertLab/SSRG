@@ -2,7 +2,7 @@
 ## Pombert JF, Illinois tech - 2019
 my $version = '1.2a';
 my $name = 'count_SNPs.pl';
-my $updated = '13/03/2021';
+my $updated = '2021-03-13';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions);
 

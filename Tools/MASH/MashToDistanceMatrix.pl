@@ -2,7 +2,7 @@
 ## Pombert lab, 2019
 my $version = '1.2';
 my $name = 'MashToDistanceMatrix.pl';
-my $updated = '14/03/2021';
+my $updated = '2021-03-14';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions); use File::Basename;
 

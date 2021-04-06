@@ -2,7 +2,7 @@
 ## Pombert Lab, Illinois Tech (2015-2020)
 my $version = '1.9';
 my $name = 'SSRG.pl';
-my $updated = '22/03/2021';
+my $updated = '2021-03-22';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions); use File::Basename;
 
