@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2019
-my $version = '1.1';
+my $version = '1.1a';
 my $name = 'run_Mash.pl';
-my $updated = '2021-03-14';
+my $updated = '2021-12-21';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions);
 
@@ -39,7 +39,7 @@ GetOptions(
 );
 
 ## Checking if Mash is installed
-my $prog = `command -v mash`;
+my $prog = `echo \$(command -v mash)`;
 chomp $prog;
 if ($prog eq ''){
 	die "\nERROR: Cannot find Mash. Please install Mash in your \$PATH\n\n";

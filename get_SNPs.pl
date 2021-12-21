@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2020
-my $version = '2.0';
+my $version = '2.0a';
 my $name = 'get_SNPs.pl';
-my $updated = '2021-03-16';
+my $updated = '2021-12-21';
 
 use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
 
@@ -414,7 +414,7 @@ print LOG "Average time per pairwise comparison: $average_time seconds\n";
 # sub to check if programs are installed
 sub chkinstall{
 	my $exe = $_[0];
-	my $prog = `command -v $exe`;
+	my $prog = `echo \$(command -v $exe)`;
 	chomp $prog;
 	if ($prog eq ''){die "\nERROR: Cannot find $exe. Please install $exe in your \$PATH\n\n";}
 }

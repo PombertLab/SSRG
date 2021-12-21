@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, IIT, 2019
 my $name = 'bam2fastq.pl';
-my $version = '0.3b';
-my $updated = '2021-03-22';
+my $version = '0.3c';
+my $updated = '2021-12-21';
 
 use strict; use warnings; use Getopt::Long qw(GetOptions); use File::Basename;
 
@@ -53,7 +53,7 @@ GetOptions(
 );
 
 ## Program + option check
-my $samtools = `command -v samtools`;
+my $samtools = `echo \$(command -v samtools)`;
 chomp $samtools;
 if ($samtools eq ''){
 	die "\nERROR: Cannot find Samtools. Please install Samtools in your path\n\n";
