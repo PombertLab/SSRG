@@ -16,7 +16,7 @@ REQUIREMENTS	Mash - https://github.com/marbl/Mash (Ondov et al. DOI: 10.1186/s13
 
 USAGE		${name} \
 		  -f DATASETS/*.fasta \
-		  -d MASH \
+		  -o MASH \
 		  -n S_pneumoniae_75.mash 
 
 OPTIONS:
