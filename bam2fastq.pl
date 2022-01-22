@@ -1,10 +1,14 @@
 #!/usr/bin/perl
 ## Pombert Lab, IIT, 2019
 my $name = 'bam2fastq.pl';
-my $version = '0.3c';
-my $updated = '2021-12-21';
+my $version = '0.3d';
+my $updated = '2022-01-22';
 
-use strict; use warnings; use Getopt::Long qw(GetOptions); use File::Basename;
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use File::Basename;
+use File::Path qw(make_path);
 
 my $usage = <<"OPTIONS";
 NAME		${name}
@@ -69,7 +73,7 @@ if ($auto){
 
 ## Creating output directory
 unless (-d $outdir){
-	mkdir ($outdir,0755) or die "Can't create folder $outdir: $!\n";
+	make_path( $outdir, { mode => 0755 } ) or die "Can't create folder $outdir: $!\n";
 }
 
 ## Creating log file

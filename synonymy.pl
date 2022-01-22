@@ -1,10 +1,14 @@
 #!/usr/bin/perl
 ## Pombert Lab, 2017-2018 Illinois Tech
-my $version = '0.5a';
+my $version = '0.5b';
 my $name = 'synonymy.pl';
-my $updated = '2021-03-16';
+my $updated = '2022-01-22';
 
-use strict; use warnings; use Getopt::Long qw(GetOptions); use File::Basename;
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use File::Basename;
+use File::Path qw(make_path);
 
 ## Usage definition
 my $usage = <<"OPTIONS";
@@ -71,7 +75,7 @@ while (my $line = <FASTA>){
 }
 
 ## Creating output directory
-unless (-d $outdir){ mkdir ($outdir,0755) or die "Can't create folder $outdir: $!\n"; }
+unless (-d $outdir){ make_path( $outdir, { mode => 0755 } ) or die "Can't create folder $outdir: $!\n"; }
 
 ## Building hashes of features
 open REF, "<", "$ref" or die "Can't read reference file $ref: $!\n";

@@ -1,10 +1,13 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2019
-my $version = '1.1a';
+my $version = '1.1b';
 my $name = 'run_Mash.pl';
-my $updated = '2021-12-21';
+my $updated = '2022-01-22';
 
-use strict; use warnings; use Getopt::Long qw(GetOptions);
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use File::Path qw(make_path);
 
 ## Defining options
 my $usage = <<"OPTIONS";
@@ -47,7 +50,7 @@ if ($prog eq ''){
 
 ## Creating output directory
 unless (-d $outdir){
-	mkdir ($outdir,0755) or die "Can't created folder $outdir: $!\n";
+	make_path( $outdir, { mode => 0755 } ) or die "Can't created folder $outdir: $!\n";
 }
 
 ## Running Mash

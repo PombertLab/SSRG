@@ -44,9 +44,7 @@ GetOptions(
 
 ## Outdir
 unless (-d $outdir) { 
-	make_path(
-		$outdir, { mode => 0755 }
-	) or die "Can't create $outdir: $!\n";
+	make_path( $outdir, { mode => 0755 }	) or die "Can't create $outdir: $!\n";
 }
 
 ## Choosing CSV or TSV

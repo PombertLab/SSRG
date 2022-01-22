@@ -1,10 +1,14 @@
 #!/usr/bin/perl
 ## Pombert Lab, Illinois Tech (2015-2020)
-my $version = '1.9';
+my $version = '1.9a';
 my $name = 'SSRG.pl';
-my $updated = '2021-03-22';
+my $updated = '2022-01-22';
 
-use strict; use warnings; use Getopt::Long qw(GetOptions); use File::Basename;
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions);
+use File::Basename;
+use File::Path qw(make_path);
 
 my $options = <<"END_OPTIONS";
 NAME		${name}
@@ -79,7 +83,7 @@ my %ASCII = ASCII(); my $offset; my $score; qscore();
 
 ## Creating output folder
 unless (-d $outdir){
-	mkdir ($outdir,0755) or die "Can't create folder $outdir: $!\n";
+	make_path( $outdir, { mode => 0755 } ) or die "Can't create folder $outdir: $!\n";
 }
 
 ## Working on files

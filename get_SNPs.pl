@@ -1,10 +1,14 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2020
-my $version = '2.0a';
+my $version = '2.0b';
 my $name = 'get_SNPs.pl';
-my $updated = '2021-12-21';
+my $updated = '2022-01-22';
 
-use strict; use warnings; use File::Basename; use Getopt::Long qw(GetOptions);
+use strict;
+use warnings;
+use File::Basename;
+use File::Path qw(make_path);
+use Getopt::Long qw(GetOptions);
 
 ## Usage definition
 my $hint = "Type get_SNPs.pl -h (--help) for list of options\n";
@@ -166,7 +170,7 @@ if ($rmo){$caller = 'rmo';}
 
 ## Creating output directory
 unless (-d $outdir){
-	mkdir ($outdir,0755) or die "Can't create output directory $outdir: $!\n";
+	make_path( $outdir, { mode => 0755 } ) or die "Can't create output directory $outdir: $!\n";
 }
 
 ## Timestamps and logs
