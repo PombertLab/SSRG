@@ -107,6 +107,7 @@ if ($type eq 'se'){ ## Single ends
 	}
 	elsif ($F1){ $flags = "-f $F1";}
 	elsif ($F2){ $flags = "-F $F2";}
+	else { $flags = ''; }
 
 	if ($auto){
 		if ($auto eq 'all'){
