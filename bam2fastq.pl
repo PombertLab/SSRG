@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert Lab, IIT, 2019
 my $name = 'bam2fastq.pl';
-my $version = '0.3d';
-my $updated = '2022-01-22';
+my $version = '0.4';
+my $updated = '2022-02-11';
 
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ OPTIONS:
 -s (--suffix)	Output file(s) suffix [Default: fastq]
 
 ## SAM/BAM flag options
--a (--auto)	Extract reads automatically: map or unmap
+-a (--auto)	Extract reads automatically: all, map or unmap
 -f SAM/BAM (-f) flag # https://www.samformat.info/sam-format-flag
 -g SAM/BAM (-F) flag # https://www.samformat.info/sam-format-flag
 OPTIONS
@@ -66,8 +66,9 @@ unless (($type eq 'pe') || ($type eq 'se')) {
 	die "\nUnrecognized type $type. Please use 'pe' for paired-ends or 'se' for single ends\n";
 }
 if ($auto){
-	unless (($auto eq 'map') || ($auto eq 'unmap')) {
-		die "\nUnrecognized mode: $auto. Please enter 'map' or 'unmap' to extract reads that map or do not map to the reference(s), respectively\n";
+	$auto = lc($auto);
+	unless (($auto eq 'all') || ($auto eq 'map') || ($auto eq 'unmap')) {
+		die "\nUnrecognized mode: $auto. Please enter 'all', 'map' or 'unmap' to extract reads that map or do not map to the reference(s), respectively\n";
 	}
 }
 
@@ -98,14 +99,25 @@ if ($type eq 'se'){ ## Single ends
 
 	my $filename_SE = "${outdir}/$prefix.$suffix";
 
+	## Setting flags, if any
 	if ($auto){
-		if ($auto eq 'map'){ $flags = '-F 4'; }
+		if ($auto eq 'all'){ $flags = ''; } ## All reads, no flag needed
+		elsif ($auto eq 'map'){ $flags = '-F 4'; }
 		elsif ($auto eq 'unmap'){ $flags = '-f 4';} 
 	}
 	elsif ($F1){ $flags = "-f $F1";}
 	elsif ($F2){ $flags = "-F $F2";}
 
-	print "\nExtracting single reads [flag: $flags] from $bam\n";
+	if ($auto){
+		if ($auto eq 'all'){
+			print "\nExtracting all single reads from $bam\n";
+		}
+	}
+	else {
+		print "\nExtracting single reads [flag: $flags] from $bam\n";
+	}
+
+	## Saving to file
 	print "Saving to $filename_SE\n\n";
 	system "samtools \\
 		bam2fq \\
@@ -119,17 +131,28 @@ elsif ($type eq 'pe'){ ## Paired ends (illumina)
 	my $filename_R1 = "${outdir}/${prefix}_R1.$suffix";
 	my $filename_R2 = "${outdir}/${prefix}_R2.$suffix";
 
+	## Setting flags, if any
 	if ($auto){
-		if ($auto eq 'map'){ $flags = '-f 1 -F 12'; } ## R1 + R2 mapped
+		if ($auto eq 'all'){ $flags = ''; } ## All reads, no flag needed
+		elsif ($auto eq 'map'){ $flags = '-f 1 -F 12'; } ## R1 + R2 mapped
 		elsif ($auto eq 'unmap'){  $flags = '-f 12 -F 256'; } ## R1 + R2 didn’t map
 	}
-	else{
+	else {
 		my $f1 = "-f $F1";
 		my $f2 = "-F $F2";
 		$flags = "$f1".' '."$f2";
 	}
 
-	print "\nExtracting paired-end reads [flags: $flags] from $bam\n";
+	if ($auto){
+		if ($auto eq 'all'){
+			print "\nExtracting all paired reads from $bam\n";
+		}
+	}
+	else {
+		print "\nExtracting paired-end reads [flags: $flags] from $bam\n";
+	}
+
+	## Saving to file
 	print "Saving to $filename_R1 and $filename_R2\n\n";
 	system "samtools \\
 		bam2fq \\
