@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2020
-my $version = '2.0b';
+my $version = '2.0c';
 my $name = 'get_SNPs.pl';
-my $updated = '2022-01-22';
+my $updated = '2022-05-27';
 
 use strict;
 use warnings;
@@ -198,9 +198,15 @@ my $fasta; my $fastq; my $file; my $fa; my $dir; my $qdir; my $flagstat;
 foreach (@fasta){
 	$fasta = $_;
 	($fa, $dir) = fileparse($fasta);
-	unless (-f $fasta) { die "\nFASTA file named $fasta not found. Please check your command line...\n\n"; }
-	if ($mapper eq 'bowtie2'){system "bowtie2-build --threads $threads $_ $fa.bt2";}
-	elsif ($mapper eq 'hisat2'){system "hisat2-build $_ $fa.ht";}
+	unless (-f $fasta) { 
+		die "\nFASTA file named $fasta not found. Please check your command line...\n\n";
+	}
+	if ($mapper eq 'bowtie2'){
+		system ("bowtie2-build --threads $threads $_ $fa.bt2") == 0 or checksig();
+	}
+	elsif ($mapper eq 'hisat2'){
+		system ("hisat2-build $_ $fa.ht") == 0 or checksig();
+	}
 }
 my $index_time = time - $tstart;
 print LOG "Time required to create all indexes: $index_time seconds\n";
@@ -215,7 +221,9 @@ if (@fastq){
 	foreach (@fastq){
 		$fastq = $_;
 		($file, $qdir) = fileparse($fastq);
-		unless (-f $fastq) { die "\nFASTQ file named $fastq not found. Please check your command line...\n\n"; }
+		unless (-f $fastq) { 
+			die "\nFASTQ file named $fastq not found. Please check your command line...\n\n";
+		}
 		print "\n## FASTQ information:\n";
 		print "FASTQ parsed as: $file\n";
 		print "FASTQ input DIR parsed as: $qdir\n";
@@ -236,48 +244,48 @@ if (@fastq){
 
 			## Read-mapping
 			if ($mapper eq 'bowtie2'){
-				system "bowtie2 \\
+				system ("bowtie2 \\
 				  --rg-id $fastq \\
 				  --rg SM:$fasta \\
 				  -p $threads \\
 				  -x $fa.bt2 \\
 				  -U $fastq \\
 				  -S $sam_file \\
-				  2>> $log_file";
+				  2>> $log_file") == 0 or checksig();
 			} 
 			elsif ($mapper eq 'minimap2'){ #-R \@RG\\\\tID:$fastq\\\\tSM:$fasta
-				system "minimap2 \\
-				-t $threads \\
-				--MD \\
-				-R \@RG\\\\tID:$fastq\\\\tSM:$fasta \\
-				-L \\
-				-ax $preset \\
-				$fasta \\
-				$fastq \\
-				1> $sam_file \\
-				2>> $log_file";
+				system ("minimap2 \\
+				  -t $threads \\
+				  --MD \\
+				  -R \@RG\\\\tID:$fastq\\\\tSM:$fasta \\
+				  -L \\
+				  -ax $preset \\
+				  $fasta \\
+				  $fastq \\
+				  1> $sam_file \\
+				  2>> $log_file") == 0 or checksig();
 			}
 			elsif ($mapper eq 'ngmlr'){
-				system "ngmlr \\
+				system ("ngmlr \\
 				  -t $threads \\
 				  --rg-id $fastq \\
 				  --rg-sm $fasta \\
 				  -r $fasta \\
 				  -q $fastq \\
 				  -o $sam_file \\
-				  2>&1 | tee $log_file";
+				  2>&1 | tee $log_file") == 0 or checksig();
 			}
 			elsif ($mapper eq 'hisat2'){
-				system "hisat2 \\
-				-p $threads \\
-				--phred33 \\
-				--rg-id $fastq \\
-				--rg SM:$fasta \\
-				-x $fa.ht \\
-				-U $fastq \\
-				--no-spliced-alignment \\
-				-S $sam_file \\
-				2>> $log_file";
+				system ("hisat2 \\
+				  -p $threads \\
+				  --phred33 \\
+				  --rg-id $fastq \\
+				  --rg SM:$fasta \\
+				  -x $fa.ht \\
+				  -U $fastq \\
+				  --no-spliced-alignment \\
+				  -S $sam_file \\
+				  2>> $log_file") == 0 or checksig();
 			}
 
 			samtools(); ## Converting to BAM
@@ -321,7 +329,7 @@ if (@pe1 && @pe2){
 
 			## Read mapping
 			if ($mapper eq 'bowtie2'){
-				  system "bowtie2 \\
+				system ("bowtie2 \\
 				  --rg-id $pe1 \\
 				  --rg SM:$fasta \\
 				  -p $threads \\
@@ -330,10 +338,10 @@ if (@pe1 && @pe2){
 				  -1 $pe1 \\
 				  -2 $pe2 \\
 				  -S $sam_file \\
-				  2>> $log_file";
+				  2>> $log_file") == 0 or checksig();
 			}
 			elsif ($mapper eq 'hisat2'){
-				system "hisat2 \\
+				system ("hisat2 \\
 				  -p $threads \\
 				  --phred33 \\
 				  --rg-id $pe1 \\
@@ -343,10 +351,10 @@ if (@pe1 && @pe2){
 				  -2 $pe2 \\
 				  --no-spliced-alignment \\
 				  -S $sam_file \\
-				  2>> $log_file";
+				  2>> $log_file") == 0 or checksig();
 			}
 			elsif ($mapper eq 'minimap2'){
-				system "minimap2 \\
+				system ("minimap2 \\
 				  -t $threads \\
 				  -R \@RG\\\\tID:$pe1\\\\tSM:$fasta \\
 				  -ax $preset \\
@@ -354,7 +362,7 @@ if (@pe1 && @pe2){
 				  $pe1 \\
 				  $pe2 \\
 				  1> $sam_file \\
-				  2>> $log_file";
+				  2>> $log_file") == 0 or checksig();
 			}
 
 			samtools(); ## Converting to BAM 
@@ -416,15 +424,34 @@ print LOG "Average time per pairwise comparison: $average_time seconds\n";
 ##### Subroutines #####
 
 # sub to check if programs are installed
-sub chkinstall{
+sub chkinstall {
 	my $exe = $_[0];
 	my $prog = `echo \$(command -v $exe)`;
 	chomp $prog;
 	if ($prog eq ''){die "\nERROR: Cannot find $exe. Please install $exe in your \$PATH\n\n";}
 }
 
+# sub to check for SIGINT and SIGTERM
+sub checksig {
+
+	my $exit_code = $?;
+	my $modulo = $exit_code % 255;
+
+	print "\nExit code = $exit_code; modulo = $modulo \n";
+
+	if ($modulo == 2) {
+		print "\nSIGINT detected: Ctrl+C => exiting...\n";
+		exit(2);
+	}
+	elsif ($modulo == 131) {
+		print "\nSIGTERM detected: Ctrl+\\ => exiting...\n";
+		exit(131);
+	}
+
+}
+
 # sub to run convert SAM files to binary (BAM) format with samtools
-sub samtools{
+sub samtools {
 	my $coverage_file = "${outdir}/$file.$fa.$mapper.coverage";
 
 	my $sammem = int(($mem/$threads)*1024);
@@ -446,7 +473,7 @@ sub samtools{
 }
 
 # sub to run the variant calling process
-sub variant{
+sub variant {
 	(my $passQC) = ($flagstat =~ /(\d+)\s+\+\s+\d+ in total/s);
 	print "\nQC-passed reads mapping to the genome = $passQC\n\n";
 
@@ -512,7 +539,7 @@ sub variant{
 }
 
 ## Sub to calculate read mapping stats/metrics
-sub stats{
+sub stats {
 	my $run_time = time - $tstart; my $mend = localtime();
 
 	my $coverage_file = "${outdir}/$file.$fa.$mapper.coverage";
@@ -620,14 +647,14 @@ sub stats{
 }
 
 ## LOG subroutines
-sub logs{
+sub logs {
 	my $run_time = time - $tstart; my $mend = localtime();
 	$comparison++;
 	print LOG "Comparison # $comparison : $file (and mate, if PE) vs. $fasta - cumulative time elapsed: $run_time seconds\n";
 	print MAP "\n".'###'." Mapping ended on $mend\n\n";
 }
 
-sub print_options{
+sub print_options {
 	print MAP "\nOPTIONS:\n\n";
 	print MAP "get_SNP.pl version: $version\n";
 	print MAP "Number of threads: $threads\n";
