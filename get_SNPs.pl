@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2020
-my $version = '2.0c';
+my $version = '2.0d';
 my $name = 'get_SNPs.pl';
-my $updated = '2022-05-27';
+my $updated = '2022-10-08';
 
 use strict;
 use warnings;
@@ -41,7 +41,7 @@ OPTIONS:
 -fq (--fastq)			Fastq reads (single ends) to be mapped against reference(s)
 -pe1				Fastq reads #1 (paired ends) to be mapped against reference(s)
 -pe2				Fastq reads #2 (paired ends) to be mapped against reference(s)
--mapper				Read mapping tool: bowtie2, minimap2, ngmlr or hisat2 [default: minimap2]
+-mapper				Read mapping tool: bowtie2, minimap2, winnowmap, ngmlr or hisat2 [default: minimap2]
 -threads			Number of processing threads [default: 16]
 -mem				Max total memory for samtools (in Gb) [default: 16] ## mem/threads = memory per thread
 -bam				Keeps BAM files generated
@@ -51,7 +51,7 @@ OPTIONS:
 -ns (--no_stats)		Do not calculate stats; stats can take a while to compute for large eukaryote genomes
 
 # Mapper-specific options
--preset				MINIMAP2 - Preset: sr, map-ont, map-pb or asm20 [default: sr]
+-preset				MINIMAP2/Winnowmap - Preset: sr, map-ont, map-pb or asm20 [default: sr]
 -X				BOWTIE2 - Maximum paired ends insert size [default: 750]
 
 # Variant calling options
@@ -152,8 +152,8 @@ if ($vn){die "\nversion $version\n\n";}
 
 ### Program checks for samtools, read mappers and variant callers
 chkinstall('samtools');
-if ($mapper =~ /bowtie2|hisat2|minimap2|ngmlr/){ chkinstall($mapper);}
-else {die "\nMapper option $mapper is unrecognized. Please use bowtie2, hisat2, minimap2 or ngmlr...\n\n";}
+if ($mapper =~ /bowtie2|hisat2|minimap2|winnowmap|ngmlr/){ chkinstall($mapper);}
+else {die "\nMapper option $mapper is unrecognized. Please use bowtie2, hisat2, minimap2, winnowmap or ngmlr...\n\n";}
 unless ($rmo){
 	if ($caller =~ /bcftools/){ chkinstall($caller);}
 	elsif ($caller eq 'varscan2'){ unless (-f $varjar){ die "Cannot find varscan jar file: $varjar\n";} }
@@ -194,7 +194,7 @@ my $comparison = 0;
 ##### Running read mapping/SNP calling
 my $fasta; my $fastq; my $file; my $fa; my $dir; my $qdir; my $flagstat;
 
-## Creating indexes
+## Creating indexes and/or kmer frequencies 
 foreach (@fasta){
 	$fasta = $_;
 	($fa, $dir) = fileparse($fasta);
@@ -206,6 +206,10 @@ foreach (@fasta){
 	}
 	elsif ($mapper eq 'hisat2'){
 		system ("hisat2-build $_ $fa.ht") == 0 or checksig();
+	}
+	elsif ($mapper eq 'winnowmap'){
+		system ("meryl count k=15 output merylDB $fasta") == 0 or checksig();
+		system ("meryl print greater-than distinct=0.9998 merylDB > $fa.repetitive_k15.txt") == 0 or checksig();
 	}
 }
 my $index_time = time - $tstart;
@@ -256,6 +260,19 @@ if (@fastq){
 			elsif ($mapper eq 'minimap2'){ #-R \@RG\\\\tID:$fastq\\\\tSM:$fasta
 				system ("minimap2 \\
 				  -t $threads \\
+				  --MD \\
+				  -R \@RG\\\\tID:$fastq\\\\tSM:$fasta \\
+				  -L \\
+				  -ax $preset \\
+				  $fasta \\
+				  $fastq \\
+				  1> $sam_file \\
+				  2>> $log_file") == 0 or checksig();
+			}
+			elsif ($mapper eq 'winnowmap'){
+				system ("winnowmap \\
+				  -t $threads \\
+				  -W $fa.repetitive_k15.txt \\
 				  --MD \\
 				  -R \@RG\\\\tID:$fastq\\\\tSM:$fasta \\
 				  -L \\
