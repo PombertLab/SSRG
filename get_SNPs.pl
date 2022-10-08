@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2020
-my $version = '2.0d';
+my $version = '2.0e';
 my $name = 'get_SNPs.pl';
 my $updated = '2022-10-08';
 
@@ -208,8 +208,12 @@ foreach (@fasta){
 		system ("hisat2-build $_ $fa.ht") == 0 or checksig();
 	}
 	elsif ($mapper eq 'winnowmap'){
-		system ("meryl count k=15 output merylDB $fasta") == 0 or checksig();
-		system ("meryl print greater-than distinct=0.9998 merylDB > $fa.repetitive_k15.txt") == 0 or checksig();
+		my $winnow_dir = "$outdir/winnowmap.files";
+		unless (-d $winnow_dir) {
+			mkdir ($winnow_dir,0755) or die "Can't create $winnow_dir: $!\n";
+		}
+		system ("meryl count k=15 output $winnow_dir/merylDB $fasta") == 0 or checksig();
+		system ("meryl print greater-than distinct=0.9998 merylDB > $winnow_dir/$fa.repetitive_k15.txt") == 0 or checksig();
 	}
 }
 my $index_time = time - $tstart;
@@ -272,7 +276,7 @@ if (@fastq){
 			elsif ($mapper eq 'winnowmap'){
 				system ("winnowmap \\
 				  -t $threads \\
-				  -W $fa.repetitive_k15.txt \\
+				  -W $outdir/winnowmap.files/$fa.repetitive_k15.txt \\
 				  --MD \\
 				  -R \@RG\\\\tID:$fastq\\\\tSM:$fasta \\
 				  -L \\
