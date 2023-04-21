@@ -1,14 +1,15 @@
 #!/usr/bin/perl
-## Pombert Lab, Illinois Tech (2015-2020)
-my $version = '1.9a';
+## Pombert Lab, Illinois Tech
+my $version = '2.0';
 my $name = 'SSRG.pl';
-my $updated = '2022-01-22';
+my $updated = '2023-04-21';
 
 use strict;
 use warnings;
 use Getopt::Long qw(GetOptions);
 use File::Basename;
 use File::Path qw(make_path);
+use PerlIO::gzip;
 
 my $options = <<"END_OPTIONS";
 NAME		${name}
@@ -20,6 +21,7 @@ SYNOPSIS	SSRG (Synthetic Short Read Generator) generates short reads in FASTQ
 COMMAND		${name} \\
 		  -f *.fasta \\
 		  -o FASTQ \\
+		  -g \\
 		  -r 250 \\
 		  -i 350 \\
 		  -s 20 \\
@@ -29,6 +31,7 @@ COMMAND		${name} \\
 OPTIONS:
  -f (--fasta)		Fasta/multifasta file(s)
  -o (--outdir)		Output directory [Default: ./]
+ -g (--gzip)		Compress output FASTQ files with GZIP
  -l (--list)		List of fasta file(s), one per line
  -r (--readsize)	Desired read size [default: 150]
  -t (--type)		Read type: single (SE) or paired ends (PE) [default: PE]
@@ -44,6 +47,7 @@ my @commands = @ARGV;
 ## Declare options
 my @fasta;
 my $outdir = './';
+my $gzip;
 my $list;
 my $readsize = 150;
 my $type = 'pe';
@@ -55,7 +59,8 @@ my $qscore = 30;
 my $q64 = '';		## Default is false so that Q33 format is used
 GetOptions(
 	'f|fasta=s@{1,}' => \@fasta,
-	'o|outdir=s' => \$outdir, 
+	'o|outdir=s' => \$outdir,
+	'g|gzip' => \$gzip,
 	'l|list=s' =>	\$list,
 	'r|readsize=i' => \$readsize,
 	'i|insert=i' => \$insert,
@@ -90,6 +95,7 @@ unless (-d $outdir){
 my $fasta;		## Init fasta file
 my $count = 0;	## Read number counter to be auto-incremented
 my $read; my $rev_read; my $pe1; my $pe2; my $rev1; my $rev2; ## Init read variables
+
 if ($list){
 	open LIST, "<", "$list" or die "Can't open $list: $!\n";
 	print "\nSequences listed in $list:\n";
@@ -102,18 +108,31 @@ if ($list){
 }
 
 while ($fasta = shift @fasta) {
+
 	open IN, "<", "$fasta" or die "Can't open $fasta: $!\n";
 	$fasta =~ s/\.\w+$//; ## Removing file extensions
 	$type = lc($type);
+
 	my $basename = fileparse($fasta);
 	my $filename = "${outdir}/$basename.$readsize";
-	
+
 	if($type eq 'se'){
-		open SE, ">", "$filename.SE.fastq" or die "Can't create file $filename.SE.fastq: $!\n";
+		if ($gzip){
+			open SE, ">:gzip", "$filename.SE.fastq.gz" or die "Can't create file $filename.SE.fastq.gz: $!\n";
+		}
+		else{
+			open SE, ">", "$filename.SE.fastq" or die "Can't create file $filename.SE.fastq: $!\n";
+		}
 	}
 	elsif($type eq 'pe'){
-		open R1, ">", "$filename.R1.fastq" or die "Can't create file $filename.R1.fastq: $!\n";
-		open R2, ">", "$filename.R2.fastq" or die "Can't create file $filename.R2.fastq: $!\n";
+		if ($gzip){
+			open R1, ">:gzip", "$filename.R1.fastq.gz" or die "Can't create file $filename.R1.fastq.gz: $!\n";
+			open R2, ">:gzip", "$filename.R2.fastq.gz" or die "Can't create file $filename.R2.fastq.gz: $!\n";
+		}
+		else{
+			open R1, ">", "$filename.R1.fastq" or die "Can't create file $filename.R1.fastq: $!\n";
+			open R2, ">", "$filename.R2.fastq" or die "Can't create file $filename.R2.fastq: $!\n";
+		}
 	}
 	stats();
 
@@ -132,6 +151,7 @@ while ($fasta = shift @fasta) {
 	}
 
 	while (my $todo = shift@contigs){ ## Parse each contig in the forward and reverse directions 
+
 		chomp $todo;
 		my $len = length($contigs{$todo});
 		my $seq = $contigs{$todo};
@@ -181,23 +201,36 @@ while ($fasta = shift @fasta) {
 my $end = localtime();
 my $time_taken = time - $tstart;
 print "\nSSRG started on: $start\nSSRG ended on: $end\nTime elapsed: $time_taken seconds\n";
+
 close IN; 
-if($type eq 'se'){close SE;}
-elsif($type eq 'pe'){ close R1; close R2; }
+if ($type eq 'se'){
+	if ($gzip eq ':gzip'){ binmode SE, ":gzip(none)"; }
+	close SE;
+}
+elsif ($type eq 'pe'){
+	if ($gzip eq ':gzip'){ 
+		binmode R1, ":gzip(none)";
+		binmode R2, ":gzip(none)";
+	}
+	close R1;
+	close R2;
+}
 exit;
 
 ## Subroutines
 sub ASCII{	## If Q33 Q=0 is ASCII 33; if Q64 Q=0 is ASCII 64
-	%ASCII = (33 => '!', 34 => '"', 35 => '#', 36 => '$', 37 => '%', 38 => '&', 39 => "'", 40 => '(', 
-	41 => ')', 42 => '*', 43 => '+', 44 => ',', 45 => '-', 46 => '.', 47 => '/', 48 => '0',
-	49 => '1', 50 => '2', 51 => '3', 52 => '4', 53 => '5', 54 => '6', 55 => '7', 56 => '8',
-	57 => '9', 58 => ':', 59 => ';', 60 => '<', 61 => '=', 62 => '>', 63 => '?', 64 => '@',
-	65 => 'A', 66 => 'B', 67 => 'C', 68 => 'D', 69 => 'E', 70 => 'F', 71 => 'G', 72 => 'H', 
-	73 => 'I', 74 => 'J', 75 => 'K', 76 => 'L', 77 => 'M', 78 => 'N', 79 => 'O', 80 => 'P',
-	81 => 'Q', 82 => 'R', 83 => 'S', 84 => 'T', 85 => 'U', 86 => 'V', 87 => 'W', 88 => 'X',
-	89 => 'Y', 90 => 'Z', 91 => '[', 92 => "\\", 93 => ']', 94 => '^', 95 => '_', 96 => '`',
-	97 => 'a', 98 => 'b', 99 => 'c', 100 => 'd', 101 => 'e', 102 => 'f', 103 => 'g', 104 => 'h',
-	105 => 'i', 106 => 'j');
+	%ASCII = (
+		33 => '!', 34 => '"', 35 => '#', 36 => '$', 37 => '%', 38 => '&', 39 => "'", 40 => '(', 
+		41 => ')', 42 => '*', 43 => '+', 44 => ',', 45 => '-', 46 => '.', 47 => '/', 48 => '0',
+		49 => '1', 50 => '2', 51 => '3', 52 => '4', 53 => '5', 54 => '6', 55 => '7', 56 => '8',
+		57 => '9', 58 => ':', 59 => ';', 60 => '<', 61 => '=', 62 => '>', 63 => '?', 64 => '@',
+		65 => 'A', 66 => 'B', 67 => 'C', 68 => 'D', 69 => 'E', 70 => 'F', 71 => 'G', 72 => 'H', 
+		73 => 'I', 74 => 'J', 75 => 'K', 76 => 'L', 77 => 'M', 78 => 'N', 79 => 'O', 80 => 'P',
+		81 => 'Q', 82 => 'R', 83 => 'S', 84 => 'T', 85 => 'U', 86 => 'V', 87 => 'W', 88 => 'X',
+		89 => 'Y', 90 => 'Z', 91 => '[', 92 => "\\", 93 => ']', 94 => '^', 95 => '_', 96 => '`',
+		97 => 'a', 98 => 'b', 99 => 'c', 100 => 'd', 101 => 'e', 102 => 'f', 103 => 'g', 104 => 'h',
+		105 => 'i', 106 => 'j'
+	);
 }
 sub qscore{								## Take qscore, calculate appropriate offset, determine correct ASCII character for quality score
 	if ($q64){$offset = $qscore + 64;}	## Print "Using Q64 format\n";
@@ -207,10 +240,20 @@ sub qscore{								## Take qscore, calculate appropriate offset, determine corre
 sub stats{
 	print "\nInput File:\t$fasta\n";
 	if ($type eq 'se'){
-		print "Output File:\t$fasta.$readsize.SE.fastq\n";
+		if ($gzip){
+			print "Output File:\t$fasta.$readsize.SE.fastq.gz\n";
+		}
+		else {
+			print "Output File:\t$fasta.$readsize.SE.fastq\n";
+		}
 	}
 	else {
-		print "Output Files:\t$fasta.$readsize.R1.fastq + $fasta.$readsize.R2.fastq\n";
+		if ($gzip){
+			print "Output Files:\t$fasta.$readsize.R1.fastq.gz + $fasta.$readsize.R2.fastq.gz\n";
+		}
+		else{
+			print "Output Files:\t$fasta.$readsize.R1.fastq + $fasta.$readsize.R2.fastq\n";
+		}
 	}
 	print "Coverage:\t$cov"."X\n";
 	print "Quality score:\t$qscore\n";
