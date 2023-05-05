@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 ## Pombert JF, Illinois Tech - 2020
-my $version = '2.0e';
+my $version = '2.0f';
 my $name = 'get_SNPs.pl';
-my $updated = '2022-10-08';
+my $updated = '2023-05-03';
 
 use strict;
 use warnings;
@@ -58,9 +58,11 @@ OPTIONS:
 -caller				[default: varscan2]	## Variant caller: varscan2 or bcftools
 -type				[default: snp]		## snp, indel, or both
 -ploidy				[default: 1]		## BCFtools option; change ploidy (if needed)
+-B (--noBAQ)			Disables Samtools base alignment quality (BAQ) computation - http://www.htslib.org/doc/samtools-mpileup.html
+				## Can cause problem with long reads 
 
 # VarScan2 parameters - see http://dkoboldt.github.io/varscan/using-varscan.html
--var				[default: VarScan.v2.4.4.jar]	## Which varscan jar file to use
+-var				[default: VarScan.v2.4.6.jar]	## Which varscan jar file to use
 -mc (--min-coverage)		[default: 15]		## Minimum read depth at a position to make a call
 -mr (--min-reads2)		[default: 15]		## Minimum supporting reads at a position to call variants
 -maq (--min-avg-qual)		[default: 28]		## Minimum base quality at a position to count a read
@@ -97,9 +99,10 @@ my $maxins = '750';
 my $caller = 'varscan2';
 my $type = 'snp';
 my $ploidy = 1;
+my $nobaq;
 
 ## VarScan-specific
-my $varjar = 'VarScan.v2.4.4.jar';
+my $varjar = 'VarScan.v2.4.6.jar';
 my $mc = 15;
 my $mr = 15;
 my $maq = 28;
@@ -135,6 +138,7 @@ GetOptions(
 	'caller=s' => \$caller,
 	'type=s' => \$type,
 	'ploidy=i' => \$ploidy,
+	'B|noBAQ' => \$nobaq,
 	
 	## VarScan-specific
 	'var=s' => \$varjar,
@@ -511,7 +515,14 @@ sub variant {
 	## If not empty, proceed; empty BAM files create isssues when piping mpileup
 	## to some variant callers (e.g. VarScan2).
 	else{
+
 		print "Calling variants with $caller on $fasta...\n\n";
+		
+		my $baq_flag = '';
+		if ($nobaq){
+			$baq_flag = '-B';
+		}
+
 		if ($caller eq 'varscan2'){
 			my $vflag = '';
 			my $cns;
@@ -523,6 +534,7 @@ sub variant {
 			else {die "\nERROR: Unrecognized variant type. Please use: snp, indel, or both\n\n";}
 			system "samtools \\
 			  mpileup \\
+			  $baq_flag \\
 			  -f $fasta \\
 			  $bam_file \\
 			  | \\
@@ -546,6 +558,7 @@ sub variant {
 			elsif ($type eq 'indel') { $varV = '-V snps'; }
 			system "bcftools \\
 			  mpileup \\
+			  $baq_flag \\
 			  -f $fasta \\
 			  $bam_file \\
 			  | \\
