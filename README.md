@@ -1,6 +1,6 @@
 <p align="center"><img src="https://github.com/PombertLab/SSRG/blob/master/Images/logo.png" alt="SSRG - A simple pipeline to assess genetic diversity" width="900"></p>
 
-<a href="https://doi.org/10.5281/zenodo.5532793"><p align="right"><img src="https://zenodo.org/badge/59776042.svg" alt="DOI"></a>
+[![DOI](https://zenodo.org/badge/59776042.svg)](https://zenodo.org/doi/10.5281/zenodo.5532793)
 
 The [SSRG pipeline](https://github.com/PombertLab/SSRG) was created as a simple and focused tool to investigate genetic diversity between genomes. The pipeline features two independent workflows:
 1.	Read-mapping/variant calling
