@@ -1,5 +1,5 @@
-#!/usr/bin/perl
-## Pombert JF,  Illinois Tech 2019
+#!/usr/bin/env perl
+## Pombert JF, Illinois Tech 2019
 
 my $version = '0.5a';
 my $name = 'queryNuccore.pl';
